@@ -19,6 +19,8 @@ Encore
     .addStyleEntry('graph-edit', './assets/css/graph-edit.css')
     .addStyleEntry('bootstrap', './assets/css/bootstrap.min.css')
 
+    .addEntry('favicon', './assets/img/favicon.ico')
+
     .createSharedEntry('vendor', [
         './assets/js/jquery.js',
         './assets/js/bootstrap.bundle.min.js'
