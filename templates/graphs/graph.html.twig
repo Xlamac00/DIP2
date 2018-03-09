@@ -1,0 +1,35 @@
+
+<canvas id="{{ gauge_name }}" height="1" width="2"></canvas>
+<script>
+    var canvas = document.getElementById("{{ gauge_name }}");
+    var ctx = canvas.getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for gauge in gauges %}
+                '{{ gauge.name }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for gauge in gauges %}
+                    '{{ gauge.value }}',
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    {% for gauge in gauges %}
+                    '{{ gauge.color }}',
+                    {% endfor %}
+                ],
+                borderColor: [
+                    {% for gauge in gauges %}
+                    '{{ gauge.color }}',
+                    {% endfor %}
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: options
+    });
+</script>
