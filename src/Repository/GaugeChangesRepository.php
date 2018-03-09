@@ -1,0 +1,129 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\GaugeChanges;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
+class GaugeChangesRepository  extends ServiceEntityRepository  {
+  private $manager;
+  private $gaugeChange;
+
+  public function __construct(RegistryInterface $registry) {
+    parent::__construct($registry, GaugeChanges::class);
+    $this->manager = $registry->getManager();
+  }
+
+  // Returns GaugeChange entity for the given ID
+  public function getGaugeChange($gaugeChange_id) {
+    if(!isset($this->gaugeChange))
+      $this->gaugeChange = $this->find($gaugeChange_id);
+    return $this->gaugeChange;
+  }
+
+  public function getOldValue($gauge_id, $secondOldest = false) {
+    $qb = $this->createQueryBuilder('c')
+      ->select('c.newValue')
+      ->where('c.discard = 0')
+      ->andWhere('c.gauge = :gauge')
+      ->setMaxResults(2)
+      ->setParameter('gauge', $gauge_id)
+      ->orderBy('c.time', 'DESC')
+      ->getQuery();
+    $result = $qb->execute();
+    if($secondOldest === false || !isset($result[1]))
+      return round($result[0]['newValue']);
+    else return round($result[1]['newValue']);
+  }
+
+  public function getNewestChange($issue_id) {
+    $gauge = $this->getNewestGauge($issue_id);
+    $qb = $this->createQueryBuilder('c')
+      ->join('App\Entity\Gauge', 'g', 'WITH', 'c.gauge = g.id')
+      ->andWhere('c.discard = 0')
+      ->andWhere('c.gauge = :latest')
+      ->andWhere('g.issue = :issue')
+      ->setMaxResults(2)
+      ->setParameter('latest', $gauge['gauge'])
+      ->setParameter('issue', $issue_id)
+      ->orderBy('c.time', 'DESC')
+      ->getQuery();
+    return $qb->execute();
+  }
+
+  /** Selects the id of the most recently changes gauge for the given issue.
+   *
+   * @param $issue_id - id of the issue
+   *
+   * @return array - id of the gauge, and id of the gaugeChange
+   */
+  public function getNewestGauge($issue_id) {
+    $qb2 = $this->createQueryBuilder('q')
+      ->select('IDENTITY(q.gauge) as gauge, q.id, q.newValue')
+      ->join('App\Entity\Gauge', 'g', 'WITH', 'q.gauge = g.id')
+      ->where('q.discard = 0')
+      ->andWhere('g.issue = :issue')
+      ->setMaxResults(1)
+      ->setParameter('issue', $issue_id)
+      ->orderBy('q.time', 'DESC')
+      ->getQuery();
+    $latestGauge = $qb2->execute();
+    if(sizeof($latestGauge) == 0) return null;
+    return
+      ["gauge" => $latestGauge[0]['gauge'],
+       "change" => $latestGauge[0]['id'],
+       "newValue" => $latestGauge[0]['newValue']];
+  }
+
+  public function getAllChangesForIssue($issue_id) {
+    $qb = $this->createQueryBuilder('q')
+      ->join('App\Entity\Gauge', 'g', 'WITH', 'q.gauge = g.id')
+      ->where('q.discard = 0')
+      ->andWhere('g.issue = :issue')
+      ->setParameter('issue', $issue_id)
+      ->orderBy('q.time', 'DESC')
+      ->getQuery();
+    $result = $qb->execute();
+    foreach($result as $key => $item) {
+      $old = $this->getOldValue($item->getGauge()->getId(), true);
+      if($old == 1 && $item->getValue() == 1) unset($result[$key]);
+      else  $item->setOldValue($old);
+    }
+    return $result;
+  }
+
+  /** Marks the gaugeChange in the DB as discarded.
+   *
+   * @param $gaugeChange - GaugeChange Entity
+   */
+  public function gaugeChangeDiscard($gaugeChange) {
+    $this->gaugeChange = $gaugeChange;
+    $this->gaugeChange->setDiscard();
+    $this->manager->flush();
+  }
+
+  /** Saves the $text to the latest gauge change in the DB
+   * for the given issue.
+   *
+   * @param $issue_id - Issue Entity ID
+   * @param $text - String up to 200 chars
+   *
+   * @return array - new comment data to draw
+   */
+  public function gaugeCommentSave($issue_id, $text) {
+    $gauge_id = $this->getNewestGauge($issue_id);
+    $this->getGaugeChange($gauge_id['change']);
+    $this->gaugeChange->setText($text);
+    $this->manager->flush();
+    return
+      ['time' => $this->gaugeChange->getTime(),
+       'value' => $this->gaugeChange->getValue(),
+       'oldValue' => $this->getOldValue($gauge_id['gauge'], true),
+       'text' => $this->gaugeChange->getText(),
+       'gauge' =>
+         ['color' => $this->gaugeChange->getGauge()->getColor(),
+          'name' => $this->gaugeChange->getGauge()->getName()]];
+  }
+
+}

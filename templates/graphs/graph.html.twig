@@ -3,8 +3,9 @@
 <script>
     var canvas = document.getElementById("{{ gauge_name }}");
     var ctx = canvas.getContext('2d');
-    var chart = new Chart(ctx, {
+    chart = new Chart(ctx, {
         type: 'bar',
+        issueId: '{{ issue_id }}',
         data: {
             labels: [
                 {% for gauge in gauges %}

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{  parent() }}
+    <script src="{{ asset('build/chart.js') }}"></script>
+    <script>
+        var options = {
+            scales: {
+                yAxes: [{
+                    gridLines : {
+                        display : false
+                    },
+                    ticks: {
+                        display: false,
+                        max: 100,
+                        beginAtZero:true
+                    }
+                }],
+                xAxes: [{
+                    gridLines : {
+                        display : false
+                    },
+                    ticks: {
+                        maxRotation: 0
+                    }
+                }]
+            },
+            legend: {
+                display : false
+            },
+            tooltips: {
+                custom: function(tooltip) {
+                    if (!tooltip) return;
+                },
+                callbacks: {
+                    // use label callback to return the desired label
+                    label: function(tooltipItem, data) {
+                        return ' '+tooltipItem.xLabel;
+                    },
+                    // remove title
+                    title: function(tooltipItem, data) {}
+                }
+            }
+        };
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+        <h1>{{  board.name }}</h1>
+        <div class="card-deck">
+            {% for issue in board.issues %}
+                <div class="card bg-dark mb-3" >
+                    <h4 class="card-header text-white">
+                        <a href="{{ path('issue', {'link': issue.link}) }}">{{ issue.name }}</a>
+                    </h4>
+                    <div class="card-body bg-light">
+                        {{ include('graphs/graph.html.twig', { 'gauges': issue.gauges,
+                            'gauge_name': issue.link,
+                            'issue_id': issue.id}) }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+{% endblock %}

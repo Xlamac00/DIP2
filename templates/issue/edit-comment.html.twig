@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+
+<div class="media">
+    <i class="fas fa-2x fa-user-circle align-self-start mr-4"></i>
+    <div class="media-body mb-3">
+        <div class="d-flex justify-content-between">
+            <h5 style="color: {{ change.gauge.color }}">{{ change.gauge.name }}: {{ change.oldValue }} % -> {{ change.value }} %</h5>
+            <span class="float-right">{{ change.time }}</span>
+        </div>
+        {% if change.text|length > 0 %}
+            <div class="border border-secondary rounded px-2 py-1">
+                {{ change.text }}
+            </div>
+        {% endif %}
+    </div>
+</div>
