@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{  parent() }}
+    <link rel="stylesheet" href="{{ asset('build/graph-edit.css') }}" />
+    <script src="{{ asset('build/chart.js') }}"></script>
+    <script src="{{ asset('build/chart-resizable.js') }}"></script>
+    <script src="{{ asset('build/fonts.js') }}"></script>
+    <script>
+        // Variable used in chart-resizable to get route to Ajax respond
+        var path_ajax_graphChange = '{{ (path('issue_ajax_graphChange')) }}';
+        var path_ajax_graphDiscard = '{{ (path('issue_ajax_graphDiscard')) }}';
+        var path_ajax_graphComment = '{{ (path('issue_ajax_graphComment')) }}';
+        var path_ajax_newGauge = '{{ (path('issue_ajax_newGauge')) }}';
+        var path_ajax_gaugesInfo = '{{ (path('issue_ajax_gaugesInfo')) }}';
+        var path_ajax_oneGaugeInfo = '{{ (path('issue_ajax_oneGaugeInfo')) }}';
+        var path_ajax_gaugeUpdate = '{{ (path('issue_ajax_gaugeUpdate')) }}';
+        var path_ajax_gaugeDelete = '{{ (path('issue_ajax_gaugeDelete')) }}';
+        var options = {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        display: false,
+                        max: 100,
+                        beginAtZero:true
+                    }
+                }],
+                xAxes: [{
+                    gridLines : {
+                        display : false
+                    }
+                }]
+            },
+            hover: {
+                onHover: function(e, el) {
+                    var chart = document.getElementById("animatedChart");
+                    if(typeof el[0] === 'object')
+                        chart.style.cursor = "ns-resize";
+                    else
+                        chart.style.cursor = "default";
+                }
+            },
+            legend: {
+                display : false
+            },
+            tooltips: {
+                custom: function(tooltip) {
+                    if (!tooltip) return;
+                },
+                callbacks: {
+                    // use label callback to return the desired label
+                    label: function(tooltipItem, data) {
+                        return ' '+tooltipItem.xLabel;
+                    },
+                    // remove title
+                    title: function(tooltipItem, data) {}
+                }
+            }
+        };
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+        <h1>{{  issue.name }}</h1>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="dropdown">
+                    <button type="button" class="nobtn float-right mb-2 ml-2 dropdown-toggle" id="gaugeEditBtn"
+                            data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                        <i class="fas fa-2x fa-cog "></i>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" id="dropdownGaugeBtn" style="cursor: pointer">Edit gauges</a>
+                        <a class="dropdown-item" id="dropdownIssueBtn" style="cursor: pointer">Edit issue</a>
+                        <a class="dropdown-item" id="dropdownShareBtn" style="cursor: pointer">Share</a>
+                    </div>
+                </div>
+                <button type="button" class="nobtn float-right mb-2" id="gaugeAddNewBtn"
+                        data-toggle="tooltip" data-placement="top" title="Add a new gauge">
+                    <i class="fas fa-2x fa-plus-circle"></i>
+                </button>
+                <div id="gaugeGraph">
+                {{ include('graphs/graph.html.twig',
+                    { 'gauges': issue.gauges,
+                    'gauge_name': 'animatedChart',
+                    'issue_id': issue.id}) }}
+                </div>
+            </div>
+            <div class="col-md-7" id="gaugeSections">
+                <div id="gaugeCommentSection" class="section" style="display: block">
+                    {{ include('issue/commentsTab.html.twig', {'changes': changes}) }}
+                </div>
+                <div id="questionSection" class="section" style="display: none">
+                    {{ include('issue/question.html.twig') }}
+                </div>
+                <div id="gaugeNewSection" class="section" style="display: none">
+                    {{ include('issue/newGaugeTab.html.twig') }}
+                </div>
+                <div id="gaugeEditOneSection" class="section" style="display: none">
+                </div>
+                <div id="gaugeEditGaugeSection" class="section" style="display: none">
+                </div>
+                <div id="gaugeEditIssueSection" class="section" style="display: none">
+                    {{ include('issue/editIssueTab.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

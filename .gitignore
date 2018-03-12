@@ -4,6 +4,7 @@ bin
 .idea
 .web-server-pid
 create.sql
+Procfile
 app/config/parameters.yml
 doc/zprava/zprava.pdf
 src/Migrations/*

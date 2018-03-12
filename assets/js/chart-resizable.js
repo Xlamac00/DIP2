@@ -12,7 +12,7 @@ $(document).ready(function() {
 
     canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt);};
     canvas.onmousedown = function (evt) { chartMouseDownEvent(evt);};
-    canvas.onmouseup = function (evt) { chartMouseUpEvent();};
+    canvas.onmouseup = function () { chartMouseUpEvent();};
 
     /** *****************************************************************************************************
      * ************************************* RESIZABLE CHART FUNCTIONS ************************************ *
@@ -152,39 +152,7 @@ $(document).ready(function() {
                 chart.ctx.lineTo(changeOld['x2'], changeOld['y']);
                 chart.ctx.stroke();
             }
-        },
-        // Adds labels to the graph body
-        // http://www.chartjs.org/samples/latest/advanced/data-labelling.html
-        // afterDatasetsDraw: function(chart) {
-        //     var ctx = chart.ctx;
-        //
-        //     chart.data.datasets.forEach(function(dataset, i) {
-        //         var meta = chart.getDatasetMeta(i);
-        //         if (!meta.hidden) {
-        //             meta.data.forEach(function(element, index) {
-        //                 // Draw the text in black, with the specified font
-        //                 ctx.fillStyle = 'rgb(0, 0, 0)';
-        //
-        //                 var fontSize = 16;
-        //                 var fontStyle = 'normal';
-        //                 var fontFamily = 'Helvetica Neue';
-        //                 ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
-        //
-        //                 // Just naively convert to string for now
-        //                 var labelValue = dataset.data[index].toString();
-        //                 var labelText = meta.data[index]._model.label;
-        //
-        //                 // Make sure alignment settings are correct
-        //                 ctx.textAlign = 'center';
-        //                 ctx.textBaseline = 'middle';
-        //
-        //                 var padding = labelValue > 60 ? -45 : 10;
-        //                 var position = element.tooltipPosition();
-        //                 ctx.fillText(labelText, position.x, position.y - (fontSize / 2) - padding);
-        //             });
-        //         }
-        //     });
-        // }
+        }
     });
 
 // Key shortcuts to commit or discard changes
@@ -200,12 +168,21 @@ $(document).ready(function() {
                 ajaxDiscardChange();        // discard latest change
             }
         }
+        else if(previousSection.length > 0) { // there is any section to hide
+            if (e.keyCode === 27) { // Escape
+                hideCurrentSection();
+            }
+        }
     };
 
     /** *****************************************************************************************************
      * ****************************************** BUTTONS AND UI ****************************************** *
      ***************************************************************************************************** **/
+    var previousSection = []; // history of shown sections
 
+    /** Shows all comments instead of only the first 6.
+     * (If there are more then 6). Displays the button to trigger this function.
+     */
     $('#gaugeCommentShowAllBtn').click(toggleAllComments);
     function toggleAllComments() {
         // get all comments in div gaugeComments
@@ -227,23 +204,85 @@ $(document).ready(function() {
     }
     toggleAllComments(); // call after the page loads
 
+
+    /** Closes the currently visible section and shows the previous one.
+     * @see hideAllSections()
+     */
+    $('.gaugeCloseBtn').click(hideCurrentSection);
+    function hideCurrentSection() {
+        var previous = previousSection.pop();
+        hideAllSections(false); // dont push the previous section into the queue!
+        var section = $("#gaugeSections div.section");
+        if(typeof section[previous] === 'undefined')
+            previous = 0;
+        section[previous].style.display = 'block'; // display the previous one
+    }
+
+    /** Hides all sections and remembers the last one visible.
+     * The last visible section is pushed into the queue to remember the history.
+     *
+     * @param push (implicit true) - if true, remembers the last section.
+     */
+    function hideAllSections(push) {
+        push = typeof push !== 'undefined' ? push : true;
+        // make all other sections invisible
+        var sections = $("#gaugeSections div.section");
+        for(var i = 0; i < sections.length; i++) {
+            if((sections[i]).style.display === 'block' && push === true) {
+                var top = previousSection.pop();
+                if(top !== 'undefined')
+                    previousSection.push(top);
+                if(top !== i) // kontrola, ze nevkladam 2x to stejne navrch
+                    previousSection.push(i);
+            }
+            (sections[i]).style.display = 'none';
+        }
+    }
+
+    /** Displays section with option to add new gauge.
+     * If the section is already displayed, it hides it instead.
+     */
     $('#gaugeAddNewBtn').click(showAddNewGauge);
-    $('#gaugeAddNewCloseBtn').click(showAddNewGauge);
     function showAddNewGauge() {
-        var commentSection = document.getElementById('gaugeCommentSection');
         var newSection = document.getElementById('gaugeNewSection');
         var addNewBtn = document.getElementById('gaugeAddNewBtn');
-        console.log('click: '+commentSection.style.display);
-        if (commentSection.style.display === 'block') {
-            commentSection.style.display = 'none';
-            newSection.style.display = 'block';
+        if (newSection.style.display === 'block') { // section is already visible, hide it
+            hideCurrentSection();
+            addNewBtn.blur(); // hide the button tooltip
+        }
+        else { // display the section
+            hideAllSections();
+            document.getElementById('gaugeNewSection').style.display = 'block';
             addNewBtn.blur();
         }
-        else {
-            commentSection.style.display = 'block';
-            newSection.style.display = 'none';
-            addNewBtn.blur();
-        }
+    }
+
+    /** Displays section with gauge edit options
+     */
+    $('#dropdownGaugeBtn').click(showEditGauge);
+    function showEditGauge() {
+        hideAllSections();
+        ajaxGetGaugesInfo();
+    }
+
+    /** Displays section with issue edit options
+     */
+    $('#dropdownIssueBtn').click(showEditIssue);
+    function showEditIssue() {
+        hideAllSections();
+        document.getElementById('gaugeEditIssueSection').style.display = 'block'; // make issue edit section visible
+    }
+
+    $('#questionNo').click(hideCurrentSection);
+    $('#questionYes').click(ajaxSendQuestion);
+    function showGaugeDeleteDialog() {
+        hideAllSections();
+        $('.gaugeDelete').blur();
+        document.getElementById('questionText').innerHTML = 'delete this gauge';
+        document.getElementById('questionCall').value = 'path_ajax_gaugeDelete';
+        document.getElementById('questionValue1').value = this.name;
+        document.getElementById('questionValue2').value = chart.config.issueId;
+        document.getElementById('questionSection').style.display = 'block';
     }
 
     /** *****************************************************************************************************
@@ -268,8 +307,8 @@ $(document).ready(function() {
                 async: true,
                 success: function (data) {
                     replaceChart(data);
+                    hideAllSections();
                     $("#gaugeCommentSection").css('display', 'block');
-                    $("#gaugeNewSection").css('display', 'none');
                     $("#gaugeAddNewName").val('');
                 }
             });
@@ -344,9 +383,97 @@ $(document).ready(function() {
                 updateGraphValue(true, data.newValue); // redraw graph value and stop
                 $("#gaugeCommentHeadline").css('color', data.color);
                 document.getElementById('gaugeCommentHeadline').innerHTML = data.oldValue + "% -> " + data.newValue + "%";
+                hideAllSections();
                 $("#gaugeCommentSection").css('display', 'block');
-                $("#gaugeNewSection").css('display', 'none');
                 $("#gaugeChangeCommit").css('display', 'flex');
+            }
+        });
+    }
+
+    function ajaxGetGaugesInfo() {
+        $.ajax({
+            url: path_ajax_gaugesInfo,
+            type: "POST",
+            dataType: "json",
+            data: {
+                "issueId": chart.config.issueId
+            },
+            async: true,
+            success: function (data) {
+                __showEditGaugeSection(data);
+            }
+        });
+    }
+
+    function __showEditGaugeSection(template) {
+        var section = document.getElementById('gaugeEditGaugeSection');
+        section.style.display = 'block'; // make gauge edit section visible
+        section.innerHTML = template;
+        $('#editGaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+        $('.gaugeEdit').click(ajaxGetOneGaugeInfo); // bind action to open gauge edit dialog
+        $('.gaugeDelete').click(showGaugeDeleteDialog); // bind action to open gauge edit dialog
+    }
+
+    function ajaxUpdateGauge() {
+        $.ajax({
+            url: path_ajax_gaugeUpdate,
+            type: "POST",
+            dataType: "json",
+            data: {
+                "issueId": chart.config.issueId,
+                "gaugeId": $("#gaugeEditOneSection #gaugeUpdateId").val(),
+                "name": $('#gaugeEditOneSection #gaugeAddNewName').val(),
+                "color": $('input[name=radio]:checked', '#gaugeEditOneSection #gaugeAddNewForm').val()
+            },
+            async: true,
+            success: function (data) {
+                replaceChart(data);
+                hideAllSections(false);
+                __showEditGaugeSection(data.tab);
+            }
+        });
+    }
+
+    function ajaxGetOneGaugeInfo() {
+        $.ajax({
+            url: path_ajax_oneGaugeInfo,
+            type: "POST",
+            dataType: "json",
+            data: {
+                "gaugeId": this.name
+            },
+            async: true,
+            success: function (data) {
+                hideAllSections();
+                var section = document.getElementById('gaugeEditOneSection');
+                section.style.display = 'block'; // make gauge edit section visible
+                section.innerHTML = data;
+                $('.gaugeEdit').blur();
+                $('.gaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
+                $('#gaugeEditOneSection #gaugeAddNewSaveBtn').click(ajaxUpdateGauge); //bind action to close btn
+            }
+        });
+    }
+
+    function ajaxSendQuestion() {
+        $.ajax({
+            url: window[document.getElementById('questionCall').value], // this value has to be set in question
+            type: "POST",
+            dataType: "json",
+            data: {
+                "value1": document.getElementById('questionValue1').value,
+                "value2": document.getElementById('questionValue2').value
+            },
+            async: true,
+            success: function (data) {
+                if(data.type === 'gaugeDelete') {
+                    replaceChart(data);
+                    hideAllSections(false);
+                    __showEditGaugeSection(data.tab);
+                }
             }
         });
     }

@@ -1,0 +1,24 @@
+
+<div class="d-flex justify-content-between">
+    <h3>Edit gauges:</h3>
+    <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close" id="editGaugeCloseBtn">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<br>
+
+{% for gauge in gauges %}
+    <div class="d-flex justify-content-between ml-2 mr-5 mb-2">
+        <h5 style="color: {{ gauge.color }}">{{ gauge.name }}</h5>
+        <span class="float-right">
+            <button type="button" class="nobtn gaugeEdit mr-3" name="{{ gauge.id }}"
+                    data-toggle="tooltip" data-placement="top" title="Edit {{ gauge.name }}">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="nobtn gaugeDelete" name="{{ gauge.id }}"
+                    data-toggle="tooltip" data-placement="top" title="Delete {{ gauge.name }}">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </span>
+    </div>
+{% endfor %}

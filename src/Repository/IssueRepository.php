@@ -67,4 +67,15 @@ class IssueRepository extends ServiceEntityRepository {
       }
       return ["error"];
     }
+
+    public function updateGaugesIndex() {
+      $i = 0;
+      $manager = $this->getEntityManager();
+      foreach($this->issue->getGauges() as $key => $data) { // all gauges in the issue
+        $data->setPosition($i);
+        $manager->persist($data);
+        $i++;
+      }
+      $manager->flush();
+    }
 }

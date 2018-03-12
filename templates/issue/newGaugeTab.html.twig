@@ -1,0 +1,69 @@
+
+<div class="d-flex justify-content-between">
+    <h3>{{ title|default('Add a new gauge:') }}</h3>
+    <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<input type="text" class="form-control" placeholder="Gauge name" id="gaugeAddNewName" value="{{ name|default('') }}">
+<input type="hidden" id="gaugeUpdateId" value="{{ id|default('') }}">
+<br>
+
+<h4>Choose gauge color:</h4>
+<form id="gaugeAddNewForm">
+    {% if color is not defined %}
+        {% set color =  '#900c3f' %}
+    {%  endif %}
+    <label class="container">
+        <input type="radio" name="radio" value="900c3f" {{ color == '#900c3f' ? 'checked="checked"' : '' }}>
+        <span class="checkmark color900c3f"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="c70039" {{ color == '#c70039' ? 'checked="checked"' : '' }}>
+        <span class="checkmark colorc70039"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="ff5733" {{ color == '#ff5733' ? 'checked="checked"' : '' }}>
+        <span class="checkmark colorff5733"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="ff8d1a" {{ color == '#ff8d1a' ? 'checked="checked"' : '' }}>
+        <span class="checkmark colorff8d1a"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="ffc300" {{ color == '#ffc300' ? 'checked="checked"' : '' }}>
+        <span class="checkmark colorffc300"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="eddd53" {{ color == '#eddd53' ? 'checked="checked"' : '' }}>
+        <span class="checkmark coloreddd53"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="add45c" {{ color == '#add45c' ? 'checked="checked"' : '' }}>
+        <span class="checkmark coloradd45c"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="57c785" {{ color == '#57c785' ? 'checked="checked"' : '' }}>
+        <span class="checkmark color57c785"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="00baad" {{ color == '#00baad' ? 'checked="checked"' : '' }}>
+        <span class="checkmark color00baad"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="2a7b9b" {{ color == '#2a7b9b' ? 'checked="checked"' : '' }}>
+        <span class="checkmark color2a7b9b"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="3d3d6b" {{ color == '#3d3d6b' ? 'checked="checked"' : '' }}>
+        <span class="checkmark color3d3d6b"></span>
+    </label>
+    <label class="container">
+        <input type="radio" name="radio" value="511849" {{ color == '#511849' ? 'checked="checked"' : '' }}>
+        <span class="checkmark color511849"></span>
+    </label>
+</form>
+
+<br>
+<button class="btn btn-success mx-auto" style="display: block; width: 130px;"
+        id="gaugeAddNewSaveBtn">Save gauge</button>

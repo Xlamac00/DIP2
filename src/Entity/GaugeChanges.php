@@ -18,7 +18,8 @@ class GaugeChanges {
   private $id;
 
   /**
-   * @ORM\ManyToOne(targetEntity="Gauge", inversedBy="changes")
+   * @ORM\ManyToOne(targetEntity="Gauge", inversedBy="changes", cascade={"remove"})
+   * @ORM\JoinColumn(name="gauge_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
    */
   private $gauge;
 
