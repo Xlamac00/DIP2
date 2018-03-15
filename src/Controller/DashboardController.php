@@ -14,7 +14,7 @@ class DashboardController extends Controller {
   public function index() {
     $board = $this->getDoctrine()->getRepository(Board::class)->getBoard();
 
-    return $this->render('issue/issue.html.twig',
+    return $this->render('issue/issue-overview.html.twig',
           ["board" => $board]);
   }
 }

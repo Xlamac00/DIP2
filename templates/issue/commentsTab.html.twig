@@ -2,15 +2,14 @@
 <div class="media mb-5" id="gaugeChangeCommit" style="display: none">
     <i class="far fa-2x fa-user-circle align-self-start mr-5"></i>
     <div class="media-body">
-        <h5 class="mt-0" id="gaugeCommentHeadline">Media heading</h5>
+        <h5 class="mt-0" id="gaugeCommentHeadline"></h5>
         <textarea class="form-control" id="gaugeCommentText" rows="2"></textarea>
     </div>
-    <div class="align-self-end mx-2">
+    <div class="align-self-end mx-0" style="position: relative; left: 20px;">
         <button class="btn btn-success" id="gaugeChangeConfirmBtn"><i class="fas fa-check"></i></button>
     </div>
-    <div class="align-self-start mr-0">
-        <button class="btn btn-danger" id="gaugeChangeResetBtn"><i class="fas
-                            fa-times"></i></button>
+    <div class="align-self-start mx-0" style="position: relative; left: -20px;">
+        <button class="btn btn-danger" id="gaugeChangeResetBtn"><i class="fas fa-times"></i></button>
     </div>
     <hr>
 </div>
@@ -19,5 +18,5 @@
         {{ include('issue/comment.html.twig', {'change': change}) }}
     {% endfor %}
 </div>
-<button class="btn btn-secondary mx-auto" style="display: none; width: 130px;"
+<button class="btn btn-secondary mx-auto" style="display: block; width: 130px;" data-field="hide"
         id="gaugeCommentShowAllBtn"><i class="fas fa-sync"></i> Show all</button>

@@ -7,18 +7,26 @@
 </div>
 <br>
 
-{% for gauge in gauges %}
-    <div class="d-flex justify-content-between ml-2 mr-5 mb-2">
-        <h5 style="color: {{ gauge.color }}">{{ gauge.name }}</h5>
-        <span class="float-right">
-            <button type="button" class="nobtn gaugeEdit mr-3" name="{{ gauge.id }}"
-                    data-toggle="tooltip" data-placement="top" title="Edit {{ gauge.name }}">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" class="nobtn gaugeDelete" name="{{ gauge.id }}"
-                    data-toggle="tooltip" data-placement="top" title="Delete {{ gauge.name }}">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </span>
-    </div>
-{% endfor %}
+<table class="table sortable">
+    <tbody>
+        {% for gauge in gauges %}
+            <tr draggable="true" rel="{{ gauge.id }}">
+                <td>
+                    <h5 style="color: {{ gauge.color }}; cursor: move">{{ gauge.name }}</h5>
+                </td>
+                <td align="right">
+                    <button type="button" class="nobtn gaugeEdit" name="{{ gauge.id }}"
+                            data-toggle="tooltip" data-placement="top" title="Edit {{ gauge.name }}">
+                        <i class="fas fa-2x fa-edit"></i>
+                    </button>
+                </td>
+                <td class="align-right">
+                    <button type="button" class="nobtn gaugeDelete" name="{{ gauge.id }}"
+                            data-toggle="tooltip" data-placement="top" title="Delete {{ gauge.name }}">
+                        <i class="fas fa-2x fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

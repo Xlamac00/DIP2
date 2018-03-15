@@ -16,6 +16,7 @@
         var path_ajax_oneGaugeInfo = '{{ (path('issue_ajax_oneGaugeInfo')) }}';
         var path_ajax_gaugeUpdate = '{{ (path('issue_ajax_gaugeUpdate')) }}';
         var path_ajax_gaugeDelete = '{{ (path('issue_ajax_gaugeDelete')) }}';
+        var path_ajax_issueUpdate = '{{ (path('issue_ajax_issueUpdate')) }}';
         var options = {
             scales: {
                 yAxes: [{
@@ -61,9 +62,8 @@
 {% endblock %}
 
 {% block body %}
-
     <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
-        <h1>{{  issue.name }}</h1>
+        <h1 id="issueName">{{  issue.name }}</h1>
         <div class="row">
             <div class="col-md-5">
                 <div class="dropdown">
@@ -72,13 +72,13 @@
                         <i class="fas fa-2x fa-cog "></i>
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" id="dropdownGaugeBtn" style="cursor: pointer">Edit gauges</a>
+                        <a class="dropdown-item" id="dropdownGaugeBtn" style="cursor: pointer">Edit tasks</a>
                         <a class="dropdown-item" id="dropdownIssueBtn" style="cursor: pointer">Edit issue</a>
                         <a class="dropdown-item" id="dropdownShareBtn" style="cursor: pointer">Share</a>
                     </div>
                 </div>
-                <button type="button" class="nobtn float-right mb-2" id="gaugeAddNewBtn"
-                        data-toggle="tooltip" data-placement="top" title="Add a new gauge">
+                <button type="button" class="nobtn float-right mb-2" id="gaugeAddNewBtn" value="{{ gaugeCount }}"
+                        data-toggle="tooltip" data-placement="top" title="Add a new task">
                     <i class="fas fa-2x fa-plus-circle"></i>
                 </button>
                 <div id="gaugeGraph">
@@ -103,10 +103,9 @@
                 <div id="gaugeEditGaugeSection" class="section" style="display: none">
                 </div>
                 <div id="gaugeEditIssueSection" class="section" style="display: none">
-                    {{ include('issue/editIssueTab.html.twig') }}
+                    {{ include('issue/editIssueTab.html.twig', {'issue': issue}) }}
                 </div>
             </div>
         </div>
     </main>
-
 {% endblock %}

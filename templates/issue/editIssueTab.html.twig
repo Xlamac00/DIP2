@@ -1,8 +1,13 @@
 
 <div class="d-flex justify-content-between">
-    <h3>Edit issue</h3>
+    <h3>Edit issue:</h3>
     <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
 <br>
+<input type="text" class="form-control" placeholder="Issue name" id="issueEditName" value="{{ issue.name }}">
+<input type="hidden" id="issueEditId" value="{{ issue.id }}">
+<br>
+<button class="btn btn-success mx-auto" style="display: block; width: 130px;"
+        id="issueEditSaveBtn">Save change</button>

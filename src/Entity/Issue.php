@@ -40,6 +40,7 @@ class Issue {
 
     /**
      * @ORM\OneToMany(targetEntity="Gauge", mappedBy="issue")
+     * @ORM\OrderBy({"position" = "ASC"})
      */
     private $gauges;
 
@@ -48,6 +49,15 @@ class Issue {
      */
     public function getGauges()  {
       return $this->gauges;
+    }
+
+    public function getGaugesSorted() {
+      return usort($this->gauges, array($this, "compare"));
+    }
+
+    /** Compares gauges to sort them by position */
+    private function compare($a, $b) {
+      return strcmp($a->getPosition(), $b->getPosition());
     }
 
     /**
@@ -64,6 +74,9 @@ class Issue {
       return $this->name;
     }
 
+    public function setName($newName) {
+      $this->name = $newName;
+    }
 
     /**
      * @param Gauge $gauge

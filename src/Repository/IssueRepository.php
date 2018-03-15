@@ -43,6 +43,12 @@ class IssueRepository extends ServiceEntityRepository {
       return sizeof($result);
     }
 
+    public function updateName($newName) {
+      $this->issue->setName($newName);
+      $this->manager->persist($this->issue);
+      $this->manager->flush();
+    }
+
   /**Changes the value of gauge in the issue.
    *
    * @param $gaugeIndex - index of the gauge in the issue
@@ -68,11 +74,26 @@ class IssueRepository extends ServiceEntityRepository {
       return ["error"];
     }
 
-    public function updateGaugesIndex() {
+  /** Recalculates position of all gauges in the issue.
+   * If gauge_id and index are given, sets gauge to the index and updates the rest accordingly.
+   * @param null $gauge_id - id of the gauge to change position specifically
+   * @param null $index - index with new position for the guage (starts from 0)
+   */
+  public function updateGaugesIndex($gauge_id = null, $index = null) {
       $i = 0;
       $manager = $this->getEntityManager();
+      // gauges are ordered by position by default
       foreach($this->issue->getGauges() as $key => $data) { // all gauges in the issue
-        $data->setPosition($i);
+        if($gauge_id != null) { // change position of concrete gauge
+          if ($i == $index) // skip $i which was set specifically
+            $i++;
+          if ($data->getId() == $gauge_id) { // change this gauge
+            $position = $index;
+            $i--; // reuse the $i
+          } else
+            $position = $i;
+        }else $position = $i;
+        $data->setPosition($position);
         $manager->persist($data);
         $i++;
       }

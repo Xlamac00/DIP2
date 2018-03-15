@@ -18,12 +18,29 @@ class IssueController extends Controller {
     public function index($link) {
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssueByLink($link);
-      $gaugeNumber = $issueRepository->getNumberOfGauges();
+      $gaugeCount = $issueRepository->getNumberOfGauges();
       $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
 
       return $this->render('issue/issue-detail.html.twig',
-        ["issue" => $issue, "changes" => $changes, "gaugeNumber" => $gaugeNumber]);
+        ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount]);
     }
+
+  /**
+   * @Route("/ajax/issueUpdate", name="issue_ajax_issueUpdate")
+   */
+  public function issueUpdate(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issue = $request->request->get('issueId');
+      $name = $request->request->get('name');
+
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issueRepository->getIssue($issue);
+      $issueRepository->updateName($name);
+
+      $arrData = ['name' => $name];
+      return new JsonResponse($arrData);
+    }
+  }
 
   /**
    * @Route("/ajax/issueGraphChange", name="issue_ajax_graphChange")
@@ -101,6 +118,7 @@ class IssueController extends Controller {
       $gaugeRepository->gaugeValueLog(1);
 
       $issue = $issueRepository->getIssue($issue_id, true);
+      $gaugeCount = $issueRepository->getNumberOfGauges();
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
@@ -108,7 +126,8 @@ class IssueController extends Controller {
       $arrData =
         ['labels' => $labels,
          'colors' => $colors,
-         'values' => $values];
+         'values' => $values,
+         'gaugeCount' => $gaugeCount];
       return new JsonResponse($arrData);
     }
   }
@@ -129,16 +148,21 @@ class IssueController extends Controller {
 
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssue($issue_id, true);
+
+      $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
+
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
       $tab = $this->renderView('issue/editGaugeTab.html.twig',['gauges' => $issue->getGauges()]);
+      $comments = $this->renderView('issue/commentsTab.html.twig',['changes' => $changes]);
 
       $arrData =
         ['labels' => $labels,
          'colors' => $colors,
          'values' => $values,
-          'tab' => $tab];
+         'comments' => $comments,
+         'tab' => $tab];
       return new JsonResponse($arrData);
     }
   }
@@ -175,24 +199,6 @@ class IssueController extends Controller {
     }
   }
 
-      /**
-       * @Route("/test", name="test")
-       */
-      public function test() {
-//        $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
-//        $gauge = $gaugeRepository->getGauge('17');
-//
-//        $entityManager = $this->getDoctrine()->getManager();
-//        $entityManager->remove($gauge);
-//        $entityManager->flush();
-
-        $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-        $issue = $issueRepository->getIssue('1', true);
-        $issueRepository->updateGaugesIndex();
-  //      die($tab);
-      }
-
-
   /**
    * @Route("/ajax/issueGaugeDelete", name="issue_ajax_gaugeDelete")
    */
@@ -211,18 +217,56 @@ class IssueController extends Controller {
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssue($issue_id, true);
       $issueRepository->updateGaugesIndex();
+
+      $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
+      $gaugeCount = $issueRepository->getNumberOfGauges();
+
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
       $tab = $this->renderView('issue/editGaugeTab.html.twig',['gauges' => $issue->getGauges()]);
+      $comments = $this->renderView('issue/commentsTab.html.twig',['changes' => $changes]);
 
       $arrData =
         ['type' => 'gaugeDelete',
          'labels' => $labels,
          'colors' => $colors,
          'values' => $values,
+         'comments' => $comments,
+         'gaugeCount' => $gaugeCount,
          'tab' => $tab];
       return new JsonResponse($arrData);
     }
   }
+
+  /**
+   * @Route("/ajax/gaugeChangePosition", name="issue_ajax_gaugeChangePosition")
+   */
+  public function gaugeChangePosition(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issue_id = $request->request->get('issueId');
+      $gauge_id = $request->request->get('gaugeId');
+      $new_position = $request->request->get('position');
+
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issueRepository->getIssue($issue_id);
+      $issueRepository->updateGaugesIndex($gauge_id, $new_position);
+
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->clear();
+      $issue = $issueRepository->getIssue($issue_id, true);
+      $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
+      $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
+      $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $tab = $this->renderView('issue/editGaugeTab.html.twig',['gauges' => $issue->getGauges()]);
+
+      $arrData =
+        ['labels' => $labels,
+         'colors' => $colors,
+         'values' => $values,
+         'tab' => $tab];
+      return new JsonResponse($arrData);
+    }
+  }
+
 }
