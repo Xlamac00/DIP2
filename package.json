@@ -28,6 +28,7 @@
     "scripts": {
         "dev-server": "encore dev-server",
         "dev": "encore dev",
+        "start": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production"
     }
