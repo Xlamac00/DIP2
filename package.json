@@ -28,7 +28,7 @@
     "scripts": {
         "dev-server": "encore dev-server",
         "dev": "encore dev",
-        "start": "encore dev",
+        "start": "node public/",
         "watch": "encore dev --watch",
         "build": "encore production"
     }
