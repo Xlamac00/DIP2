@@ -15,6 +15,7 @@ Encore
     .addEntry('chart-resizable', './assets/js/chart-resizable.js')
     .addEntry('jquery', './assets/js/jquery.js')
     .addEntry('fonts', './assets/js/fontawesome-all.min.js')
+    .addEntry('dashboard', './assets/js/frontend/dashboard.js')
     .addStyleEntry('app', './assets/css/main.css')
     .addStyleEntry('graph-edit', './assets/css/graph-edit.css')
     .addStyleEntry('bootstrap', './assets/css/bootstrap.min.css')

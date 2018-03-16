@@ -224,6 +224,7 @@ $(document).ready(function() {
                 if(i > 6) // hide any more then first six
                     ($("#gaugeComments div.media")[i]).style.display = 'none';
             }
+            showBtn.style.display = 'block';
             showBtn.innerHTML = '<i class="fas fa-sync"></i> Show all';
             showBtn.setAttribute('data-field', 'show');
         }
@@ -231,8 +232,12 @@ $(document).ready(function() {
             for(var i = 0; i < commentsCount; i++) {
                 ($("#gaugeComments div.media")[i]).style.display = 'flex';
             }
-            showBtn.innerHTML = '<i class="fas fa-sync"></i> Hide old';
-            showBtn.setAttribute('data-field', 'hide');
+            if(commentsCount < 6)
+                showBtn.style.display = 'none';
+            else {
+                showBtn.innerHTML = '<i class="fas fa-sync"></i> Hide old';
+                showBtn.setAttribute('data-field', 'hide');
+            }
         }
         showBtn.blur();
         $('#gaugeCommentShowAllBtn').unbind('click');

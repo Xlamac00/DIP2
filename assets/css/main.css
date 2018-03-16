@@ -54,19 +54,17 @@ h1 {
  * Dashboard
  */
 
-/* Placeholders */
-.placeholders {
-    padding-bottom: 3rem;
-}
-
-.placeholder img {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-}
-
 .nobtn {
     border: 0;
     background: none;
     margin: 0;
     padding: 0;
+}
+
+.borderless {
+    border: none;
+}
+
+.pointer {
+    cursor: pointer;
 }

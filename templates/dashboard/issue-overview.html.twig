@@ -3,6 +3,8 @@
 {% block stylesheets %}
     {{  parent() }}
     <script src="{{ asset('build/chart.js') }}"></script>
+    <script src="{{ asset('build/fonts.js') }}"></script>
+    <script src="{{ asset('build/dashboard.js') }}"></script>
     <script>
         var options = {
             scales: {
@@ -47,21 +49,30 @@
 
 {% block body %}
 
-    <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+        <main role="main" class="col-xl-12">
         <h1>{{  board.name }}</h1>
         <div class="card-deck">
             {% for issue in board.issues %}
-                <div class="card bg-dark mb-3" >
-                    <h4 class="card-header text-white">
-                        <a href="{{ path('issue', {'link': issue.link}) }}">{{ issue.name }}</a>
-                    </h4>
-                    <div class="card-body bg-light">
-                        {{ include('graphs/graph.html.twig', { 'gauges': issue.gauges,
-                            'gauge_name': issue.link,
-                            'issue_id': issue.id}) }}
-                    </div>
+                <div class="card bg-dark col-xl-3 px-1 pb-1" id="issue-{{ issue.link }}">
+                    {{ include('dashboard/issue-card.html.twig', { 'issue': issue}) }}
                 </div>
             {% endfor %}
+            <div class="card bg-dark col-xl-3 px-1 pb-1" id="dashboardNewCardPlaceholder" style="display: none">
+            </div>
+            <div class="card col-xl-2 border-dark px-1 pb-1 h-25" >
+                <div class="card-body">
+                    <input type="text" placeholder="New issue name" class="pointer borderless w-100 form-control"
+                           id="dashboardIssueName">
+                    <div class="mt-3" id="dashboardIssueButtons" style="display: none">
+                        <button class="btn btn-success" id="dashboardIssueCreateBtn">Create</button>
+                        <button type="button" class="close float-right gaugeCloseBtn mt-1" aria-label="Close"
+                                id="dashboardIssueNameClose">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <input type="hidden" id="dashboardId" value="{{ board.id }}">
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 

@@ -23,23 +23,21 @@
 
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
-                    {#<li class="nav-item active">#}
-                        {#<a class="nav-link" href=".">Home <span class="sr-only">(current)</span></a>#}
-                    {#</li>#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link" href="#">Settings</a>#}
-                    {#</li>#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link" href="#">Profile</a>#}
-                    {#</li>#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link" href="#">Help</a>#}
-                    {#</li>#}
+                    <li class="nav-item active">
+                        <a class="nav-link" href=".">Home <span class="sr-only">(current)</span></a>
+                    </li>
                 </ul>
-                {#<form class="form-inline mt-2 mt-md-0">#}
-                    {#<input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">#}
-                    {#<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>#}
-                {#</form>#}
+
+                <div class="dropdown">
+                    <button type="button" class="nobtn float-right text-light mt-1 pointer"
+                            id=""
+                            data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                        <i class="fas fa-2x fa-user"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="right: 0; left: auto;">
+                        <a class="dropdown-item pointer" id="">User options</a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -47,25 +45,6 @@
 
 <div class="container-fluid">
     <div class="row">
-        {% block side_menu %}
-            {#<nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">#}
-                {#<ul class="nav nav-pills flex-column">#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link active" href="#">Overview <span class="sr-only">(current)</span></a>#}
-                    {#</li>#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link" href="#">Reports</a>#}
-                    {#</li>#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link" href="#">Analytics</a>#}
-                    {#</li>#}
-                    {#<li class="nav-item">#}
-                        {#<a class="nav-link" href="#">Export</a>#}
-                    {#</li>#}
-                {#</ul>#}
-            {#</nav>#}
-        {% endblock %}
-
         {% block body %}{% endblock %}
     </div>
 </div>

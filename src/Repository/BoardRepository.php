@@ -8,40 +8,18 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class BoardRepository extends ServiceEntityRepository {
   private $registry;
+  private $manager;
   private $board;
 
     public function __construct(RegistryInterface $registry) {
         parent::__construct($registry, Board::class);
         $this->registry = $registry;
+        $this->manager = $registry->getManager();
     }
 
-    public function getBoard() {
+    public function getBoard($board_id) {
       if(!isset($this->board))
-        $this->getBoardFromDb(1);
+        $this->board = $this->find($board_id);
       return $this->board;
-    }
-
-    private function getBoardFromDb($board_id) {
-      $qb = $this->createQueryBuilder('b')
-        ->andWhere('b.id = :id')
-        ->setParameter('id', $board_id)
-        ->getQuery();
-      $result = $qb->execute();
-      $this->board = $result[0];
-
-      $qa = $this->createQueryBuilder('q')
-        ->select('i.id')
-        ->from('App:Issue', 'i')
-        ->andWhere('i.board = :id')
-        ->andWhere('q.id = :id')
-        ->setParameter('id', $board_id)
-        ->getQuery();
-      $issues = $qa->execute();
-
-      foreach ($issues as $data) {
-        $issueRepository = new IssueRepository($this->registry);
-        $issue = $issueRepository->getIssue($data['id']);
-        $this->board->setIssue($issue);
-      }
     }
 }

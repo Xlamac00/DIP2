@@ -2,14 +2,19 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BoardRepository")
  * @ORM\Table(name="board")
  */
-class Board
-{
+class Board {
+  public function __construct() {
+    $this->issues = new ArrayCollection();
+  }
+
   /**
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="AUTO")
@@ -27,7 +32,10 @@ class Board
    */
   private $link;
 
-  private $issues = [];
+  /**
+   * @ORM\OneToMany(targetEntity="Issue", mappedBy="board")
+   */
+  private $issues;
 
   /**
    * @return mixed
@@ -37,14 +45,14 @@ class Board
   }
 
   /**
-   * @return mixed
+   * @return Collection|Issue[]
    */
   public function getIssues() {
     return $this->issues;
   }
 
   /**
-   * @param mixed $issue
+   * @param Issue $issue
    */
   public function setIssue($issue) {
     $this->issues[] = $issue;

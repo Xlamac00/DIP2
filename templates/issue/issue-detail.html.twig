@@ -62,19 +62,19 @@
 {% endblock %}
 
 {% block body %}
-    <main role="main" class="col-sm-9 ml-sm-auto col-md-10 pt-3">
+    <main role="main" class="col-sm-12 pt-3">
         <h1 id="issueName">{{  issue.name }}</h1>
         <div class="row">
-            <div class="col-md-5">
+            <div class="col-lg-6">
                 <div class="dropdown">
                     <button type="button" class="nobtn float-right mb-2 ml-2 dropdown-toggle" id="gaugeEditBtn"
                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
                         <i class="fas fa-2x fa-cog "></i>
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" id="dropdownGaugeBtn" style="cursor: pointer">Edit tasks</a>
-                        <a class="dropdown-item" id="dropdownIssueBtn" style="cursor: pointer">Edit issue</a>
-                        <a class="dropdown-item" id="dropdownShareBtn" style="cursor: pointer">Share</a>
+                        <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
+                        <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
+                        <a class="dropdown-item pointer" id="dropdownShareBtn">Share</a>
                     </div>
                 </div>
                 <button type="button" class="nobtn float-right mb-2" id="gaugeAddNewBtn" value="{{ gaugeCount }}"
@@ -88,7 +88,7 @@
                     'issue_id': issue.id}) }}
                 </div>
             </div>
-            <div class="col-md-7" id="gaugeSections">
+            <div class="col-lg-6" id="gaugeSections">
                 <div id="gaugeCommentSection" class="section" style="display: block">
                     {{ include('issue/commentsTab.html.twig', {'changes': changes}) }}
                 </div>

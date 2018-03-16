@@ -23,10 +23,14 @@ class Issue {
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Board")
+     * @ORM\ManyToOne(targetEntity="Board", inversedBy="issues")
      * @ORM\JoinColumn(name="board_id", referencedColumnName="id")
      */
     private $board;
+
+    public function setBoard($board_id) {
+      $this->board = $board_id;
+    }
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -75,7 +79,8 @@ class Issue {
     }
 
     public function setName($newName) {
-      $this->name = $newName;
+      $this->name = ucfirst($newName);
+      $this->link = strtolower($newName);
     }
 
     /**
