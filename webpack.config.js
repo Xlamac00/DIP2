@@ -13,7 +13,6 @@ Encore
     // uncomment to define the assets of the project
     .addEntry('chart', './assets/js/chart.min.js')
     .addEntry('chart-resizable', './assets/js/chart-resizable.js')
-    .addEntry('jquery', './assets/js/jquery.js')
     .addEntry('fonts', './assets/js/fontawesome-all.min.js')
     .addEntry('dashboard', './assets/js/frontend/dashboard.js')
     .addStyleEntry('app', './assets/css/main.css')
@@ -23,7 +22,7 @@ Encore
     .addEntry('favicon', './assets/img/favicon.ico')
 
     .createSharedEntry('vendor', [
-        './assets/js/jquery.js',
+        // './assets/js/jquery.js',
         './assets/js/bootstrap.bundle.min.js'
     ])
 

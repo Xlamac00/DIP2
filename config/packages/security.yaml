@@ -1,18 +1,29 @@
 security:
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory: { memory: ~ }
+        db_provider:
+            id: App\Security\User\OwnUserProvider
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: ~
-
-            # activate different ways to authenticate
-
-            # http_basic: ~
-            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-
-            # form_login: ~
-            # https://symfony.com/doc/current/security/form_login_setup.html
+            pattern:    ^/
+            provider: db_provider
+            logout:
+                delete_cookies:
+                    googleId: { path: null, domain: null }
+            oauth:
+                resource_owners:
+                    google:             "/login/google"
+                login_path:        /
+                use_forward:       false
+                failure_path:      /login-fail
+                oauth_user_provider:
+                     service: App\Security\User\OwnAuthUserProvider
+            guard:
+                authenticators:
+                    - App\Security\CustomAuthenticator

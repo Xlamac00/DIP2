@@ -25,5 +25,11 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    security.authentication.success_handler:
+        class:  App\Security\GoogleAuthenticationSuccessHandler
+        arguments:  ["@security.http_utils", {}]
+        tags:
+            - { name: 'monolog.logger', channel: 'security' }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

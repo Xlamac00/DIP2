@@ -29,13 +29,16 @@
                 </ul>
 
                 <div class="dropdown">
+                    <input type="text" value="{{ app.user.username }}"
+                           class="text-right borderless bg-dark text-secondary mr-2 mt-1">
                     <button type="button" class="nobtn float-right text-light mt-1 pointer"
                             id=""
                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
                         <i class="fas fa-2x fa-user"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="right: 0; left: auto;">
-                        <a class="dropdown-item pointer" id="">User options</a>
+                        <a class="dropdown-item pointer" href="{{ path('hwi_oauth_service_redirect', {'service': 'google'}) }}">Login with Google</a>
+                        <a class="dropdown-item pointer" href="{{ url('logout') }}">Logout</a>
                     </div>
                 </div>
             </div>
