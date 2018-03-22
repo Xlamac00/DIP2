@@ -1,5 +1,5 @@
-/* Customize the label (the container) */
-.container {
+/*!* Customize the label (the container) *!*/
+.radio-container {
     display: inline-block;
     position: relative;
     padding-left: 35px;
@@ -14,8 +14,8 @@
     user-select: none;
 }
 
-/* Hide the browser's default radio button */
-.container input {
+/*!* Hide the browser's default radio button *!*/
+.radio-container input {
     position: absolute;
     opacity: 0;
 }

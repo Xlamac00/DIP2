@@ -53,7 +53,7 @@
         <h1>{{  board.name }}</h1>
         <div class="card-deck">
             {% for issue in board.issues %}
-                <div class="card bg-dark col-xl-3 px-1 pb-1" id="issue-{{ issue.link }}">
+                <div class="card my-primary col-xl-3 px-1 pb-1" id="issue-{{ issue.link }}">
                     {{ include('dashboard/issue-card.html.twig', { 'issue': issue}) }}
                 </div>
             {% endfor %}

@@ -15,6 +15,7 @@ Encore
     .addEntry('chart-resizable', './assets/js/chart-resizable.js')
     .addEntry('fonts', './assets/js/fontawesome-all.min.js')
     .addEntry('dashboard', './assets/js/frontend/dashboard.js')
+    // .addEntry('app-bundle', './assets/js/app.bundle.js')
     .addStyleEntry('app', './assets/css/main.css')
     .addStyleEntry('graph-edit', './assets/css/graph-edit.css')
     .addStyleEntry('bootstrap', './assets/css/bootstrap.min.css')
@@ -22,8 +23,8 @@ Encore
     .addEntry('favicon', './assets/img/favicon.ico')
 
     .createSharedEntry('vendor', [
-        // './assets/js/jquery.js',
-        './assets/js/bootstrap.bundle.min.js'
+        './assets/js/bootstrap.bundle.min.js',
+        './assets/js/app.bundle.js'
     ])
 
     .enableSassLoader()

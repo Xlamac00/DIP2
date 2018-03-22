@@ -48,10 +48,17 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
       );
   }
 
+  public function updateUsername($newName) {
+    $this->user->setUsername($newName);
+    $this->manager->persist($this->user);
+    $this->manager->flush();
+  }
+
   public function createNewAnonymousUser($userLink) {
     $user = new User();
     $user->setUsername('Anonymous user');
     $user->setLink($userLink);
+    $user->setColor($this->getRandomColor());
     $this->manager->persist($user);
     $this->manager->flush();
     $this->user = $user;
@@ -72,6 +79,7 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $user->setUsername($name);
     $user->setLink($userLink);
     $user->setGoogleId($googleId);
+    $user->setColor($this->getRandomColor());
     $user->setEmail($email);
     $user->setImageLink($image);
     $this->manager->persist($user);
@@ -79,5 +87,15 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $this->user = $user;
     return $user;
   }
+
+  private function getRandomColor() {
+    //    $colors = ['d32f2f', 'c2185b', '7b1fa2', '512da8', '303f9f', '1976d2',
+    //      '0097a7',  '00796b', '388e3c', '689f38', 'afb42b', 'fbc02d', '5d4037'];
+    $colors = ['ad1457', 'ab47bc', '7e57c2', '5c6bc0', '42a5f5',
+      '00bcd4', '4db6ac',  '66bb6a', '9ccc65', 'c0ca33'];
+    $i = rand(0, sizeof($colors)-1);
+    return '#'.$colors[$i];
+  }
+
 
 }

@@ -32,6 +32,11 @@ class User implements UserInterface, \Serializable {
   private $email;
 
   /**
+   * @ORM\Column(type="string", length=7)
+   */
+  private $color;
+
+  /**
    * @ORM\Column(name="id_google", type="string", length=24, nullable=true)
    */
   private $googleId;
@@ -70,11 +75,21 @@ class User implements UserInterface, \Serializable {
   public function setImageLink($image) {
     $this->googleImg = $image;
   }
+  public function setColor($color) {
+    $this->color = $color;
+  }
   public function getPassword() {
     return null;
   }
   public function getGoogleId() {
     return $this->googleId;
+  }
+  public function getImageLink() {
+    return $this->googleImg;
+  }
+  public function getColor() {
+      return $this->color;
+      return null;
   }
 
   // Username is unique 20 char string

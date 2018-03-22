@@ -1,19 +1,19 @@
 
-<div class="card-header">
-    <h5 class="float-left"><a href="{{ path('issue', {'link': issue.link}) }}" class="text-light">
-            {{ issue.name }}</a></h5>
-
-    <div class="dropdown">
-        <button type="button" class="nobtn float-right text-light mt-1 pointer"
-                id=""
-                data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
-            <i class="fas fa-ellipsis-h"></i>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item pointer issueDelete" name="{{ issue.link }}">Delete issue</a>
+<a href="{{ path('issue', {'link': issue.link}) }}" >
+    <div class="card-header">
+        <h5 class="float-left text-light"> {{ issue.name }}</h5>
+        <div class="dropdown">
+            <button type="button" class="nobtn float-right text-light mt-1 pointer"
+                    id=""
+                    data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item pointer issueDelete" name="{{ issue.link }}">Delete issue</a>
+            </div>
         </div>
     </div>
-</div>
+</a>
 <div class="bg-light card-img-top">
     {{ include('graphs/graph.html.twig', { 'gauges': issue.gauges,
         'gauge_name': issue.link,

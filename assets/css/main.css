@@ -68,3 +68,37 @@ h1 {
 .pointer {
     cursor: pointer;
 }
+
+.my-primary {
+    background-color: #00bcd4;
+}
+.my-primary-dark {
+    background-color: #008ba3;
+}
+.my-secondary {
+    background-color: #0277bd;
+}
+
+.user-portrait {
+    border-radius: 999em;
+    padding: 0;
+    margin: 0;
+}
+.user-image-anonymous {
+    border: none;
+    margin: -3px;
+    font-size: 36px
+}
+.user-image-google {
+    width: 40px;
+}
+.dropdown-menu:after {
+    position: absolute;
+    top: -6px;
+    right: 10px;
+    display: inline-block;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #ffffff;
+    border-left: 6px solid transparent;
+    content: '';
+}
