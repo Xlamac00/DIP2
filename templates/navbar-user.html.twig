@@ -8,24 +8,33 @@
 <div class="dropdown">
 
     {% if is_granted('ROLE_ANONYMOUS') %}
-        <button class="nobtn float-right text-light pointer mt-1 p-0 user-portrait"
-                style="background-color: {{ app.user.color }}"  data-toggle="dropdown" aria-haspopup="false"
+        <button class="nobtn float-right pointer mt-1 p-0 " data-toggle="dropdown" aria-haspopup="false"
                 type="button" aria-expanded="true" id="dropdownMenuUser">
-            <i class="fas fa-2x fa-user-circle user-image-anonymous"></i>
+            {{ include('user/user-icon.html.twig', {'user': app.user, 'size': 'small'}) }}
+            {#<i class="fas fa-2x fa-user-circle user-image-anonymous-big"></i>#}
         </button>
     {% else %}
         <button class="nobtn float-right pointer m-0" id="dropdownMenuUser"
                 data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
-            <img src="{{ app.user.imagelink }}" class="user-portrait user-image-google">
+            <img src="{{ app.user.imagelink }}" class="user-portrait user-image-google-big">
         </button>
     {% endif %}
-    <div class="dropdown-menu mt-2" aria-labelledby="dropdownMenuUser" style="right: 0; left: auto;"
+    <div class="dropdown-menu my-dropdown mt-2" aria-labelledby="dropdownMenuUser" style="right: 0; left: auto;"
          id="navbar-user-menu">
         <label title="Change user name" for="navbar-username">
             <span class="input-group">
+                {% if is_granted('ROLE_ANONYMOUS') %}
+                    <div class="mx-2 mt-1 p-0 user-portrait float-left" style="background-color: {{ app.user.color }}">
+                        <i class="fas fa-2x fa-user-circle user-image-anonymous-small text-light"  ></i>
+                    </div>
+                {% else %}
+                    <img src="{{ app.user.imagelink }}" class="mx-2 mt-1 p-0 user-portrait float-left
+                    user-image-google-small" height="36px">
+                {% endif %}
                 <input type="text" value="{{ app.user.username }}" id="navbar-username"
-                       class="text-left borderless text-secondary bg-white pl-3" disabled >
+                       class="text-left borderless text-dark bg-white pl-3" disabled size="12">
                 <input type="hidden" value="{{ app.user.username }}" id="user-name">
+                <input type="hidden" value="{{ app.user.id }}" id="user-id">
                 <span class="text-secondary pointer mt-2 m-1" id="navbar-user-edit"><i class="fas fa-1x fa-edit"></i></span>
             </span>
         </label>
@@ -36,15 +45,15 @@
             <a class="dropdown-item pointer" href="{{ url('logout') }}">Logout</a>
         {% endif %}
     </div>
-    <span class="btn-group">
-        <button type="button" class="nobtn float-right text-light pointer mt-1 mr-3"
-                id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-2x fa-plus-circle user-image-anonymous"></i>
-        </button>
-        <div class="dropdown-menu mt-2 mr-3" aria-labelledby="navbarDropdownMenuLink"  style="right: 0; left: auto;">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-    </span>
+    {#<span class="btn-group">#}
+        {#<button type="button" class="nobtn float-right text-light pointer mt-1 mr-3"#}
+                {#id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+            {#<i class="fas fa-2x fa-plus-circle user-image-anonymous"></i>#}
+        {#</button>#}
+        {#<div class="dropdown-menu mt-2 mr-3" aria-labelledby="navbarDropdownMenuLink"  style="right: 0; left: auto;">#}
+            {#<a class="dropdown-item" href="#">Action</a>#}
+            {#<a class="dropdown-item" href="#">Another action</a>#}
+            {#<a class="dropdown-item" href="#">Something else here</a>#}
+        {#</div>#}
+    {#</span>#}
 </div>

@@ -25,11 +25,23 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    App\AjaxController\:
+        resource: '../src/AjaxController'
+        public: true
+        tags: ['controller.service_arguments']
+
     security.authentication.success_handler:
         class:  App\Security\GoogleAuthenticationSuccessHandler
         arguments:  ["@security.http_utils", {}]
         tags:
             - { name: 'monolog.logger', channel: 'security' }
+
+    gedmo.listener.softdeleteable:
+        class: Gedmo\SoftDeleteable\SoftDeleteableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+#        calls:
+#            - [ setAnnotationReader, [ @annotation_reader ] ]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

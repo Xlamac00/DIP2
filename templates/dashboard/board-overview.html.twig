@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{  parent() }}
+    <script src="{{ asset('build/chart.js') }}"></script>
+    <script src="{{ asset('build/dashboard.js') }}"></script>
+    <script src="{{ asset('build/issue-share.js') }}"></script>
+    <script src="{{ asset('build/typeahead.js') }}"></script>
+    <script>
+        var options = {
+            scales: {
+                yAxes: [{
+                    gridLines : {
+                        display : false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        display: false,
+                        max: 100,
+                        beginAtZero:true
+                    }
+                }],
+                xAxes: [{
+                    gridLines : {
+                        display : false
+                    },
+                    ticks: {
+                        maxRotation: 0
+                    }
+                }]
+            },
+            legend: {
+                display : false
+            },
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
+                }
+            },
+            tooltips: {
+                custom: function(tooltip) {
+                    if (!tooltip) return;
+                },
+                callbacks: {
+                    // use label callback to return the desired label
+                    label: function(tooltipItem, data) {
+                        return ' '+tooltipItem.xLabel;
+                    },
+                    // remove title
+                    title: function(tooltipItem, data) {}
+                }
+            }
+        };
+    </script>
+{% endblock %}
+
+{% block body %}
+
+        <main role="main" class="col-xl-12">
+        <div class="clearfix">
+            <div class="float-left">
+                <h1>{{ board.name }}</h1>
+                <input type="hidden" id="boardId" value="{{ board.id }}">
+            </div>
+            {% if board.canUserManage or board.isShareEnabled %}
+                <button class="nobtn mt-3 pointer float-right" type="button" data-toggle="modal"
+                        data-target="#modalShareBoard">
+                    <i class="fas fa-2x fa-share"></i>
+                </button>
+                {{ include('dashboard/board-share.html.twig') }}
+            {% endif %}
+        </div>
+        <div class="card-deck">
+            {% for issue in board.issues %}
+                {% if issue.canUserRead %}
+                    <div class="col-4 p-0 m-0 mb-4">
+                        <div class="card" id="issue-{{ issue.pageId }}">
+                            {{ include('dashboard/issue-card.html.twig', { 'issue': issue}) }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% if board.canUserWrite %}
+                <div class="col-4 h-100 p-0">
+                    <div class="card border-dark px-1 pb-1 h-25" >
+                        <div class="card-body">
+                            <input type="text" placeholder="New issue name" class="pointer borderless w-100 form-control"
+                                   id="dashboardIssueName">
+                            <div class="mt-3" id="dashboardIssueButtons" style="display: none">
+                                <button class="btn btn-success" id="dashboardIssueCreateBtn">Create</button>
+                                <button type="button" class="close float-right gaugeCloseBtn mt-1" aria-label="Close"
+                                        id="dashboardIssueNameClose">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <input type="hidden" id="dashboardId" value="{{ board.id }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+{% endblock %}

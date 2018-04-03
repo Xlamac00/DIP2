@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Gauge;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
+use App\Repository\IssueRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,16 +14,18 @@ use Symfony\Component\HttpFoundation\Request;
 class IssueController extends Controller {
 
   /**
-   * @Route("/issue/{link}", name="issue")
+   * @Route("/i/{link}/{name}", name="issue")
    */
-    public function index($link) {
+    public function index($link, $name) {
+      /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssueByLink($link);
+      $issue = $issueRepository->getIssueByLink($link, $this->getUser());
       $gaugeCount = $issueRepository->getNumberOfGauges();
       $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
+      $users = $issueRepository->getAllActiveUsers($issue->getId());
 
       return $this->render('issue/issue-detail.html.twig',
-        ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount]);
+        ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount, "users" => array_reverse($users)]);
     }
 
   /**
@@ -43,6 +46,16 @@ class IssueController extends Controller {
   }
 
   /**
+   * @Route("/test", name="test")
+   */
+  public function test() {
+//    $changeRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
+//    $arrData = $changeRepository->gaugeCommentSave(14, 'Tiidudu');
+//    $render = $this->renderView('issue/comment.html.twig', ['change' => $arrData]);
+//      die($render);
+  }
+
+  /**
    * @Route("/ajax/issueGraphChange", name="issue_ajax_graphChange")
    */
   public function graphChange(Request $request) {
@@ -50,10 +63,11 @@ class IssueController extends Controller {
       $number = $request->request->get('gaugeNumber');
       $value = $request->request->get('gaugeValue');
       $issue = $request->request->get('issueId');
+      $user = $request->request->get('userId');
 
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issueRepository->getIssue($issue);
-      $arrData = $issueRepository->gaugeValueChange($number, $value);
+      $arrData = $issueRepository->gaugeValueChange($number, $value, $user);
       return new JsonResponse($arrData);
     }
   }
@@ -97,11 +111,12 @@ class IssueController extends Controller {
     if ($request->isXmlHttpRequest()) {
       $name = $request->request->get('name');
       $color = $request->request->get('color');
-      $issue_id = $request->request->get('issueId');
+      $issueId = $request->request->get('issueId');
+      $userId = $request->request->get('userId');
 
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $gaugeNumber = $issueRepository->getNumberOfGauges($issue_id);
-      $issue = $issueRepository->getIssue($issue_id);
+      $gaugeNumber = $issueRepository->getNumberOfGauges($issueId);
+      $issue = $issueRepository->getIssue($issueId);
 
       $entityManager = $this->getDoctrine()->getManager();
       $gauge = new Gauge();
@@ -115,9 +130,9 @@ class IssueController extends Controller {
 
       $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
       $gaugeRepository->setGauge($gauge);
-      $gaugeRepository->gaugeValueLog(1);
+      $gaugeRepository->gaugeValueLog(1, $userId);
 
-      $issue = $issueRepository->getIssue($issue_id, true);
+      $issue = $issueRepository->getIssue($issueId, true);
       $gaugeCount = $issueRepository->getNumberOfGauges();
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);

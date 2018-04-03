@@ -17,6 +17,11 @@
     {% for change in changes %}
         {{ include('issue/comment.html.twig', {'change': change}) }}
     {% endfor %}
+    {% if changes|length == 0 %}
+        <p class="text-center text-secondary mt-5" id="gaugeCommentNoChangesText">
+            There are no changes yet!
+        </p>
+    {% endif %}
 </div>
 <button class="btn btn-secondary mx-auto" style="display: none; width: 130px;" data-field="hide"
         id="gaugeCommentShowAllBtn"><i class="fas fa-sync"></i> Show all</button>

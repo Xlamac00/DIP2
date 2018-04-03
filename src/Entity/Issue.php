@@ -5,95 +5,124 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\IssueRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  * @ORM\Table(name="issue")
  */
-class Issue {
-    public function __construct() {
-      $this->gauges = new ArrayCollection();
-    }
+class Issue extends AbstractSharableEntity {
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+  public function __construct() {
+    parent::__construct();
+    $this->gauges = new ArrayCollection();
+    $this->oldShareRights = null;
+  }
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Board", inversedBy="issues")
-     * @ORM\JoinColumn(name="board_id", referencedColumnName="id")
-     */
-    private $board;
+  /**
+   * @ORM\ManyToOne(targetEntity="Board", inversedBy="issues")
+   * @ORM\JoinColumn(name="id_board", referencedColumnName="id")
+   */
+  private $board;
 
-    public function setBoard($board_id) {
-      $this->board = $board_id;
-    }
+  public function setBoard($board_id) {
+    $this->board = $board_id;
+  }
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $name;
+  /**
+   * @ORM\OneToMany(targetEntity="Gauge", mappedBy="issue")
+   * @ORM\OrderBy({"position" = "ASC"})
+   */
+  private $gauges;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $link;
+  /**
+   * @ORM\Column(type="datetime", nullable=true)
+   */
+  private $deletedAt;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Gauge", mappedBy="issue")
-     * @ORM\OrderBy({"position" = "ASC"})
-     */
-    private $gauges;
+  public function setDeletedAt($deletedAt) {
+    $this->deletedAt = $deletedAt;
+  }
+  /** Variable with array of users that contributed to the issue.
+   * Has to be manually set (eg. from boardrepository) */
+  private $activeUsers;
 
-    /**
-     * @return Collection|Gauge[]
-     */
-    public function getGauges()  {
-      return $this->gauges;
-    }
+  /** Set if the sharing was changed for this Issue only. While this is not null,
+   * its not affected by Board sharing rights changes. When its set to its default value,
+   * oldShareRights is set to null and it inherits from its parent Board once again.
+   * @ORM\Column(type="string", length=32, nullable=true)
+   */
+  private  $oldShareRights;
 
-    public function getGaugesSorted() {
-      return usort($this->gauges, array($this, "compare"));
-    }
+  public function getOldShareRights() {
+    return $this->oldShareRights;
+  }
 
-    /** Compares gauges to sort them by position */
-    private function compare($a, $b) {
-      return strcmp($a->getPosition(), $b->getPosition());
-    }
+  public function setOldShareRights($newRight = null) {
+    $this->oldShareRights = $newRight;
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getId() {
-      return $this->id;
-    }
+  /**
+   * @return Collection|Gauge[]
+   */
+  public function getGauges()  {
+    return $this->gauges;
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getName() {
-      return $this->name;
-    }
+  public function getGaugesSorted() {
+    return usort($this->gauges, array($this, "compare"));
+  }
 
-    public function setName($newName) {
-      $this->name = ucfirst($newName);
-      $this->link = strtolower($newName);
-    }
+  /** Compares gauges to sort them by position.
+   * @param Gauge $a
+   * @param Gauge $b
+   * @return int
+   */
+  private function compare($a, $b) {
+    return strcmp($a->getPosition(), $b->getPosition());
+  }
 
-    /**
-     * @param Gauge $gauge
-     */
-    public function setGauge($gauge) {
-      $this->gauges[] = $gauge;
-    }
+  /** Array of few latest GaugeChanges */
+  private $gaugeCommentLatest;
 
-    /**
-     * @return mixed
-     */
-    public function getLink() {
-      return $this->link;
-    }
+  /** @var int - number of GaugeChanges for the issue */
+  private $gaugeCommentsCount;
+
+  public function getLatestGaugeComments() {
+    return $this->gaugeCommentLatest;
+  }
+
+  public function getCountGaugeComments() {
+    return $this->gaugeCommentsCount;
+  }
+
+  public function setLatestGaugeComments($comments) {
+    $this->gaugeCommentLatest = $comments;
+  }
+
+  public function setCountGaugeComments($count) {
+    $this->gaugeCommentsCount = $count;
+  }
+  /**
+   * @param Gauge $gauge
+   */
+  public function setGauge($gauge) {
+    $this->gauges[] = $gauge;
+  }
+
+  public function getUrl() {
+    return 'i/'.parent::getUrl();
+  }
+
+  /**
+   * @param array $usersArray
+   */
+  public function setActiveUsers($usersArray) {
+    $this->activeUsers = $usersArray;
+  }
+
+  public function getActiveUsers() {
+    return $this->activeUsers;
+  }
 }

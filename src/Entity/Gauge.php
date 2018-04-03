@@ -25,7 +25,7 @@ class Gauge {
 
     /**
      * @ORM\ManyToOne(targetEntity="Issue", inversedBy="gauges")
-     * @ORM\JoinColumn(name="issue_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(name="id_issue", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $issue;
 

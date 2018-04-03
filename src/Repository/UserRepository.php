@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 class UserRepository extends ServiceEntityRepository  implements UserLoaderInterface {
   private $registry;
   private $manager;
-  /** @var  User */
+  /** @var User */
   private $user;
 
   public function __construct(RegistryInterface $registry) {
@@ -48,10 +48,56 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
       );
   }
 
+  /** Loads user either by Google ID or my UserLink.
+   *
+   * @param string $anyId - either 21+ numeric Google Id, or my 20 char alphanumeric id
+   * @return User|null
+   */
+  public function loadUser($anyId) {
+    if(is_numeric($anyId)) { // its number - id
+      if(strlen($anyId > 10))
+        return $this->loadUserByGoogleId($anyId);
+      else
+        return $this->loadUserById($anyId);
+    }
+    else
+      return $this->loadUserByUsername($anyId);
+  }
+
+  public function loadUserById($userId) {
+    if(!isset($this->user))
+      $this->user = $this->find($userId);
+    return $this->user;
+  }
+
   public function updateUsername($newName) {
     $this->user->setUsername($newName);
     $this->manager->persist($this->user);
     $this->manager->flush();
+  }
+
+  /** Returns all possible users that fit the substring.
+   * Used for autocomplete where finding new users to share with.
+   *
+   * @param string $substring - part of users name or email address
+   *
+   * @return array - array of possile usernames (with part of email)
+   */
+  public function findUsersBySubstring($substring) {
+    $qb = $this->createQueryBuilder('u')
+      ->andWhere('u.isActive = 1')
+      ->andWhere('u.email IS NOT NULL')
+      ->andWhere('u.email LIKE :string OR u.username LIKE :string')
+      ->setParameter('string', '%'.$substring.'%')
+      ->getQuery();
+    $users = $qb->execute();
+    $result = array();
+    foreach($users as $user) {
+      $mail = explode('@', $user->getEmail());
+      $email = $mail[0]."@ ... ";
+      $result[] = strtolower($user->getUsername())." (".$email.")";
+    }
+    return $result;
   }
 
   public function createNewAnonymousUser($userLink) {

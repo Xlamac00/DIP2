@@ -10,18 +10,22 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+#        not_secured_area:
+#            pattern: ^/error
+#            security: false
         main:
             pattern:    ^/
             provider: db_provider
             logout:
                 delete_cookies:
                     googleId: { path: null, domain: null }
+            user_checker: App\Security\UserChecker
             oauth:
                 resource_owners:
                     google:             "/login/google"
-                login_path:        /
+                login_path:        /error/404
                 use_forward:       false
-                failure_path:      /login-fail
+                failure_path:      /error/404
                 oauth_user_provider:
                      service: App\Security\User\OwnAuthUserProvider
             guard:

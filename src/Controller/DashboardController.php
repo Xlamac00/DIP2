@@ -3,11 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Board;
-use App\Entity\Issue;
+use App\Entity\BoardRole;
+use App\Repository\BoardRoleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 class DashboardController extends Controller {
 
@@ -15,54 +14,28 @@ class DashboardController extends Controller {
    * @Route("/", name="homepage")
    */
   public function index() {
-    $board = $this->getDoctrine()->getRepository(Board::class)->getBoard(1);
-
-    return $this->render('dashboard/issue-overview.html.twig',
-          ["board" => $board]);
+    /** @var BoardRoleRepository $boardRole */
+    $boardRole = $this->getDoctrine()->getRepository(BoardRole::class);
+    /** @var BoardRole[] $boards */
+    $boards = $boardRole->getUserBoards($this->getUser());
+    if(sizeof($boards) == 0) { // user has nothing yet
+      return $this->render('homepage.html.twig');
+    }
+    elseif(sizeof($boards) == 1) {
+      return $this->redirectToRoute('board', array('link' => $boards[0]->getBoard()->getPageId(),
+                                                   'name' => $boards[0]->getBoard()->getLink()));
+//      $board = $this->getDoctrine()->getRepository(Board::class)->getBoard(1, $this->getUser());
+//      return $this->render('dashboard/board-overview.html.twig', ["board" => $board]);
+    }
+//    else {}
   }
 
   /**
-   * @Route("/ajax/issueNew", name="issue_ajax_new")
+   * @Route("/b/{link}/{name}", name="board")
    */
-  public function issueNew(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $name = $request->request->get('name');
-      $board_id = $request->request->get('board');
+  public function showBoard($link, $name) {
+    $board = $this->getDoctrine()->getRepository(Board::class)->getBoardByLink($link, $this->getUser());
 
-      $board = $this->getDoctrine()->getRepository(Board::class)->getBoard($board_id);
-
-      $entityManager = $this->getDoctrine()->getManager();
-      $issue = new Issue();
-      $issue->setName($name);
-      $issue->setBoard($board);
-      $entityManager->persist($issue);
-      $entityManager->flush();
-
-//      $card = $this->renderView('dashboard/issue-card.html.twig',['issue' => $issue]);
-
-      $arrData = [ 'link' => $issue->getLink(),
-//        'card' => $card
-      ];
-      return new JsonResponse($arrData);
-    }
-  }
-
-  /**
-   * @Route("/ajax/issueDelete", name="issue_ajax_delete")
-   */
-  public function issueDelete(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $link = $request->request->get('link');
-
-      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssueByLink($link);
-
-      $entityManager = $this->getDoctrine()->getManager();
-      $entityManager->remove($issue);
-      $entityManager->flush();
-
-      $arrData = ['link' => $link];
-      return new JsonResponse($arrData);
-    }
+    return $this->render('dashboard/board-overview.html.twig', ["board" => $board]);
   }
 }

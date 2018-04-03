@@ -38,10 +38,13 @@ class GaugeRepository extends ServiceEntityRepository  {
     }
 
     // Logs the change of the value in gauge
-    public function gaugeValueLog($newValue) {
+    public function gaugeValueLog($newValue, $userId) {
+      $repository = new UserRepository($this->registry);
+      $user = $repository->loadUserById($userId);
       $change = new GaugeChanges();
       $change->setGauge($this->gauge);
       $change->setValues($newValue);
+      $change->setUser($user);
       $this->manager->persist($change);
       $this->manager->flush();
     }

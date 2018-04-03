@@ -1,0 +1,16 @@
+{% if user is iterable %} {# if its an array and not a user object - show there are some more users #}
+    <span class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">
+        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }}"
+           style="color: #ddd; position: relative; top: -3px"></i>
+        <span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-3"
+        style="font-weight:900;">+{{ user['count'] }}</span>
+    </span>
+{% elseif user.isAnonymous %}
+    <div class="mx-1 p-0 user-portrait float-left" style="background-color: {{ user.color }}"
+         title="{{ user.username }}">
+        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }} text-light"></i>
+    </div>
+{% else %}
+    <img src="{{ user.imagelink }}" class="mr-1 p-0 user-portrait user-image-google-{{ size }} float-left"
+         title="{{ user.username }}">
+{% endif %}

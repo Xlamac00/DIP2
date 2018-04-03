@@ -1,0 +1,40 @@
+
+{% for role in users %}
+    <tr>
+        <td>{{ include('user/user-icon.html.twig', {'user': role.user, 'size': 'small'}) }}</td>
+        <td><span class="userName {% if role.isActive != 1 %}text-secondary{% endif %}"
+                  id="modalBoardShareUser{{ role.user.uniquelink }}">{{ role.user.username }}</span></td>
+        <td>
+            {% if role.rights is constant('App\\Entity\\Board::ROLE_ADMIN') %}
+                <span class="text-secondary">Is owner</span>
+            {% else %}
+                <select class="custom-select userChange" name="{{ role.user.uniquelink }}">
+                    <option value="{{ constant('App\\Entity\\Board::ROLE_WRITE') }}"
+                            {% if (role.rights is constant('App\\Entity\\Board::ROLE_ANON') or
+                                (role.rights is constant('App\\Entity\\Board::ROLE_WRITE') and role.user.isAnonymous != 1))
+                            and (role.isBoardHistory != 1 or role.isShareEnabled == 1)
+                            %}selected{% endif %}>
+                        Can edit</option>
+                    <option value="{{ constant('App\\Entity\\Board::ROLE_READ') }}"
+                            {% if (role.rights is constant('App\\Entity\\Board::ROLE_READ') or
+                            (role.rights is constant('App\\Entity\\Board::ROLE_WRITE') and role.user.isAnonymous == 1))
+                            and (role.isBoardHistory != 1 or role.isShareEnabled == 1) %}selected{% endif %}>
+                        Can view</option>
+                    <option value="{{ constant('App\\Entity\\Board::ROLE_VOID') }}"
+                            {% if role.isActive != 1 or (role.isShareEnabled != 1 and role.isBoardHistory == 1)
+                            %}selected{%
+                    endif %}>
+                        Cannot view</option>
+                </select>
+            {% endif %}
+        </td>
+        <td>
+            {% if role.rights is not constant('App\\Entity\\Board::ROLE_ADMIN') %}
+                <button class="nobtn pointer userRemove"  data-toggle="tooltip"
+                        data-placement="top" title="Remove {{ role.user.username }}"
+                        name="{{ role.user.uniquelink }}">
+                    <i class="fas fa-times"></i></button>
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}

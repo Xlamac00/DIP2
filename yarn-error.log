@@ -5743,7 +5743,7 @@ Lockfile:
 
 Trace: 
   Error: Command failed.
-  Exit code: 1
+  Exit code: 2
   Command: sh
   Arguments: -c /home/johny/dip2/node_modules/.bin/encore dev
   Directory: /home/johny/dip2

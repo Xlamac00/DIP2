@@ -1,7 +1,8 @@
 <?php
 namespace App\Security;
 
-use App\Entity\User;
+use App\Repository\BoardRoleRepository;
+use App\Repository\IssueRoleRepository;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,14 +12,18 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class CustomAuthenticator extends AbstractGuardAuthenticator {
   private $router;
+  private $issueRepository;
+  private $boardRepository;
 
   // Not required by GuardAuthneticator, added because of UrlGenerator
-  public function __construct(UrlGeneratorInterface $router) {
+  public function __construct(UrlGeneratorInterface $router, IssueRoleRepository $issueRepository,
+                              BoardRoleRepository $boardRoleRepository) {
     $this->router = $router;
+    $this->issueRepository = $issueRepository;
+    $this->boardRepository = $boardRoleRepository;
   }
 
   /**
@@ -36,9 +41,14 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
    * be passed to getUser() as $credentials.
    */
   public function getCredentials(Request $request) {
+    $uri = $request->server->get('REQUEST_URI');
+    preg_match('/\/[i,b]\/[0-9A-z]{8}\//', $uri, $matches); // get page id from url
     return array(
       'clientId' => $request->cookies->get('clientId'),
       'googleId' => $request->cookies->get('googleId'),
+      'pageId' => sizeof($matches) > 0 ? substr($matches[0], 3, 8) : null,
+      'pageType' => sizeof($matches) > 0 ? substr($matches[0], 1, 1) : null,
+      'shareLink' => key($request->query->all())
     );
   }
 
@@ -53,13 +63,39 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   }
 
   public function checkCredentials($credentials, UserInterface $user) {
-//    if($user instanceof User && $user->isAnonymous())
+    if($credentials['pageType'] === 'i') { // issue
+      try { // check database if the user has rights to view this issue
+        $role = $this->issueRepository->checkUsersRights($credentials['pageId'], $credentials['clientId'], $credentials['googleId']);
+      }
+      catch (AuthenticationException $e) { // user has no rights for the issue - check is there is share link
+        if(strlen($credentials['shareLink']) == 32) // there is share link set
+          $role = $this->issueRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
+        else
+          return false;
+      }
+      $user->setPagePermission($credentials['pageId'], $role);
       return true;
-//    return false;
+    }
+    else if($credentials['pageType'] === 'b') { // board
+      try { // check database if the user has rights to view this board
+        $role = $this->boardRepository->checkUsersRights($credentials['pageId'], $credentials['clientId'], $credentials['googleId']);
+      }
+      catch (AuthenticationException $e) { // user has no rights for the board - check is there is share link
+        if(strlen($credentials['shareLink']) == 32) {// there is share link set
+          $role = $this->boardRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
+        }
+        else
+          return false;
+      }
+      $user->setPagePermission($credentials['pageId'], $role);
+      return true;
+    }
+    else
+      return true;
   }
 
   public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey) {
-    $userLink = $token->getUser()->getUniqueLink();
+    $userLink = $token->getUser()->getAnonymousLink();
     $userCookie = $request->cookies->get('clientId');
     if($userLink === $userCookie) {
       return null;
@@ -77,10 +113,12 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   }
 
   public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {
-    new RedirectResponse('/custom-authenticator-fail');
+//    die('chyba');
+    new RedirectResponse('/error/404');
   }
 
   public function start(Request $request, AuthenticationException $authException = null) {
+    die('chyba aut');
     new RedirectResponse('/custom-authenticator-error');
   }
 

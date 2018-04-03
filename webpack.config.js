@@ -12,9 +12,11 @@ Encore
 
     // uncomment to define the assets of the project
     .addEntry('chart', './assets/js/chart.min.js')
-    .addEntry('chart-resizable', './assets/js/chart-resizable.js')
+    .addEntry('chart-resizable', './assets/js/frontend/chart-resizable.js')
     .addEntry('fonts', './assets/js/fontawesome-all.min.js')
     .addEntry('dashboard', './assets/js/frontend/dashboard.js')
+    .addEntry('issue-share', './assets/js/frontend/issue-share.js')
+    .addEntry('typeahead', './assets/js/bootstrap3-typeahead.min.js')
     // .addEntry('app-bundle', './assets/js/app.bundle.js')
     .addStyleEntry('app', './assets/css/main.css')
     .addStyleEntry('graph-edit', './assets/css/graph-edit.css')

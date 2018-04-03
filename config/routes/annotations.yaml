@@ -1,3 +1,7 @@
 controllers:
     resource: ../../src/Controller/
     type: annotation
+
+ajaxcontrollers:
+    resource: ../../src/AjaxController/
+    type: annotation

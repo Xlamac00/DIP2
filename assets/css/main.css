@@ -84,15 +84,39 @@ h1 {
     padding: 0;
     margin: 0;
 }
-.user-image-anonymous {
+.user-image-anonymous-small {
     border: none;
     margin: -3px;
     font-size: 36px
 }
-.user-image-google {
+.user-image-anonymous-big {
+    border: none;
+    margin: -3px;
+    font-size: 40px
+}
+.user-image-google-small {
+    width: 34px;
+}
+.user-image-google-big {
     width: 40px;
 }
-.dropdown-menu:after {
+.card {
+    box-shadow: 0 0 5px 2px #CCCCCC;
+    border: none;
+    border-radius: 0;
+}
+.text-smallcaps {
+    font-variant: small-caps;
+}
+/* Add shadow behind dropdown menu dialog */
+.my-dropdown {
+    -webkit-box-shadow: 0 0 10px 0 rgba(168,168,168,1);
+    -moz-box-shadow: 0 0 10px 0 rgba(168,168,168,1);
+    box-shadow: 0 0 10px 0 rgba(168,168,168,1);
+    border: 1px solid #dbdbdb;
+ }
+/* little arrow to dropdown menus */
+.my-dropdown:after {
     position: absolute;
     top: -6px;
     right: 10px;
@@ -101,4 +125,7 @@ h1 {
     border-bottom: 6px solid #ffffff;
     border-left: 6px solid transparent;
     content: '';
+}
+.card-columns {
+    column-count: 3;
 }

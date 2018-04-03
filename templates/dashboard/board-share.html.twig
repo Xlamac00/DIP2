@@ -1,0 +1,129 @@
+
+<div class="modal fade" id="modalShareBoard" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Share {{ board.name }}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modalBoardSharePrimarySection">
+                    <div class="clearfix">
+                        <div class="d-flex justify-content-between">
+                            <h5>Share project via link</h5>
+                            {% if board.canUserManage %}
+                                <div class="dropdown">
+                                    <button type="button" class="nobtn float-right text-dark mt-1 pointer"
+                                            id="modalBoardShareOptions"
+                                            data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                                        <i class="fas fa-ellipsis-h text-dark mx-2"></i>
+                                    </button>
+                                    <div class="dropdown-menu my-dropdown dropdown-menu-right mt-1"
+                                         aria-labelledby="modalBoardShareOptions">
+                                        <a class="dropdown-item pointer" id="modalBoardShareDisable">Disable link</a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <i class="fas fa-spinner fa-spin" id="modalBoardShareOptions" style="display: none"></i>
+                            {% endif %}
+                        </div>
+                        <div id="modalBoardShareEnabledSection"
+                            style="display: {% if board.isShareEnabled %} block {% else %} none {% endif %}">
+                            <div class="form-group">
+                                <label for="modalBoardShareLink" title="Link to share this project" class="w-100">
+                                    <input type="text" id="modalBoardShareLink" value="{{ app.request.uri }}?{{ board.shareLink }}"
+                                           class="form-control bg-white" readonly="readonly"
+                                           data-toggle="tooltip" data-placement="top" title="Link copied to clipboard">
+                                </label>
+                                <div class="input-group">
+                                    {% if board.canUserManage %}
+                                        <select  class="form-control" id="modalBoardShareSelect"
+                                                 title="Choose the rights for users with this link">
+                                            <option value="{{ constant('ROLE_WRITE', board) }}"
+                                                    {% if (board.shareRights == constant('ROLE_WRITE', board) or
+                                                          board.shareRights == constant('ROLE_ANON', board)) %}selected{% endif %}>
+                                                Anyone with the link can edit</option>
+                                            <option value="{{ constant('ROLE_READ', board) }}"
+                                                    {% if board.shareRights == constant('ROLE_READ', board) %}selected{% endif %}>
+                                                Anyone with the link can view</option>
+                                        </select>
+                                    {% else %}
+                                        <input type="text" class="form-control bg-white" disabled
+                                               value="{% if board.shareRights is constant('ROLE_READ', board)
+                                               %}Anyone with the link can view{% else %}Anyone with the link can edit{% endif %}">
+                                    {% endif %}
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-secondary" id="modalBoardShareCopyBtn">
+                                            Copy to clipboard</button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if board.canUserManage %}
+                                <label for="modalBoardShareAnonymous" title="Choose to allow editing tasks in this
+                                project to anonymous or only logged in users">
+                                    <input type="checkbox" id="modalBoardShareAnonymous"
+                                           {% if board.shareRights == constant('ROLE_READ', board) %} disabled
+                                           {% elseif board.shareRights == constant('ROLE_ANON', board) %}checked="checked" {%
+                                    endif %}>
+                                    <span id="modalBoardShareAnonymousText" class="{% if board.shareRights ==
+                                        constant('ROLE_READ', board) %}text-secondary{%  endif %}">
+                                        Allow anonymous users to edit this project too</span>
+                                </label>
+                            {% endif %}
+                        </div>
+                        {% if board.canUserManage %}
+                            <div id="modalBoardShareDisabledSection"
+                                 style="display: {% if not board.isShareEnabled %} block {% else %} none {% endif %}">
+                                <div class="d-flex justify-content-center">
+                                    <button class="btn btn-success" id="modalBoardShareEnable">Enabled link sharing</button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if board.canUserManage %}
+                        <hr>
+                        <div>
+                            <div class="d-flex justify-content-between">
+                                <h5>Invite people</h5>
+                                <i class="fas fa-spinner fa-spin" id="modalBoardInviteLoading" style="display: none"></i>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" placeholder="Enter name or email address" class="form-control"
+                                       data-toggle="tooltip" data-placement="top" title="Email with invitation was send"
+                                       id="modalBoardShareAddUser">
+                                <select class="custom-select" id="modalBoardShareInviteRole">
+                                    <option value="{{ constant('ROLE_WRITE', board) }}">Can edit</option>
+                                    <option value="{{ constant('ROLE_READ', board) }}">Can view</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-success mt-1" id="modalBoardShareInviteBtn" style="display:none;">Invite</button>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if board.canUserManage %}
+                    <div id="modalBoardShareIndividualSection" style="display: none">
+                        <div class="d-flex justify-content-between">
+                            <h5>Who has access</h5>
+                            <i class="fas fa-spinner fa-spin" id="modalBoardIndividualLoading" style="display: none"></i>
+                        </div>
+                        <span class="text-secondary">Manage each user's rights to this project and all its issues.</span>
+                        <table class="table mt-2">
+                            <tbody id="modalBoardShareUserlist">
+                                {#{{ include('dashboard/share-userlist.html.twig', {'users': board.allUsers}) }}#}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                <div class="d-flex justify-content-between mt-5">
+                    <button class="btn btn-primary float-left" data-dismiss="modal" >Done</button>
+                    {% if board.canUserManage %}
+                        <button class="nobtn float-right text-secondary pointer"
+                                id="modalBoardShareIndividual">Manage individual users</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -16,6 +16,10 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
+        filters:
+            softdeleteable:
+              class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+              enabled: true
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
         mappings:

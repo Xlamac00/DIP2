@@ -1,14 +1,13 @@
 
 $(document).ready(function() {
+    var userId = document.getElementById("user-id").value;
     var canvas = document.getElementById("animatedChart");
     var changeActive = false;
     var commentActive = false;
     var changeBar = false;
     var changeOld = [];
 
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    });
+    $('.startTooltip').tooltip();
 
     canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt);};
     canvas.onmousedown = function (evt) { chartMouseDownEvent(evt);};
@@ -219,23 +218,24 @@ $(document).ready(function() {
         // get all comments in div gaugeComments
         var commentsCount = $("#gaugeComments div.media").length;
         var showBtn = document.getElementById('gaugeCommentShowAllBtn');
-        if(showBtn.getAttribute('data-field') === 'hide' && commentsCount > 6) { // make the button visible
+        if(showBtn.getAttribute('data-field') === 'hide' && commentsCount > 5) { // make the button visible
             for(var i = 0; i < commentsCount; i++) {
-                if(i > 6) // hide any more then first six
+                if(i > 5) // hide any more then first six
                     ($("#gaugeComments div.media")[i]).style.display = 'none';
             }
-            showBtn.style.display = 'block';
-            showBtn.innerHTML = '<i class="fas fa-sync"></i> Show all';
+            if(commentsCount > 6)
+                showBtn.style.display = 'block';
+            showBtn.innerHTML = 'Show all <i class="fas fa-angle-double-down "></i>';
             showBtn.setAttribute('data-field', 'show');
         }
         else {
-            for(var i = 0; i < commentsCount; i++) {
+            for(i = 0; i < commentsCount; i++) {
                 ($("#gaugeComments div.media")[i]).style.display = 'flex';
             }
-            if(commentsCount < 6)
+            if(commentsCount <= 6)
                 showBtn.style.display = 'none';
             else {
-                showBtn.innerHTML = '<i class="fas fa-sync"></i> Hide old';
+                showBtn.innerHTML = 'Hide old <i class="fas fa-angle-double-up"></i>';
                 showBtn.setAttribute('data-field', 'hide');
             }
         }
@@ -351,6 +351,7 @@ $(document).ready(function() {
                 type: "POST",
                 dataType: "json",
                 data: {
+                    "userId": userId,
                     "issueId": issue,
                     "name": name,
                     "color": $('input[name=radio]:checked', '#gaugeAddNewForm').val()
@@ -409,6 +410,7 @@ $(document).ready(function() {
                 chart.update();
                 var oldHtml = document.getElementById('gaugeComments').innerHTML;
                 document.getElementById('gaugeComments').innerHTML = data + oldHtml;
+                document.getElementById('gaugeCommentNoChangesText').className = "d-none";
             }
         });
     }
@@ -422,6 +424,7 @@ $(document).ready(function() {
             type: "POST",
             dataType: "json",
             data: {
+                "userId": userId,
                 "issueId": chart.config.issueId,
                 "gaugeNumber": changeBar,
                 "gaugeValue": newValue
@@ -462,9 +465,7 @@ $(document).ready(function() {
         section.style.display = 'block'; // make gauge edit section visible
         section.innerHTML = template;
         $('#editGaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        });
+        $('.editTooltip').tooltip();
         $('.gaugeEdit').click(ajaxGetOneGaugeInfo); // bind action to open gauge edit dialog
         $('.gaugeDelete').click(showGaugeDeleteDialog); // bind action to open gauge edit dialog
         initDraggableEntityRows();
@@ -485,6 +486,7 @@ $(document).ready(function() {
                 async: true,
                 success: function (data) {
                     hideCurrentSection();
+                    document.getElementById('issueName').innerHTML = data.name;
                     document.getElementById('issueName').innerHTML = data.name;
                 }
             });

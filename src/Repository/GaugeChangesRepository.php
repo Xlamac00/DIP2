@@ -118,9 +118,11 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
     $this->manager->flush();
     return
       ['time' => $this->gaugeChange->getTime(),
+        'timeText' => $this->gaugeChange->getTimeText(),
        'value' => $this->gaugeChange->getValue(),
        'oldValue' => $this->getOldValue($gauge_id['gauge'], true),
        'text' => $this->gaugeChange->getText(),
+        'user' => $this->gaugeChange->getUser(),
        'gauge' =>
          ['color' => $this->gaugeChange->getGauge()->getColor(),
           'name' => $this->gaugeChange->getGauge()->getName()]];

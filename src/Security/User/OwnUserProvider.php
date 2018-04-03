@@ -30,6 +30,10 @@ class OwnUserProvider implements UserProviderInterface {
     return $user;
   }
 
+  public function checkUsersRights($credentials) {
+
+  }
+
   public function refreshUser(UserInterface $user) {
     if (!$user instanceof User) {
       throw new UnsupportedUserException(

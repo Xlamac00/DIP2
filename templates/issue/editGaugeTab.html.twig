@@ -12,18 +12,18 @@
         {% for gauge in gauges %}
             <tr draggable="true" rel="{{ gauge.id }}">
                 <td>
-                    <h5 style="color: {{ gauge.color }}; cursor: move">{{ gauge.name }}</h5>
+                    <h5 style="color: {{ gauge.color }}; cursor: move" title="Drag task to change its position">{{ gauge.name }}</h5>
                 </td>
                 <td align="right">
-                    <button type="button" class="nobtn gaugeEdit" name="{{ gauge.id }}"
+                    <button type="button" class="nobtn gaugeEdit pointer editTooltip" name="{{ gauge.id }}"
                             data-toggle="tooltip" data-placement="top" title="Edit {{ gauge.name }}">
-                        <i class="fas fa-2x fa-edit"></i>
+                        <i class="fas fa-edit"></i>
                     </button>
                 </td>
                 <td class="align-right">
-                    <button type="button" class="nobtn gaugeDelete" name="{{ gauge.id }}"
+                    <button type="button" class="nobtn gaugeDelete pointer editTooltip" name="{{ gauge.id }}"
                             data-toggle="tooltip" data-placement="top" title="Delete {{ gauge.name }}">
-                        <i class="fas fa-2x fa-trash-alt"></i>
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </td>
             </tr>

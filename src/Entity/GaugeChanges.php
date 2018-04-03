@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\OneToOne;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GaugeChangesRepository")
@@ -19,9 +21,54 @@ class GaugeChanges {
 
   /**
    * @ORM\ManyToOne(targetEntity="Gauge", inversedBy="changes", cascade={"remove"})
-   * @ORM\JoinColumn(name="gauge_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+   * @ORM\JoinColumn(name="id_gauge", referencedColumnName="id", nullable=true, onDelete="SET NULL")
    */
   private $gauge;
+
+  /**
+   * @ORM\Column(type="decimal", precision=4, scale=1)
+   */
+  private $newValue;
+
+  // Not to be saved in the DB, must be computed every time needed
+  private $oldValue;
+
+  /**
+   * @ORM\Column(type="string", length=200, nullable=true)
+   */
+  private $text;
+
+  /**
+   * @ORM\ManyToOne(targetEntity="User")
+   * @ORM\JoinColumn(name="user", referencedColumnName="id")
+   */
+  private $user;
+
+  /**
+   * @ORM\Column(type="boolean")
+   */
+  private $discard;
+
+  /**
+   * @ORM\Column(type="datetime")
+   */
+  private $time;
+
+  public function getId() {
+    return $this->id;
+  }
+
+  public function getOldValue() {
+    return $this->oldValue;
+  }
+
+  public function setOldValue($value) {
+    $this->oldValue = $value;
+  }
+
+  public function getValue() {
+    return round($this->newValue);
+  }
 
   public function getGauge(): Gauge {
     return $this->gauge;
@@ -42,39 +89,37 @@ class GaugeChanges {
     $this->text = NULL;
   }
 
-  /**
-   * @ORM\Column(type="decimal", precision=4, scale=1)
-   */
-  private $newValue;
-
-  public function getValue() {
-    return round($this->newValue);
-  }
-
-  // Not to be saved in the DB, will be computed every time needed
-  private $oldValue;
-
-  public function getOldValue() {
-    return $this->oldValue;
-  }
-
-  public function setOldValue($value) {
-    $this->oldValue = $value;
-  }
-
-  /**
-   * @ORM\Column(type="datetime")
-   */
-  private $time;
-
   public function getTime() {
-    return $this->time->format('H:i d.m.Y');
+    return $this->time->format('d.m.Y \v H:i');
   }
 
-  /**
-   * @ORM\Column(type="string", length=200, nullable=true)
-   */
-  private $text;
+  public function getTimeText() {
+    $now = new DateTime;
+    $diff = $now->diff($this->time);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+      'y' => 'y',
+      'm' => 'mo',
+      'w' => 'w',
+      'd' => 'd',
+      'h' => 'h',
+      'i' => 'min',
+      's' => 's',
+    );
+    foreach ($string as $k => &$v) {
+      if ($diff->$k) {
+        $v = $diff->$k.''.$v;
+      } else {
+        unset($string[$k]);
+      }
+    }
+
+    $string = array_slice($string, 0, 1);
+    return implode(', ', $string).' ago';
+  }
 
   public function setText($text) {
     $this->text = $text;
@@ -84,24 +129,27 @@ class GaugeChanges {
     return $this->text;
   }
 
-  /**
-   * @ORM\Column(type="integer")
-   */
-  private $user;
+  public function getUser() {
+    return $this->user;
+  }
 
-  /**
-   * @ORM\Column(type="boolean")
-   */
-  private $discard;
+  public function setUser($user) {
+    $this->user = $user;
+  }
 
   public function setDiscard() {
     $this->discard = true;
+  }
+
+  public function isDiscarded() {
+    return $this->discard;
   }
 
   public function toString() {
     return "GaugeChange: <br><br>".
             "Gauge: ".$this->gauge->getId()."<br><br>".
             "Time: ".$this->time->format('Y-m-d H:i:s').
+            "<br>Text: ".$this->text.
             "<br>NewValue: ".$this->newValue;
   }
 }

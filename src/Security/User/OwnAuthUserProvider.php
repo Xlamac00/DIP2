@@ -26,6 +26,8 @@ class OwnAuthUserProvider extends OAuthUserProvider {
    * @throws AccountExpiredException if the google id cookie is empty
    */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response) {
+//      die("ASDSA");
+//      die($response);
       try {
         $user = $this->repository->loadUserByGoogleId($response->getUsername());
       }

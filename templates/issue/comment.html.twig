@@ -1,15 +1,27 @@
 
-<div class="media">
-    <i class="fas fa-2x fa-user-circle align-self-start mr-4"></i>
+<div class="media mb-3">
+    <span title="{{ change.user.username }}" class="ml-1 mr-3">
+        {% if change.user.roles[0] == 'ROLE_ANONYMOUS' %}
+            <div class="mt-1 p-0 user-portrait" style="background-color: {{ change.user.color }}">
+                <i class="fas fa-2x fa-user-circle user-image-anonymous-big text-light"  ></i>
+            </div>
+        {% else %}
+            <img src="{{ change.user.imagelink }}" class="user-portrait user-image-google-big">
+        {% endif %}
+    </span>
     <div class="media-body mb-3">
         <div class="d-flex justify-content-between">
-            <h5 style="color: {{ change.gauge.color }}">{{ change.gauge.name }}: {{ change.oldValue }} % -> {{ change.value }} %</h5>
-            <span class="float-right">{{ change.time }}</span>
+            <span style="color: {{ change.gauge.color }}">{{ change.gauge.name }}: {{ change.oldValue }}
+                <i class="fas fa-angle-right"></i> <b>{{ change.value }}</b> %</span>
+            <small class="float-right text-secondary" title="{{ change.time }}">{{ change.timeText }}</small>
         </div>
-        {% if change.text|length > 0 %}
-            <div class="border border-secondary rounded px-2 py-1">
-                {{ change.text }}
+        <div class="d-flex justify-content-between">
+            <div class="pl-1 float-left">
+                {% if change.text|length > 0 %}
+                        {{ change.text }}
+                {% endif %}
             </div>
-        {% endif %}
+            <a href="" class="float-right">+1</a>
+        </div>
     </div>
 </div>

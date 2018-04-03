@@ -51,6 +51,39 @@ class User implements UserInterface, \Serializable {
    */
   private $isActive;
 
+  /** Variables set in the authenticator if the user is granted permission to see certain pages.  */
+  private $permissionPageId;
+  private $permissionRole;
+
+  public function setPagePermission($pageId, $role) {
+    $this->permissionPageId = $pageId;
+    $this->permissionRole = $role;
+  }
+
+//  public function getTest() {
+//    return $this->id.",".$this->permissionPageId.", ".$this->permissionRole;
+//  }
+
+//  /** Checks rights for the current page to edit.
+//   * These variables are set in page authenticator.
+//   * @param $pageId - 8 char id of the page the rights are for
+//   * @return boolean - if the user has rights to edit given page
+//   */
+//  public function canWrite($pageId) {
+//    if($this->permissionPageId === $pageId) {
+//      switch ($this->permissionRole) {
+//        case Board::ROLE_ANON:
+//        case Board::ROLE_ADMIN:
+//          return true;
+//        case Board::ROLE_WRITE:
+//          return !$this->isAnonymous(); // anonymous users cant write
+//        case Board::ROLE_READ:
+//          return false;
+//      }
+//    }
+//    return false;
+//  }
+
   public function __construct() {
     $this->isActive = true;
     $this->email = null;
@@ -60,6 +93,9 @@ class User implements UserInterface, \Serializable {
     // $this->salt = md5(uniqid('', true));
   }
 
+  public function getId() {
+    return $this->id;
+  }
   public function setUsername($name) {
     $this->username = $name;
   }
@@ -81,6 +117,9 @@ class User implements UserInterface, \Serializable {
   public function getPassword() {
     return null;
   }
+  public function getEmail() {
+    return $this->email;
+  }
   public function getGoogleId() {
     return $this->googleId;
   }
@@ -89,7 +128,6 @@ class User implements UserInterface, \Serializable {
   }
   public function getColor() {
       return $this->color;
-      return null;
   }
 
   // Username is unique 20 char string
@@ -99,6 +137,13 @@ class User implements UserInterface, \Serializable {
   }
 
   public function getUniqueLink() {
+    if($this->isAnonymous())
+      return $this->link;
+    else
+      return $this->googleId;
+  }
+
+  public function getAnonymousLink() {
     return $this->link;
   }
 
