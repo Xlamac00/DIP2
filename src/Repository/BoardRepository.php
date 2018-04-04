@@ -11,6 +11,7 @@ use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -74,6 +75,32 @@ class BoardRepository extends AbstractSharableEntityRepository {
       $users = $issueRoleRepository->getIssueUsers($issue->getId());
       $issue->setAllUsers($users);
     }
+  }
+
+  public function createNewBoard($name, $currentUser) {
+    $board = new Board();
+    $board->setName($name);
+    $board->setShareEnabled(true);
+    $board->setShareRights(Board::ROLE_ANON);
+    while(1) { // try generating random strings
+      try{
+        $board->generateLinks();
+        $this->manager->persist($board);
+        $this->manager->flush();
+        break;
+      }
+      catch (UniqueConstraintViolationException $e) { //random string was not unique! (probably never gonna happen)
+        continue;
+      }
+    }
+
+    // set current user as admin - he created this issue
+    $admin = new BoardRole();
+    $admin->setRole(Board::ROLE_ADMIN);
+    $admin->setBoard($board);
+    $admin->setUser($currentUser);
+    $this->manager->persist($admin);
+    $this->manager->flush();
   }
 
   /**

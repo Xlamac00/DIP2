@@ -3,5 +3,17 @@
 {% block body %}
     <main role="main" class="col-xl-12">
         <h1>Welcome</h1>
+
+        <p class="text-secondary">Zatím nemáte práva k žádnému z projektů.</p>
+        <br>
+        {% if link|length > 0 %}
+            Prozatím využijte odkaz ke sdílení testovacího projektu. Vytváření nových projektů bude v další verzi :)
+            <br><br>
+            <a href="{{ link }}">{{ link }}</a>
+        {% else %}
+            <form method="POST" class="form-control" action="/newBoard">
+                <button class="btn btn-success">Vytvorit testovaci projekt</button>
+            </form>
+        {% endif %}
     </main>
 {% endblock %}

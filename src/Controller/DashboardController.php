@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Board;
 use App\Entity\BoardRole;
+use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -19,7 +20,14 @@ class DashboardController extends Controller {
     /** @var BoardRole[] $boards */
     $boards = $boardRole->getUserBoards($this->getUser());
     if(sizeof($boards) == 0) { // user has nothing yet
-      return $this->render('homepage.html.twig');
+      /** @var BoardRepository $boardRepository */
+      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
+      $board = $boardRepository->getBoard(1);
+      if($board == null) {
+        return $this->render('homepage.html.twig');
+      }
+      else
+        return $this->render('homepage.html.twig', ['link' => $board->getUrl()]);
     }
     elseif(sizeof($boards) == 1) {
       return $this->redirectToRoute('board', array('link' => $boards[0]->getBoard()->getPageId(),
@@ -28,6 +36,16 @@ class DashboardController extends Controller {
 //      return $this->render('dashboard/board-overview.html.twig', ["board" => $board]);
     }
 //    else {}
+  }
+
+  /**
+   * @Route("/newBoard", name="newBoard")
+   */
+  public function newBoard() {
+    /** @var BoardRepository $board */
+    $board = $this->getDoctrine()->getRepository(Board::class);
+    $board->createNewBoard('Rockový koncert', $this->getUser());
+    die("Created. Return to previous page.");
   }
 
   /**
