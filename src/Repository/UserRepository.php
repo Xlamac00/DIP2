@@ -37,6 +37,7 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
       );
   }
 
+  /** @return User $user */
   public function loadUserByGoogleId($googleId) {
     if(!isset($this->user) || $this->user->getGoogleId() != $googleId)
       $this->user = $this->findOneBy(["googleId" => $googleId]);

@@ -166,42 +166,31 @@ class BoardRoleRepository extends ServiceEntityRepository {
     if($role != Board::ROLE_ADMIN)
       throw new AuthenticationException('Not enough rights to make this change');
 
+    /** @var UserRepository $userRepository */
+    $userRepository = $this->manager->getRepository(User::class);
     if(is_numeric($uniquelink)) // google id
-      $where = 'u.googleId = :uniquelink';
-    else // my own user, they have dot and chars in the id
-      $where = 'u.link = :uniquelink AND u.googleId IS NULL';
-
-    $qb = $this->createQueryBuilder('r')
-      ->join('App\Entity\User', 'u')
-      ->andWhere('r.user = u.id')
-      ->andWhere($where)
-      ->andWhere('r.board = :boardId')
-      ->setParameter('uniquelink', $uniquelink)
-      ->setParameter('boardId', $board)
-      ->getQuery();
-    $user = $qb->execute();
-    if(sizeof($user) != 1)
+      $user = $userRepository->loadUserByGoogleId($uniquelink);
+    else
+      $user = $userRepository->loadUserByUsername($uniquelink);
+    if($user === null)
       throw new AuthenticationException('No user found to change his rights');
-    $user[0]->delete();
-    $this->manager->persist($user[0]);
+
+    /** @var BoardRepository $boardRepository */
+    $boardRepository = $this->manager->getRepository(Board::class);
+    $board = $boardRepository->getBoard($board);
+    $rights = $this->getUserRights($user, $board);
+    $rights->delete();
+    $this->manager->persist($rights);
     $this->manager->flush();
 
-    // Get all the issues for the board and its right and remove user from them
-    $query = $this->manager->createQuery(
-      'SELECT r
-        FROM App\Entity\IssueRole r
-        JOIN App\Entity\Issue i
-        JOIN App\Entity\User u
-        WHERE i.board = :boardId
-          AND r.issue = i.id
-          AND r.user = u.id
-          AND '.$where
-    )->setParameter('boardId', $board)
-      ->setParameter('uniquelink', $uniquelink);
-    $issues = $query->execute();
-    foreach($issues as $issue) {
-      $issue->delete();
-      $this->manager->persist($issue);
+    foreach($board->getIssues() as $issue) {
+      /** @var IssueRoleRepository $issueRoleRepository */
+      $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
+      $right = $issueRoleRepository->getUserRights($user, $issue);
+      if($right !== null) {
+        $right->delete();
+        $this->manager->persist($right);
+      }
     }
     $this->manager->flush();
   }
@@ -216,34 +205,64 @@ class BoardRoleRepository extends ServiceEntityRepository {
    */
   public function checkUsersRights($boardId, $userId, $googleId = null) {
     if($userId instanceof User) {
-      if($userId->isAnonymous())
-        $googleId = null;
-      else
-        $googleId = $userId->getGoogleId();
-      $userId = $userId->getUniqueLink();
+      $user = $userId;
     }
-    $identifier = (strlen($boardId) == 8 ? 'linkId' : 'id'); // if its linkId or dbId
-    $qb = $this->createQueryBuilder('r')
-      ->select('DISTINCT r.role')
-      ->join('App\Entity\User', 'u')
-      ->andWhere('r.user = u.id')
-      ->join('App\Entity\Board', 'b')
-      ->andWhere('b.'.$identifier.' = :pageId')
-      ->andWhere('r.board = b.id')
-      ->setParameter('pageId', $boardId);
-    // get user whether he is logged by google id or is anonymous
-    if($googleId !== null && strlen($googleId) > 10)
-      $q = $qb->andWhere('u.googleId = :userId')
-        ->setParameter('userId', $googleId);
-    else
-      $q = $qb->andWhere('u.link = :userId')
-        ->andWhere('u.googleId is null')
-        ->setParameter('userId', $userId);
+    else {
+      /** @var UserRepository $userRepository */
+      $userRepository = $this->manager->getRepository(User::class);
+      if ($googleId === null)
+        $user = $userRepository->loadUser($userId);
+      else
+        $user = $userRepository->loadUserByGoogleId($googleId);
+    }
 
-    $result = $q->getQuery()->execute();
-    if(sizeof($result) <= 0)
-      throw new AuthenticationException('No rights found');
-    return $result[0]['role'];
+    /** @var BoardRepository $boardRepository */
+    $boardRepository = $this->manager->getRepository(Board::class);
+    if(strlen($boardId) == 8)
+      $board = $boardRepository->getBoardByLink($boardId, $user);
+    else
+      $board = $boardRepository->getBoard($boardId, $user);
+    if($board === null)
+      throw new AuthenticationException('No board found');
+
+    $rights = $this->getUserRights($user, $board);
+    if($rights === null)
+      throw new AuthenticationException('No rights for the user');
+    if($rights->isDeleted() || !$rights->isActive())
+      throw new AuthenticationException('User deleted');
+
+    return $rights->getRights();
+
+//    if($userId instanceof User) {
+//      if($userId->isAnonymous())
+//        $googleId = null;
+//      else
+//        $googleId = $userId->getGoogleId();
+//      $userId = $userId->getUniqueLink();
+//    }
+//    $identifier = (strlen($boardId) == 8 ? 'linkId' : 'id'); // if its linkId or dbId
+//    $qb = $this->createQueryBuilder('r')
+//      ->select('DISTINCT r.role')
+//      ->join('App\Entity\User', 'u')
+//      ->andWhere('r.user = u.id')
+//      ->join('App\Entity\Board', 'b')
+//      ->andWhere('b.'.$identifier.' = :pageId')
+//      ->andWhere('r.board = b.id')
+//      ->setParameter('pageId', $boardId);
+//    // get user whether he is logged by google id or is anonymous
+//    if($googleId !== null && strlen($googleId) > 10)
+//      $q = $qb->andWhere('u.googleId = :userId')
+//        ->setParameter('userId', $googleId);
+//    else
+//      $q = $qb->andWhere('u.link = :userId')
+//        ->andWhere('u.googleId is null')
+//        ->setParameter('userId', $userId);
+//
+//    $result = $q->getQuery()->execute();
+//    if(sizeof($result) <= 0)
+//      throw new AuthenticationException('No rights found');
+//    die($result[0]->isDeleted()."A");
+//    return $result[0]['role'];
   }
 
   /** Checks if the board has set the share link and if the link is ok.
@@ -265,10 +284,8 @@ class BoardRoleRepository extends ServiceEntityRepository {
     $board = $query->execute();
     if(sizeof($board) != 1) // has not found anything
       throw new AuthenticationException('This board has no share link enabled');
-//    /** @var User $user */
-    if(!$user->isAnonymous()) $rights = Board::ROLE_ADMIN; // !!!!!!!!!!!!!!! SMAZAT. Dano pouze kvuli demonstraci
-    else
-      $rights = $board[0]->getShareRights();
+    $rights = Board::ROLE_ADMIN; // !!!!!!!!!!!!!!! SMAZAT. Dano pouze kvuli demonstraci
+//      $rights = $board[0]->getShareRights();
 
     // save record about the link use
     $bHistory = new BoardShareHistory();

@@ -29,6 +29,10 @@ class Board extends AbstractSharableEntity {
     return $this->issues;
   }
 
+  public function removeIssue($issue) {
+    $this->issues->removeElement($issue);
+  }
+
   /**
    * @param Issue $issue
    */

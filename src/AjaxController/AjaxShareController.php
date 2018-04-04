@@ -135,36 +135,6 @@ class AjaxShareController extends Controller {
     }
   }
 
-
-  /**
-   * @Route("/tests", name="tests")
-   */
-  public function tests() {
-    //    $user = "5ab2cfaf237527.88179802";
-    $user = "5ab3860491add4.72831813";
-    $board = '1';
-    $issue = 29;
-    $newRole = 'ROLE_ISSUE_READ';
-
-    //    $board = $request->request->get('board');
-    $option = 'ROLE_ISSUE_WRITE';
-    $anonymous = "true";
-
-    $enabled = true;
-
-    $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
-    try {
-      $enabled = $roleRepository->changeUserRights($this->getUser(), $board, $user, $newRole);
-      $success = true;
-    }
-    catch (Exception $e) {
-      $success = false;
-    }
-
-    $arrData = ['name' => $user, 'board' => $board, 'enabled' => $enabled, 'success' => $success];
-    die(var_dump($arrData));
-  }
-
   /**
    * @Route("/ajax/boardChangeUser", name="ajax_board_user_change")
    */
@@ -217,6 +187,42 @@ class AjaxShareController extends Controller {
 
 
   /**
+   * @Route("/tests", name="tests")
+   */
+  public function tests() {
+//        $user = "5ab2cfaf237527.88179802";
+//    $user = "5ab3860491add4.72831813";
+    $user = "5ac4cc04a79c88.95626601";
+
+    $board = '1';
+    $issue = 29;
+    $newRole = 'ROLE_ISSUE_READ';
+
+    //    $board = $request->request->get('board');
+    $option = 'ROLE_ISSUE_WRITE';
+    $anonymous = "true";
+
+    $enabled = true;
+    $render = '';
+
+    /** @var BoardRoleRepository $roleRepository */
+    $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
+    try {
+      $roleRepository->deleteUser($this->getUser(), $board, $user);
+      $users = $roleRepository->getBoardUsers($board);
+      $render = $this->renderView('dashboard/share-userlist.html.twig', ["users" => $users]);
+      $success = true;
+    }
+    catch (AuthenticationException $e) {
+      $success = false;
+    }
+
+    $arrData = ['name' => $user, 'board' => $board, 'result' => $render, 'success' => $success];
+    die(var_dump($arrData));
+  }
+
+
+  /**
    * @Route("/ajax/boardRemoveUser", name="ajax_board_user_remove")
    */
   public function boardRemoveUser(Request $request) {
@@ -225,6 +231,7 @@ class AjaxShareController extends Controller {
       $board = $request->request->get('board');
       $render = '';
 
+      /** @var BoardRoleRepository $roleRepository */
       $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
       try {
         $roleRepository->deleteUser($this->getUser(), $board, $user);

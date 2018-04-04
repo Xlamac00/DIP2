@@ -62,14 +62,18 @@ class BoardRepository extends AbstractSharableEntityRepository {
     $issueRepository = $this->manager->getRepository(Issue::class);
     // count the number of changes and get the latest ones for each issue
     foreach($this->board->getIssues() as $issue) {
+      $rights = $issueRoleRepository->getUserRights($user, $issue);
+      if($rights === null) {
+        $this->board->removeIssue($issue);
+        continue;
+      }
+      $issue->setThisUserRights($rights);
       /** @var GaugeChangesRepository $gaugeChangesRepository */
       $gaugeChangesRepository = $this->manager->getRepository(GaugeChanges::class);
       $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
       $issue->setCountGaugeComments(sizeof($changes));
       $issue->setLatestGaugeComments(array_slice($changes, 0, 3));
       // gets users rights to this issue
-      $rights = $issueRoleRepository->getUserRights($user, $issue);
-      $issue->setThisUserRights($rights);
       $activeUsers = $issueRepository->getAllActiveUsers($issue->getId(), true);
       $issue->setActiveUsers($activeUsers);
       $users = $issueRoleRepository->getIssueUsers($issue->getId());
