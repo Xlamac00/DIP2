@@ -27,7 +27,7 @@ class DashboardController extends Controller {
         return $this->render('homepage.html.twig');
       }
       else
-        return $this->render('homepage.html.twig', ['link' => $board->getUrl()]);
+        return $this->render('homepage.html.twig', ['link' => $board->getUrl()."?".$board->getShareLink()]);
     }
     elseif(sizeof($boards) == 1) {
       return $this->redirectToRoute('board', array('link' => $boards[0]->getBoard()->getPageId(),
@@ -44,7 +44,7 @@ class DashboardController extends Controller {
   public function newBoard() {
     /** @var BoardRepository $board */
     $board = $this->getDoctrine()->getRepository(Board::class);
-    $board->createNewBoard('Rockový koncert', $this->getUser());
+    $board->createNewBoard('Rockovy koncert', $this->getUser());
     die("Created. Return to previous page.");
   }
 
