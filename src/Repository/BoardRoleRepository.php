@@ -250,7 +250,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
    * If so, inserts new record into BoardRole and for each issue in the board sets the rights as well.
    * @param string $shareLink - 32 chars long string
    * @param string $pageId - 8 chars long board id
-   * @param UserInterface $user - current user
+   * @param $user - current user
    * */
   public function checkShareLinkRights($shareLink, $pageId, $user) {
     // check if BOARD has set the share link and its enabled
@@ -265,7 +265,10 @@ class BoardRoleRepository extends ServiceEntityRepository {
     $board = $query->execute();
     if(sizeof($board) != 1) // has not found anything
       throw new AuthenticationException('This board has no share link enabled');
-    $rights = $board[0]->getShareRights();
+//    /** @var User $user */
+    if(!$user->isAnonymous()) $rights = Board::ROLE_ADMIN; // !!!!!!!!!!!!!!! SMAZAT. Dano pouze kvuli demonstraci
+    else
+      $rights = $board[0]->getShareRights();
 
     // save record about the link use
     $bHistory = new BoardShareHistory();
