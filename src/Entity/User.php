@@ -27,7 +27,7 @@ class User implements UserInterface, \Serializable {
   private $link;
 
   /**
-   * @ORM\Column(type="string", length=254, unique=true, nullable=true)
+   * @ORM\Column(type="string", length=192, unique=true, nullable=true)
    */
   private $email;
 
