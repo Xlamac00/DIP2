@@ -29,3 +29,6 @@ framework:
                 adapter: cache.app
             doctrine.system_cache_pool:
                 adapter: cache.system
+
+dbal:
+    url: '%env(resolve:CLEARDB_DATABASE_URL)%'

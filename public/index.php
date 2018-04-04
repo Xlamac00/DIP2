@@ -34,6 +34,11 @@ if ($trustedHosts = $_SERVER['TRUSTED_HOSTS'] ?? false) {
 
 $kernel = new Kernel($env, $debug);
 $request = Request::createFromGlobals();
+// tell Symfony about your reverse proxy
+// https://auth0.com/blog/symfony-tutorial-building-a-blog-part-3/
+Request::setTrustedProxies(
+  array($request->server->get('REMOTE_ADDR')),Request::HEADER_X_FORWARDED_ALL ^ Request::HEADER_X_FORWARDED_HOST
+);
 $response = $kernel->handle($request);
 $response->send();
 $kernel->terminate($request, $response);
