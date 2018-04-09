@@ -256,10 +256,12 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssue($issue_id, true);
+      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
       $issueRepository->updateGaugesIndex();
 
-      $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
+      /** @var GaugeChangesRepository $gaugeChangesRepository */
+      $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
+      $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
       $gaugeCount = $issueRepository->getNumberOfGauges();
 
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
