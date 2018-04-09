@@ -5,27 +5,49 @@
     <title>{% block title %}Welcome!{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block stylesheets %}
-        <script src="{{ asset('build/manifest.js') }}"></script>
-        <script src="{{ asset('build/vendor.js') }}"></script>
-        <script src="{{ asset('build/fonts-all.js') }}"></script>
-        <script src="{{ asset('build/fonts-solid.js') }}"></script>
-        {#<script src="{{ asset('build/app-bundle.js') }}"></script>#}
         <link rel="icon" type="image/x-icon" href="{{ asset('build/images/favicon.231567a8.ico') }}" />
         <link rel="stylesheet" href="{{ asset('build/bootstrap.css') }}" />
         <link rel="stylesheet" href="{{ asset('build/app.css') }}" />
+        <script src="{{ asset('build/manifest.js') }}"></script>
+        <script src="{{ asset('build/vendor.js') }}"></script>
+        {#<script src="{{ asset('build/bootjs.js') }}"></script>#}
+        {#<script src="{{ asset('build/app-bundle.js') }}"></script>#}
+        <script src="{{ asset('build/fonts-all.js') }}"></script>
+        <script src="{{ asset('build/fonts-solid.js') }}"></script>
     {% endblock %}
 </head>
 <body>
 {% block menu %}
     <header>
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top my-primary-dark">
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top
+                    {% if board is defined %}{{ board.background }}{% else %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('homepage') }}" class="navbar-brand">Logo</a>
+                <a href="{{ url('homepage') }}" class="navbar-brand mr-5">Logo</a>
                 <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                    <div class="btn-group">
+                        {% if board is defined %}
+                            <a href="../../{{ board.url }}">
+                                <button class="btn menubtn text-light pointer {{ board.background }}">
+                                    {{ board.name }}
+                                </button>
+                            </a>
+                            <button type="button" id="navbarProjectBtn" data-toggle="dropdown"
+                                    class="btn menubtn dropdown-toggle dropdown-toggle-split pointer text-light {{ board.background }}"
+                                     aria-haspopup="true" aria-expanded="false">
+                                <span class="sr-only"> Others</span>
+                            </button>
+                        {% elseif not(is_granted('ROLE_ANONYMOUS') and boards|length == 0) %}
+                            <button type="button" class="btn menubtn dropdown-toggle pointer text-light my-primary-dark"
+                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="navbarProjectBtn">
+                                Projects
+                            </button>
+                        {% endif %}
+                        <div class="dropdown-menu" id="navbarProjectsBody"></div>
+                    </div>
                     {{ include('navbar-user.html.twig') }}
                 </div>
             </div>
@@ -37,8 +59,10 @@
     <div class="row">
         {% block body %}{% endblock %}
     </div>
+    {{ include('board/new-modal.html.twig') }}
 </div>
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+{% endblock %}
 </body>
 </html>

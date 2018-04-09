@@ -1,8 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{% block menu %}
+    {% set board = issue.board %}
+    {{  parent() }}
+{% endblock %}
+
 {% block stylesheets %}
     {{  parent() }}
-    <link rel="stylesheet" href="{{ asset('build/graph-edit.css') }}" />
     <script src="{{ asset('build/chart.js') }}"></script>
     {% if issue.canUserWrite %}
         <script src="{{ asset('build/chart-resizable.js') }}"></script>
@@ -89,7 +93,7 @@
                                 <i class="fas fa-2x fa-share"></i>
                             </button>
                             </span>
-                            {{ include('dashboard/issue-share.html.twig', {'issue': issue}) }}
+                            {{ include('issue/share-modal.html.twig', {'issue': issue}) }}
                         {% endif %}
                         {% if issue.canUserManage %}
                             <div class="dropdown mx-2">

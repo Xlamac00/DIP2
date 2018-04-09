@@ -8,7 +8,6 @@
             {% if role.rights is constant('App\\Entity\\Board::ROLE_ADMIN') %}
                 <span class="text-secondary">Is owner</span>
             {% else %}
-                {{ role.user.uniquelink }}
                 <select class="custom-select userChange" name="{{ role.user.uniquelink }}">
                     <option value="{{ constant('App\\Entity\\Board::ROLE_WRITE') }}"
                             {% if (role.rights is constant('App\\Entity\\Board::ROLE_ANON') or

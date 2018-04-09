@@ -1,14 +1,22 @@
 {% if user is iterable %} {# if its an array and not a user object - show there are some more users #}
-    <span class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">
-        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }}"
-           style="color: #ddd; position: relative; top: -3px"></i>
-        <span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-3"
-        style="font-weight:900;">+{{ user['count'] }}</span>
-    </span>
+    {#<div class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">#}
+        {#<i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }}"#}
+           {#style="color: #ddd; position: relative;"></i>#}
+        {#<div class="user-image-anonymous-bg bg-success" ></div>#}
+        {#<span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-3"#}
+        {#style="font-weight:900;">+{{ user['count'] }}</span>#}
+    {#</div>#}
+    <div class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">
+        <i class="fas fa-2x fa-user-circle  user-image-anonymous-{{ size }}"
+           style="position: absolute; top: 18px; color: #ddd"></i>
+        <div class="user-image-anonymous-bg bg-light"></div>
+        <span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-4"
+        style="font-weight:900; z-index: 5">+{{ user['count'] }}</span>
+    </div>
 {% elseif user.isAnonymous %}
-    <div class="mx-1 p-0 user-portrait float-left" style="background-color: {{ user.color }}"
-         title="{{ user.username }}">
-        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }} text-light"></i>
+    <div class="mr-1 p-0 user-portrait float-left" title="{{ user.username }}">
+        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }} text-light position-absolute"></i>
+        <div class="user-image-anonymous-bg" style="background-color: {{ user.color }}"></div>
     </div>
 {% else %}
     <img src="{{ user.imagelink }}" class="mr-1 p-0 user-portrait user-image-google-{{ size }} float-left"

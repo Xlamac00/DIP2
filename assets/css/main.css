@@ -22,33 +22,33 @@ h1 {
  * Sidebar
  */
 
-.sidebar {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    padding: 20px 0;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    border-right: 1px solid #eee;
-}
+/*.sidebar {*/
+    /*position: fixed;*/
+    /*top: 51px;*/
+    /*bottom: 0;*/
+    /*left: 0;*/
+    /*z-index: 1000;*/
+    /*padding: 20px 0;*/
+    /*overflow-x: hidden;*/
+    /*overflow-y: auto; !* Scrollable contents if viewport is shorter than content. *!*/
+    /*border-right: 1px solid #eee;*/
+/*}*/
 
-.sidebar .nav {
-    margin-bottom: 20px;
-}
+/*.sidebar .nav {*/
+    /*margin-bottom: 20px;*/
+/*}*/
 
-.sidebar .nav-item {
-    width: 100%;
-}
+/*.sidebar .nav-item {*/
+    /*width: 100%;*/
+/*}*/
 
-.sidebar .nav-item + .nav-item {
-    margin-left: 0;
-}
+/*.sidebar .nav-item + .nav-item {*/
+    /*margin-left: 0;*/
+/*}*/
 
-.sidebar .nav-link {
-    border-radius: 0;
-}
+/*.sidebar .nav-link {*/
+    /*border-radius: 0;*/
+/*}*/
 
 /*
  * Dashboard
@@ -69,25 +69,108 @@ h1 {
     cursor: pointer;
 }
 
-.my-primary {
-    background-color: #00bcd4;
+.my-primary-dark { background-color: #008ba3; }
+
+.bg-ad1457 { background-color: #ad1457; }
+.bg-008ba3 { background-color: #008ba3; }
+.bg-455a64 { background-color: #455a64; }
+.bg-0277bd { background-color: #0277bd; }
+.bg-795548 { background-color: #795548; }
+
+.bg-ad1457-light { background-color: #ff84b2; }
+.bg-ad1457-light:hover { background-color: #e35183; }
+.bg-008ba3-light { background-color: #57C9E2; }
+.bg-008ba3-light:hover { background-color: #54bbd4; }
+.bg-455a64-light { background-color: #718792; }
+.bg-455a64-light:hover { background-color: #455a64; }
+.bg-0277bd-light { background-color: #90d6ff; }
+.bg-0277bd-light:hover { background-color: #58a5f0; }
+.bg-795548-light { background-color: #a98274; }
+.bg-795548-light:hover { background-color: #795548; }
+
+.color900c3f { background-color: #900c3f;  }
+.colorc70039 { background-color: #c70039;  }
+.colorff5733 { background-color: #ff5733;  }
+.colorff8d1a { background-color: #ff8d1a;  }
+.colorffc300 { background-color: #ffc300;  }
+.coloreddd53 { background-color: #eddd53;  }
+.coloradd45c { background-color: #add45c;  }
+.color57c785 { background-color: #57c785;  }
+.color00baad { background-color: #00baad;  }
+.color2a7b9b { background-color: #2a7b9b;  }
+.color3d3d6b { background-color: #3d3d6b;  }
+.color511849 { background-color: #511849;  }
+
+/* **********************************************
+ * ****** CUSTOM RADIO BUTTONS with colors ******
+ * **********************************************/
+.radio-container {
+    display: inline-block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 5px;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+    font-size: 20px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
-.my-primary-dark {
-    background-color: #008ba3;
+.radio-container input { /*!* Hide the browser's default radio button *!*/
+    position: absolute;
+    opacity: 0;
 }
-.my-secondary {
-    background-color: #0277bd;
+.checkmark { /* Create a custom radio button */
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 30px;
+    width: 30px;
+    border-radius: 10%;
+}
+.container:hover input ~ .checkmark { /* On mouse-over, add a grey background color */
+    filter: brightness(85%);
+}
+.checkmark:after { /* Create the indicator (the dot/circle - hidden when not checked) */
+    content: "";
+    position: absolute;
+    display: none;
+}
+.container input:checked ~ .checkmark:after { /* Show the indicator (dot/circle) when checked */
+    display: block;
+}
+.container .checkmark:after { /* Style the indicator (dot/circle) */
+    top: 7px;
+    left: 7px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
 }
 
+/* **********************************************
+ * *************** USER PORTRAITS ***************
+ * **********************************************/
 .user-portrait {
     border-radius: 999em;
     padding: 0;
     margin: 0;
 }
+.user-image-anonymous-bg {
+    display: inline-block;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    margin: 2px;
+    border-radius: 999em;
+}
 .user-image-anonymous-small {
     border: none;
-    margin: -3px;
-    font-size: 36px
+    margin: 0;
+    font-size: 36px;
+    z-index: 2;
 }
 .user-image-anonymous-big {
     border: none;
@@ -100,6 +183,10 @@ h1 {
 .user-image-google-big {
     width: 40px;
 }
+
+/* **********************************************
+ * ***************  ***************
+ * **********************************************/
 .card {
     box-shadow: 0 0 5px 2px #CCCCCC;
     border: none;
@@ -108,15 +195,13 @@ h1 {
 .text-smallcaps {
     font-variant: small-caps;
 }
-/* Add shadow behind dropdown menu dialog */
-.my-dropdown {
+.my-dropdown { /* Add shadow behind dropdown menu dialog */
     -webkit-box-shadow: 0 0 10px 0 rgba(168,168,168,1);
     -moz-box-shadow: 0 0 10px 0 rgba(168,168,168,1);
     box-shadow: 0 0 10px 0 rgba(168,168,168,1);
     border: 1px solid #dbdbdb;
  }
-/* little arrow to dropdown menus */
-.my-dropdown:after {
+.my-dropdown:after { /* little arrow to dropdown menus */
     position: absolute;
     top: -6px;
     right: 10px;
@@ -128,4 +213,12 @@ h1 {
 }
 .card-columns {
     column-count: 3;
+}
+.dashboard-userlist {
+    top: -40px;
+    position: relative;
+}
+
+.menubtn {
+    filter: brightness(110%);
 }

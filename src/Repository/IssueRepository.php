@@ -148,30 +148,13 @@ class IssueRepository extends AbstractSharableEntityRepository {
   /** Returns all users cooperating on this issue.
    * If the user has rights to read, but did no change there, he is not returned
    *
-   * @param string $issue_id - id of the issue
-   * @param bool $firstTwo - if it should return all the users, or only first two
+   * @param string $issueId - id of the issue
+   * @param integer $onlyFirstX - if it should return all the users, or only first x
    *
    * @return array
    */
-  public function getAllActiveUsers($issue_id, $firstTwo = false) {
-    // First, get all administrators for the given issue
-    $qb = $this->createQueryBuilder('i')
-      ->select('r')
-      ->join('App\Entity\IssueRole', 'r')
-      ->andWhere('r.role = :role')
-      ->andWhere('r.issue = i.id')
-      ->andWhere('i.id= :issue')
-      ->setParameter('role', Board::ROLE_ADMIN)
-      ->setParameter('issue', $issue_id)
-      ->getQuery();
+  public function getAllActiveUsers($issueId, $onlyFirstX = 0) {
     $result = array();
-    $admins = array();
-    $users = $qb->execute();
-    foreach($users as $user) { // get all admins to start
-      array_unshift($result, $user->getUser());
-      $admins[] = $user->getUser()->getId();
-    }
-
     // get all other guys who commented, in the order of comment count
     $qb = $this->createQueryBuilder('i')
       ->select('c, COUNT(c) as pocet')
@@ -180,21 +163,37 @@ class IssueRepository extends AbstractSharableEntityRepository {
       ->join('App\Entity\GaugeChanges', 'c')
       ->andWhere('c.gauge = g.id')
       ->andWhere('i.id= :issue')
-      ->setParameter('issue', $issue_id)
+      ->andWhere('c.discard = 0')
+      ->setParameter('issue', $issueId)
       ->groupBy('c.user')
       ->orderBy('pocet', 'DESC')
       ->getQuery();
     $changes = $qb->execute();
-    foreach($changes as $change) { // get all admins to start
-      if(in_array($change[0]->getUser()->getId(), $admins))
-        continue; // user was already admin, no need to be there twice
+    foreach($changes as $change) {
       array_push($result, $change[0]->getUser());
     }
-    if($firstTwo === false || sizeof($result) <= 3) // return all users
+
+    if(empty($result)) { // If there are no changes by users, add at least all admins
+      $qb = $this->createQueryBuilder('i')
+        ->select('r')
+        ->join('App\Entity\IssueRole', 'r')
+        ->andWhere('r.role = :role')
+        ->andWhere('r.issue = i.id')
+        ->andWhere('i.id= :issue')
+        ->setParameter('role', Board::ROLE_ADMIN)
+        ->setParameter('issue', $issueId)
+        ->getQuery();
+      $users = $qb->execute();
+      foreach($users as $user) { // get all admins to start
+        array_unshift($result, $user->getUser());
+      }
+    }
+
+    if($onlyFirstX === 0 || sizeof($result) <= $onlyFirstX+1) // return all users
       return $result;
     // get only first two users and return number of hidden users as array
-    $cut = array_slice($result, 0, 2);
-    $cut[3] = ['count' => (sizeof($result)-2)];
+    $cut = array_slice($result, 0, $onlyFirstX);
+    $cut[$onlyFirstX+1] = ['count' => (sizeof($result)-$onlyFirstX)];
     return $cut;
   }
 

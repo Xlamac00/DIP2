@@ -8,6 +8,7 @@ Procfile
 app/config/parameters.yml
 doc/zprava/zprava.pdf
 src/Migrations/*
+yarn-error.log
 
 ###> symfony/framework-bundle ###
 .env

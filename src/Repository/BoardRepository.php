@@ -74,16 +74,58 @@ class BoardRepository extends AbstractSharableEntityRepository {
       $issue->setCountGaugeComments(sizeof($changes));
       $issue->setLatestGaugeComments(array_slice($changes, 0, 3));
       // gets users rights to this issue
-      $activeUsers = $issueRepository->getAllActiveUsers($issue->getId(), true);
+      $activeUsers = $issueRepository->getAllActiveUsers($issue->getId(), 2);
       $issue->setActiveUsers($activeUsers);
       $users = $issueRoleRepository->getIssueUsers($issue->getId());
       $issue->setAllUsers($users);
     }
   }
 
-  public function createNewBoard($name, $currentUser) {
+  /** Returns all users that changed anything in this Board.
+   * @param Board $board - Board object
+   * @param integer $onlyFirstX - show all users all only first x
+   * @return array $activeUsers - all contributing users
+   */
+  public function getAllActiveUsers($board, $onlyFirstX = 0) {
+    /** @var User[] $activeUsers */
+    $activeUsers = array();
+    /** @var IssueRepository $issueRepository */
+    $issueRepository = $this->manager->getRepository(Issue::class);
+    foreach($board->getIssues() as $issue) {
+      /** @var User[] $active */
+      $active = $issueRepository->getAllActiveUsers($issue->getId());
+      foreach($active as $user) {
+        $found = false;
+        foreach($activeUsers as $active) { // check if the user isnt in the array already
+          if($active->getId() === $user->getId()) {
+            $found = true;
+            break;
+          }
+        }
+        if($found === false) // add new user
+          $activeUsers[] = $user;
+      }
+    }
+
+    if($onlyFirstX === 0 || sizeof($activeUsers) <= $onlyFirstX+1) // return all users
+      return $activeUsers;
+    // get only first two users and return number of hidden users as array
+    $cut = array_slice($activeUsers, 0, $onlyFirstX);
+    $cut[$onlyFirstX+1] = ['count' => (sizeof($activeUsers)-$onlyFirstX)];
+    return $cut;
+  }
+
+  /** Creates new Board.
+   *
+   * @param string $name - name of the Board. Will be also converted to url friendly version
+   * @param string $color - hexa value of the color for the board background
+   * @param User $currentUser - currently logged user, will be made admin
+   * @return string url
+   */
+  public function createNewBoard($name, $color, $currentUser) {
     $board = new Board();
     $board->setName($name);
+    $board->setColor($color);
     $board->setShareEnabled(true);
     $board->setShareRights(Board::ROLE_ANON);
     while(1) { // try generating random strings
@@ -105,6 +147,7 @@ class BoardRepository extends AbstractSharableEntityRepository {
     $admin->setUser($currentUser);
     $this->manager->persist($admin);
     $this->manager->flush();
+    return $board->getUrl();
   }
 
   /**

@@ -19,6 +19,7 @@ class AjaxIssueController extends Controller {
       $name = $request->request->get('name');
       $board_id = $request->request->get('board');
 
+      /** @var IssueRepository $repo */
       $repo = $this->getDoctrine()->getRepository(Issue::class);
       $link = $repo->createNewIssue($name, $board_id, $this->getUser());
 
@@ -55,7 +56,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssueByLink($link);
+      $issue = $issueRepository->getIssueByLink($link, $this->getUser());
       $entityManager = $this->getDoctrine()->getManager();
       $entityManager->remove($issue);
       $entityManager->flush();

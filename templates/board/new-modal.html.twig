@@ -1,0 +1,44 @@
+
+<!-- Modal -->
+<div class="modal fade" id="modalNewBoard" tabindex="-1" role="dialog" aria-labelledby="modalNewBoardLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" id="modalNewBoardHeader">
+                <h4 class="modal-title" id="modalNewBoardLabel">Create new project</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="modalNewBoardColors">
+                    <label class="radio-container">
+                        <input type="radio" name="color" value="008ba3" checked>
+                        <span class="checkmark bg-008ba3"></span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="color" value="0277bd">
+                        <span class="checkmark bg-0277bd"></span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="color" value="ad1457">
+                        <span class="checkmark bg-ad1457"></span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="color" value="795548">
+                        <span class="checkmark bg-795548"></span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="color" value="455a64">
+                        <span class="checkmark bg-455a64"></span>
+                    </label>
+                </form>
+                <input type="text" placeholder="New project name" class="form-control" id="modalNewBoardName">
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-primary float-left pointer"
+                        id="modalNewBoardCreateBtn">Create</button>
+            </div>
+        </div>
+    </div>
+</div>

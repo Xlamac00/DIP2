@@ -17,43 +17,24 @@ class DashboardController extends Controller {
   public function index() {
     /** @var BoardRoleRepository $boardRole */
     $boardRole = $this->getDoctrine()->getRepository(BoardRole::class);
-    /** @var BoardRole[] $boards */
-    $boards = $boardRole->getUserBoards($this->getUser());
+    /** @var BoardRole[][] $boards */
+    $boards = $boardRole->getUserBoardsAndFavorite($this->getUser());
     if(sizeof($boards) == 0) { // user has nothing yet
-      /** @var BoardRepository $boardRepository */
-      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $board = $boardRepository->getBoard(1);
-      if($board == null) {
-        return $this->render('homepage.html.twig');
-      }
-      else
-        return $this->render('homepage.html.twig', ['link' => $board->getUrl()."?".$board->getShareLink()]);
+      return $this->render('dashboard/homepage.html.twig');
     }
     elseif(sizeof($boards) == 1) {
-      return $this->redirectToRoute('board', array('link' => $boards[0]->getBoard()->getPageId(),
-                                                   'name' => $boards[0]->getBoard()->getLink()));
-//      $board = $this->getDoctrine()->getRepository(Board::class)->getBoard(1, $this->getUser());
-//      return $this->render('dashboard/board-overview.html.twig', ["board" => $board]);
+      return $this->redirectToRoute('board', array('link' => $boards['boards'][0]->getBoard()->getPageId(),
+                                                   'name' => $boards['boards'][0]->getBoard()->getLink()));
     }
-//    else {}
-  }
-
-  /**
-   * @Route("/newBoard", name="newBoard")
-   */
-  public function newBoard() {
-    /** @var BoardRepository $board */
-    $board = $this->getDoctrine()->getRepository(Board::class);
-    $board->createNewBoard('Rockovy koncert', $this->getUser());
-    die("Created. Return to previous page.");
-  }
-
-  /**
-   * @Route("/b/{link}/{name}", name="board")
-   */
-  public function showBoard($link, $name) {
-    $board = $this->getDoctrine()->getRepository(Board::class)->getBoardByLink($link, $this->getUser());
-
-    return $this->render('dashboard/board-overview.html.twig', ["board" => $board]);
+    else { // user has more than one board
+      /** @var BoardRepository $boardRepository */
+      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
+      foreach($boards['boards'] as $board) { // get all users that contributed to all boards
+        $active = $boardRepository->getAllActiveUsers($board->getBoard(), 4);
+        $board->getBoard()->setActiveUsers($active);
+      }
+      return $this->render('dashboard/homepage.html.twig',
+        ['boards' => $boards['boards'], 'favorite' => $boards['favorite']]);
+    }
   }
 }

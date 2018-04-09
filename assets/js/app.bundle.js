@@ -1,6 +1,9 @@
 
 $(document).ready(function() {
 
+    /** **************************************************************** **
+     *  ****************        NAVBAR - USERNAME        ***************
+     ** **************************************************************** **/
     var navbarUsername = document.getElementById('navbar-username');
     var navbarUserEdit = document.getElementById('navbar-user-edit');
     $('#navbar-user-menu').bind('click', function (e) { e.stopPropagation() });
@@ -22,7 +25,7 @@ $(document).ready(function() {
     };
     function ajaxChangeUsername(name) {
         if(name.length > 0) {
-            navbarUserEdit.innerHTML = '<i class="fas fa-1x fa-spinner"></i>';
+            navbarUserEdit.innerHTML = '<i class="fas fa-1x fa-spinner fa-spin"></i>';
             $.ajax({
                 url:'/ajax/userNameChange',
                 type: "POST",
@@ -35,6 +38,75 @@ $(document).ready(function() {
                     navbarUserEdit.innerHTML = '<i class="fas fa-1x fa-edit"></i>';
                     navbarUsername.disabled = true;
                     document.getElementById('user-name').value = data.name;
+                }
+            });
+        }
+    }
+    /** **************************************************************** **
+     *  **************         NAVBAR - MY PROJECTS        *************
+     ** **************************************************************** **/
+    var navbarProjectBtn = document.getElementById('navbarProjectBtn');
+    if(navbarProjectBtn !== null) {
+        navbarProjectBtn.onclick = function () {
+            var navbarProjectsBody = document.getElementById('navbarProjectsBody');
+            if (navbarProjectsBody.innerHTML.length === 0) { // My Projects body is empty - download it
+                navbarProjectsBody.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                $.ajax({
+                    url: '/ajax/getBoardFavorite',
+                    type: "POST",
+                    dataType: "json",
+                    data: {},
+                    async: true,
+                    success: function (data) {
+                        navbarProjectsBody.innerHTML = data.render;
+                    }
+                });
+            }
+        };
+        var name = document.getElementById('modalNewBoardName');
+        var colors = document.getElementById('modalNewBoardColors');
+        $('#modalNewBoard').on('shown.bs.modal', function () {
+            setHeaderBackground(colors);
+            name.focus();
+        });
+        $('.radio-container').click(function () {
+            setHeaderBackground(this);
+        });
+        function setHeaderBackground(container) {
+            var color = $('input[name=color]:checked', container).val();
+            if(color !== null && color !== undefined) {
+                name.classList.remove('is-invalid');
+                var header = document.getElementById('modalNewBoardHeader');
+                header.className = 'modal-header text-light bg-'+color;
+                name.focus();
+            }
+        }
+        var createBtn = document.getElementById('modalNewBoardCreateBtn');
+        createBtn.onmousedown = function() {
+            if(name.value.length <= 0) {
+                name.classList.add('is-invalid');
+                name.focus();
+            }
+            else {
+                name.classList.remove('is-invalid');
+                ajaxNewBoard();
+            }
+        };
+        function ajaxNewBoard() {
+            var loading = document.getElementById('modalNewBoardHeader');
+            loading.innerHTML =  '<i class="fa fa-2x fa-spinner fa-spin">';
+            var color = $('input[name=color]:checked', colors).val();
+            $.ajax({
+                url: '/ajax/boardNew',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "name": name.value,
+                    "color": color
+                },
+                async: true,
+                success: function (data) {
+                    location.href = data.link;
                 }
             });
         }

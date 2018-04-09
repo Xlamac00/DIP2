@@ -210,7 +210,7 @@ class AjaxShareController extends Controller {
     try {
       $roleRepository->deleteUser($this->getUser(), $board, $user);
       $users = $roleRepository->getBoardUsers($board);
-      $render = $this->renderView('dashboard/share-userlist.html.twig', ["users" => $users]);
+      $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
       $success = true;
     }
     catch (AuthenticationException $e) {
@@ -236,7 +236,7 @@ class AjaxShareController extends Controller {
       try {
         $roleRepository->deleteUser($this->getUser(), $board, $user);
         $users = $roleRepository->getBoardUsers($board);
-        $render = $this->renderView('dashboard/share-userlist.html.twig', ["users" => $users]);
+        $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
         $success = true;
       }
       catch (AuthenticationException $e) {
@@ -258,7 +258,7 @@ class AjaxShareController extends Controller {
       /** @var BoardRoleRepository $roleRepository */
       $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
       $users = $roleRepository->getBoardUsers($board);
-      $render = $this->renderView('dashboard/share-userlist.html.twig', ["users" => $users]);
+      $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
 
       $arrData = ['board' => $board, 'result' => $render];
       return new JsonResponse($arrData);
@@ -275,7 +275,7 @@ class AjaxShareController extends Controller {
       /** @var IssueRoleRepository $roleRepository */
       $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
       $users = $roleRepository->getIssueUsers($issue);
-      $render = $this->renderView('dashboard/share-userlist.html.twig', ["users" => $users]);
+      $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
 
       $arrData = ['issue' => $issue, 'result' => $render];
       return new JsonResponse($arrData);

@@ -15,6 +15,7 @@ class Board extends AbstractSharableEntity {
   public function __construct() {
     parent::__construct();
     $this->issues = new ArrayCollection();
+    $this->favorite = false;
   }
 
   /**
@@ -53,5 +54,43 @@ class Board extends AbstractSharableEntity {
 
   public function getUsers() {
     return $this->users;
+  }
+
+  /** Variable with array of users that contributed to this board.
+   * Has to be manually set (eg. from controllers) */
+  private $activeUsers;
+
+
+  /**
+   * @ORM\Column(type="string", length=7)
+   */
+  private $color;
+
+  public function setColor($color) {
+    if(strlen($color) == 7)
+      $this->color = $color;
+    elseif(strlen($color) == 6)
+      $this->color = '#'.$color;
+    else
+      $this->color = '#008ba3';
+  }
+
+  public function getColor() {
+    return $this->color;
+  }
+
+  public function getBackground() {
+    return 'bg-'.substr($this->color,1);
+  }
+
+  /**
+   * @param array $usersArray
+   */
+  public function setActiveUsers($usersArray) {
+    $this->activeUsers = $usersArray;
+  }
+
+  public function getActiveUsers() {
+    return $this->activeUsers;
   }
 }

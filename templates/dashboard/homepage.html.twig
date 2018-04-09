@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{  parent() }}
+    <script src="{{ asset('build/fonts-regular.js') }}"></script>
+    <script src="{{ asset('build/dashboard.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="col-xl-12">
+        <h1 class="text-center">Manage your tasks easily!</h1>
+        {% if is_granted('ROLE_ANONYMOUS') and boards|length == 0 %}
+            <div class="text-center row">
+                <div class="col-6">
+                    <h2 class="text-secondary">Login for free!</h2>
+                    <p>To </p>
+                    <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google'}) }}">
+                        <img src="{{ asset('build/images/signin_normal.696c081a.png') }}">
+                    </a>
+                </div>
+                <div class="border border-left-0 border-top-0 border-bottom-0 border-secondary">
+                    <div class="jumbotron bg-white m-0 px-0">
+                        <h4 class="position-relative rounded-circle p-2 bg-white"
+                            style="left: 50%">Or</h4>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <h2 class="text-secondary">Get invited</h2>
+                    <p>By your friends</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="{% if favorite|length == 0 %}d-none{% endif %}" id="dashboardFavoriteSection">
+                <h3>Favorite projects</h3>
+                <div class="card-deck mb-4" id="dashboardFavoriteDeck">
+                    {% for role in favorite %}
+                        {{ include('dashboard/board-card.html.twig', {'role': role, 'section': 'fav'}) }}
+                    {% endfor %}
+                </div>
+            </div>
+            <h3>My projects</h3>
+            <div class="card-deck">
+                {% for role in boards %}
+                    {{ include('dashboard/board-card.html.twig', {'role': role, 'section': ''}) }}
+                {% endfor %}
+                {% if not is_granted('ROLE_ANONYMOUS') %}
+                    <div class="col-md-3 p-0 h-75">
+                        <div class="card">
+                            <div class="card-header bg-light border-0 rounded-0 m-0 pb-0 px-2 pt-1" id="dashboardBoardHeader">
+                                <div class="pt-5" id="dashboardHeaderSpace">
+                                    <form id="dashboardBoardColors" class="d-none">
+                                        <label class="radio-container">
+                                            <input type="radio" name="radio" value="008ba3" checked>
+                                            <span class="checkmark bg-008ba3"></span>
+                                        </label>
+                                        <label class="radio-container">
+                                            <input type="radio" name="radio" value="0277bd">
+                                            <span class="checkmark bg-0277bd"></span>
+                                        </label>
+                                        <label class="radio-container">
+                                            <input type="radio" name="radio" value="ad1457">
+                                            <span class="checkmark bg-ad1457"></span>
+                                        </label>
+                                        <label class="radio-container">
+                                            <input type="radio" name="radio" value="795548">
+                                            <span class="checkmark bg-795548"></span>
+                                        </label>
+                                        <label class="radio-container">
+                                            <input type="radio" name="radio" value="455a64">
+                                            <span class="checkmark bg-455a64"></span>
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" placeholder="New project name" class="pointer borderless w-100 form-control"
+                                       id="dashboardBoardName">
+                                <div class="mt-3 d-none" id="dashboardBoardButtons">
+                                    <button class="btn btn-success" id="dashboardBoardCreateBtn">Create</button>
+                                    <button type="button" class="close float-right gaugeCloseBtn mt-1 pointer"
+                                            aria-label="Close" id="dashboardBoardNameClose">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </main>
+{% endblock %}

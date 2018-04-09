@@ -1,9 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}
+    {{ board.name }}
+{% endblock %}
+
 {% block stylesheets %}
     {{  parent() }}
     <script src="{{ asset('build/chart.js') }}"></script>
-    <script src="{{ asset('build/dashboard.js') }}"></script>
+    <script src="{{ asset('build/board.js') }}"></script>
     <script src="{{ asset('build/issue-share.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
     <script>
@@ -70,7 +74,7 @@
                         data-target="#modalShareBoard">
                     <i class="fas fa-2x fa-share"></i>
                 </button>
-                {{ include('dashboard/board-share.html.twig') }}
+                {{ include('board/share-modal.html.twig') }}
             {% endif %}
         </div>
         <div class="card-deck">
@@ -78,7 +82,7 @@
                 {% if issue.canUserRead %}
                     <div class="col-4 p-0 m-0 mb-4">
                         <div class="card" id="issue-{{ issue.pageId }}">
-                            {{ include('dashboard/issue-card.html.twig', { 'issue': issue}) }}
+                            {{ include('board/issue-card.html.twig', { 'issue': issue}) }}
                         </div>
                     </div>
                 {% endif %}

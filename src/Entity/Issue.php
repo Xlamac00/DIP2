@@ -30,6 +30,10 @@ class Issue extends AbstractSharableEntity {
     $this->board = $board_id;
   }
 
+  public function getBoard() {
+    return $this->board;
+  }
+
   /**
    * @ORM\OneToMany(targetEntity="Gauge", mappedBy="issue")
    * @ORM\OrderBy({"position" = "ASC"})
@@ -44,6 +48,7 @@ class Issue extends AbstractSharableEntity {
   public function setDeletedAt($deletedAt) {
     $this->deletedAt = $deletedAt;
   }
+
   /** Variable with array of users that contributed to the issue.
    * Has to be manually set (eg. from boardrepository) */
   private $activeUsers;
