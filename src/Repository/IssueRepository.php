@@ -4,12 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Board;
 use App\Entity\BoardRole;
-use App\Entity\GaugeChanges;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
-use App\Entity\IssueShareHistory;
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -23,9 +20,13 @@ class IssueRepository extends AbstractSharableEntityRepository {
   }
 
   // Returns Issue entity for the given ID
-  public function getIssue($issue_id, $forceFind = false) {
-    if(!isset($this->issue) || $forceFind === true)
+  public function getIssue($issue_id, $user, $forceFind = false) {
+    if(!isset($this->issue) || $forceFind === true) {
+      if($forceFind === true) $this->manager->clear();
       $this->issue = $this->find($issue_id);
+      if($user !== null)
+        $this->loadIssue($user);
+    }
     return $this->issue;
   }
 
@@ -40,14 +41,12 @@ class IssueRepository extends AbstractSharableEntityRepository {
   public function getIssueByLink($link, $user) {
     if(!isset($this->issue)) {
       $this->issue = $this->findOneBy(["linkId" => $link]);
-//      if($user !== null)
-        $this->loadIssue($user);
+      $this->loadIssue($user);
     }
     return $this->issue;
   }
 
   private function loadIssue($user) {
-
     /** @var IssueRoleRepository $issueRoleRepository */
     $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
     $rights = $issueRoleRepository->getUserRights($user, $this->issue);

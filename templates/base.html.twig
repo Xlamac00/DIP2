@@ -40,7 +40,7 @@
                                      aria-haspopup="true" aria-expanded="false">
                                 <span class="sr-only"> Others</span>
                             </button>
-                        {% elseif not(is_granted('ROLE_ANONYMOUS') and boards|length == 0) %}
+                        {% elseif not(is_granted('ROLE_ANONYMOUS')) or (boards is defined and boards|length > 0) %}
                             <button type="button" class="btn menubtn dropdown-toggle pointer text-light my-primary-dark"
                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="navbarProjectBtn">
                                 Projects

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Board;
+use App\Entity\BoardRole;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\IssueShareHistory;
@@ -163,7 +164,7 @@ class IssueRoleRepository extends ServiceEntityRepository {
   /** Checks if the issue has set the share link and if the link is ok.
    * If so, inserts new record into IssueRole and for each issue in the board sets the rights as well.
    * @param string $shareLink - 32 chars long string
-   * @param string $pageId - 8 chars long board id
+   * @param string $pageId - 8 chars long Issue id
    * @param $user - current user
    * @throws AuthenticationException
    * */
@@ -191,6 +192,36 @@ class IssueRoleRepository extends ServiceEntityRepository {
       $role->setIssueHistory($history);
       $role->setBoardHistory(null);
       $this->manager->persist($role);
+
+      // add rights to see whole Board
+      /** @var BoardRoleRepository $boardRoleRepository */
+      $boardRoleRepository = $this->manager->getRepository(BoardRole::class);
+      $boardRights = $boardRoleRepository->getUserRights($user, $issue->getBoard());
+      if($boardRights === null) { // if the User does not have rights already
+        $role = new BoardRole();
+        $role->setBoard($issue->getBoard());
+        $role->setRole(Issue::ROLE_READ);
+        $role->setUser($user);
+        $role->setBoardHistory(NULL);
+        $this->manager->persist($role);
+      }
+
+      // for all other Issue in the same Board, add rights to read
+      foreach($issue->getBoard()->getIssues() as $boardIssue) {
+        if($boardIssue->getPageId() !== $pageId) { // every other Issue
+          $check = $this->getUserRights($user, $boardIssue);
+          if($check !== null && !$check->isDeleted()) continue; // user has already rights to this Issue
+
+          $role = new IssueRole();
+          $role->setIssue($boardIssue);
+          $role->setRole(Issue::ROLE_READ);
+          $role->setUser($user);
+          $role->setIssueHistory($history);
+          $role->setBoardHistory(null);
+          $this->manager->persist($role);
+        }
+      }
+      $this->manager->flush();
     }
     else
       throw new AuthenticationException('Sharing is not enabled');

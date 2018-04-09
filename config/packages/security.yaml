@@ -19,7 +19,6 @@ security:
             logout:
                 delete_cookies:
                     googleId: { path: null, domain: null }
-            user_checker: App\Security\UserChecker
             oauth:
                 resource_owners:
                     google:             "/login/google"

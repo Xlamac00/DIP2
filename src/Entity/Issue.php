@@ -30,6 +30,7 @@ class Issue extends AbstractSharableEntity {
     $this->board = $board_id;
   }
 
+  /** @return Board */
   public function getBoard() {
     return $this->board;
   }

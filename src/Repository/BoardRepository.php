@@ -30,11 +30,13 @@ class BoardRepository extends AbstractSharableEntityRepository {
    *
    * @param string    $boardId - id of the board
    * @param User|null $user - if there is no User, the Board cannot be rendered! (additional info wont be calculated)
+   * @param bool      $forceLoad - to force reload of the Board data
    *
-   * @return null|Board
+   * @return Board|null
    */
-  public function getBoard($boardId, $user = null) {
-    if(!isset($this->board)) {
+  public function getBoard($boardId, $user = null, $forceLoad = false) {
+    if(!isset($this->board) || $forceLoad === true) {
+      if($forceLoad === true) $this->manager->clear();
       $this->board = $this->find($boardId);
       if($user !== null) //
         $this->loadBoard($user);
@@ -48,6 +50,19 @@ class BoardRepository extends AbstractSharableEntityRepository {
       $this->loadBoard($user);
     }
     return $this->board;
+  }
+
+  /** Returns Board by its url share link.
+   *
+   * @param string $boardLinkId - 8 char Board pageId
+   * @param string $boardShareLink - 32 char Board sharelink
+   *
+   * @return Board|null
+   */
+  public function getBoardByShareLink($boardLinkId, $boardShareLink) {
+    /** @var Board $board */
+    $board = $this->findOneBy(["linkId" => $boardLinkId, 'shareLink' => $boardShareLink, 'shareEnabled' => true]);
+    return $board;
   }
 
   private function loadBoard($user) {
