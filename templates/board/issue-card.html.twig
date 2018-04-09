@@ -1,6 +1,8 @@
 
-<div class="card-header clearfix bg-white pr-1">
-    <h5 class="float-left text-dark mt-1"><a href="../../{{ issue.url }}"> {{ issue.name }} </a></h5>
+<div class="card-header clearfix bg-white pr-1 pb-0">
+    <h5 class="float-left text-dark mt-1"
+        style="max-width: {% if issue.activeUsers|length > 1 %}60%{% else %}75%{% endif %}">
+        <a href="../../{{ issue.url }}" title="{{ issue.name }}" class="overflow-text">{{ issue.name }}</a></h5>
     <div class="dropdown float-right">
         <button type="button" class="nobtn float-right text-dark mt-1 pointer"
                 id="dropdownCard{{ issue.link }}"
@@ -33,16 +35,22 @@
         'issue_id': issue.id}) }}
 </div>
 
-<div class="card-body">
+<div class="card-body pb-1 pt-2">
     {% if issue.countGaugeComments > 0 %}
-        <div class="text-smallcaps text-center">
-            <a href="../../{{ issue.url }}">Show all {{ issue.countGaugeComments }} changes <i class="fas
-            fa-angle-down"></i></a>
-        </div>
         {% for comment in issue.latestGaugeComments %}
-            <b>{{ comment.user.username }}</b>:
-            {{ comment.gauge.name }}&nbsp;{{ comment.oldvalue }}&nbsp;<i class="fas fa-angle-right"></i>&nbsp;<b>{{
-            comment.value }}</b>&nbsp;%<br>
+            <div class="d-flex justify-content-between">
+                <b title="{{ comment.gauge.name }}: {{ comment.oldValue }} > {{ comment.value }} %"
+                   class="startTooltip" data-toggle="tooltip" data-placement="right" >
+                    {{ comment.user.username }}</b>
+                <span class="text-secondary" title="{{ comment.time }}">{{ comment.timetext }}</span>
+            </div>
         {% endfor %}
+        {% if issue.countGaugeComments > 2 %}
+            <div class="text-smallcaps text-right">
+                <a href="../../{{ issue.url }}">And {{ issue.countGaugeComments-2 }} more changes
+                    {#<i class="fas fa-angle-down"></i>#}
+                </a>
+            </div>
+        {% endif %}
     {% endif %}
 </div>

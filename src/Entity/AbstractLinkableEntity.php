@@ -34,7 +34,7 @@ abstract class AbstractLinkableEntity {
   }
 
   public function setName($newName) {
-    $this->name = ucfirst(strtolower($newName));
+    $this->name = ucfirst($newName);
     $replace = [ 'ě' => 'e', 'š' => 's', 'č' => 'c', 'ř' => 'r', 'ž' => 'z',
                  'ý' => 'y', 'á' => 'a', 'í' => 'i', 'é' => 'e', 'ú' => 'u',
                  'ů' => 'u', 'ď' => 'd', 'ť' => 't', 'ň' => 'n', 'ó' => 'o',

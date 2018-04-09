@@ -80,7 +80,7 @@
         <div class="card-deck">
             {% for issue in board.issues %}
                 {% if issue.canUserRead %}
-                    <div class="col-4 p-0 m-0 mb-4">
+                    <div class="col-md-4 p-0 m-0 mb-4">
                         <div class="card" id="issue-{{ issue.pageId }}">
                             {{ include('board/issue-card.html.twig', { 'issue': issue}) }}
                         </div>
