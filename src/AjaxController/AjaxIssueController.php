@@ -68,7 +68,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issueRepository->getIssue($issue);
+      $issueRepository->getIssue($issue, $this->getUser());
       $arrData = $issueRepository->gaugeValueChange($number, $value, $user);
       return new JsonResponse($arrData);
     } else return null;
@@ -127,7 +127,7 @@ class AjaxIssueController extends Controller {
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $gaugeNumber = $issueRepository->getNumberOfGauges($issueId);
-      $issue = $issueRepository->getIssue($issueId);
+      $issue = $issueRepository->getIssue($issueId, $this->getUser());
 
       $entityManager = $this->getDoctrine()->getManager();
       $gauge = new Gauge();
@@ -209,7 +209,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssue($issue_id);
+      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
 
       $tab = $this->renderView('issue/editGaugeTab.html.twig',['gauges' => $issue->getGauges()]);
       return new JsonResponse($tab);
@@ -293,7 +293,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issueRepository->getIssue($issue_id);
+      $issueRepository->getIssue($issue_id, $this->getUser());
       $issueRepository->updateGaugesIndex($gauge_id, $new_position);
 
       $entityManager = $this->getDoctrine()->getManager();
@@ -325,7 +325,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issueRepository->getIssue($issue);
+      $issueRepository->getIssue($issue, $this->getUser());
       $issueRepository->updateName($name);
 
       $arrData = ['name' => $name];

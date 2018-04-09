@@ -410,7 +410,9 @@ $(document).ready(function() {
                 chart.update();
                 var oldHtml = document.getElementById('gaugeComments').innerHTML;
                 document.getElementById('gaugeComments').innerHTML = data + oldHtml;
-                document.getElementById('gaugeCommentNoChangesText').className = "d-none";
+                var noChangesText = document.getElementById('gaugeCommentNoChangesText');
+                if(typeof noChangesText !== 'undefined' && noChangesText !== null)
+                    noChangesText.className = "d-none";
             }
         });
     }

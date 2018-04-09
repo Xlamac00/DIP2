@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Board;
 use App\Entity\BoardRole;
+use App\Entity\Gauge;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\User;
@@ -206,13 +207,14 @@ class IssueRepository extends AbstractSharableEntityRepository {
    * @return array - new gauge value from db or "error" text
    */
   public function gaugeValueChange($gaugeIndex, $value, $userId) {
+    /* @var Gauge $data */
     foreach($this->issue->getGauges() as $key => $data) { // all gauges in the issue
       if($key == $gaugeIndex) { // correct gauge (ordered)
         $gauge = new GaugeRepository($this->registry);
         $gauge->getGauge($data->getId());
-        $oldValue = $gauge->getPreviousValue();
         $newValue = $gauge->gaugeValueChange($value);
-        $gauge->gaugeValueLog($value, $userId);
+        $changeId = $gauge->gaugeValueLog($value, $userId);
+        $oldValue = $gauge->getPreviousValue($changeId);
         return
           ['color' => $data->getColor(),
            'oldValue' => round($oldValue),

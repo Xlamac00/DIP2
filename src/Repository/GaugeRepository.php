@@ -47,6 +47,7 @@ class GaugeRepository extends ServiceEntityRepository  {
       $change->setUser($user);
       $this->manager->persist($change);
       $this->manager->flush();
+      return $change->getId();
     }
 
     public function changeGaugeData($newName, $newColor) {
@@ -56,9 +57,9 @@ class GaugeRepository extends ServiceEntityRepository  {
       $this->manager->flush();
     }
 
-    public function getPreviousValue() {
+    public function getPreviousValue($changeId) {
       $repository = new GaugeChangesRepository($this->registry);
-      return $repository->getOldValue($this->gauge->getId());
+      return $repository->getOldValue($this->gauge->getId(), $changeId);
     }
 
     public function gaugeValueDiscard($issue_id) {

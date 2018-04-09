@@ -22,17 +22,19 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
     return $this->gaugeChange;
   }
 
-  public function getOldValue($gauge_id, $secondOldest = false) {
+  public function getOldValue($gaugeId, $changeId) {
     $qb = $this->createQueryBuilder('c')
       ->select('c.newValue')
       ->where('c.discard = 0')
       ->andWhere('c.gauge = :gauge')
+      ->andWhere('c.id <= :change')
       ->setMaxResults(2)
-      ->setParameter('gauge', $gauge_id)
+      ->setParameter('gauge', $gaugeId)
+      ->setParameter('change', $changeId)
       ->orderBy('c.time', 'DESC')
       ->getQuery();
     $result = $qb->execute();
-    if($secondOldest === false || !isset($result[1]))
+    if(!isset($result[1]))
       return round($result[0]['newValue']);
     else return round($result[1]['newValue']);
   }
@@ -85,8 +87,9 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
       ->orderBy('q.time', 'DESC')
       ->getQuery();
     $result = $qb->execute();
+    /** @var GaugeChanges $item */
     foreach($result as $key => $item) {
-      $old = $this->getOldValue($item->getGauge()->getId(), true);
+      $old = $this->getOldValue($item->getGauge()->getId(), $item->getId());
       if($old == 1 && $item->getValue() == 1) unset($result[$key]);
       else  $item->setOldValue($old);
     }
@@ -120,7 +123,7 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
       ['time' => $this->gaugeChange->getTime(),
         'timeText' => $this->gaugeChange->getTimeText(),
        'value' => $this->gaugeChange->getValue(),
-       'oldValue' => $this->getOldValue($gauge_id['gauge'], true),
+       'oldValue' => $this->getOldValue($gauge_id['gauge'], $this->gaugeChange->getId()),
        'text' => $this->gaugeChange->getText(),
         'user' => $this->gaugeChange->getUser(),
        'gauge' =>

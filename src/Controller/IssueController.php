@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
+use App\Repository\GaugeChangesRepository;
 use App\Repository\IssueRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,7 +24,9 @@ class IssueController extends Controller {
       $issue = $issueRepository->getIssue($issue->getId(), $this->getUser(), true);
     }
     $gaugeCount = $issueRepository->getNumberOfGauges();
-    $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
+    /** @var GaugeChangesRepository $gaugeChangesRepository */
+    $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
+    $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
     $users = $issueRepository->getAllActiveUsers($issue->getId());
 
     return $this->render('issue/issue-detail.html.twig',
