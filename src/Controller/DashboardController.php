@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Board;
 use App\Entity\BoardRole;
+use App\Entity\Bug;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -31,6 +32,15 @@ class DashboardController extends Controller {
     else { // user has more than one board
       return $this->showMoreBoards($boards);
     }
+  }
+
+  /**
+   * @Route("/bugs", name="bugs")
+   */
+  public function bugs() {
+    $entityManager = $this->getDoctrine()->getManager();
+    $records = $entityManager->getRepository(Bug::class)->findAll();
+    return $this->render('bugs.html.twig', ['bugs' => $records]);
   }
 
   /**

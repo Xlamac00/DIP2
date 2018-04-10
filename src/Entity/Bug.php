@@ -45,4 +45,12 @@ class Bug {
   public function setUser($user) {
     $this->user = $user;
   }
+
+  public function getUser() {
+    return $this->user;
+  }
+
+  public function getText() {
+    return $this->text;
+  }
 }
