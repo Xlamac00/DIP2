@@ -47,6 +47,8 @@ class BoardRepository extends AbstractSharableEntityRepository {
   public function getBoardByLink($boardLink, $user) {
     if(!isset($this->board)) {
       $this->board = $this->findOneBy(["linkId" => $boardLink]);
+      if($this->board === null)
+        return null;
       $this->loadBoard($user);
     }
     return $this->board;

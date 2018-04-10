@@ -190,6 +190,8 @@ class BoardRoleRepository extends ServiceEntityRepository {
     /** @var BoardRepository $boardRepository */
     $boardRepository = $this->manager->getRepository(Board::class);
     $board = $boardRepository->getBoard($board);
+    if($board === null)
+      throw new AuthenticationException('No Board found');
     $rights = $this->getUserRights($user, $board);
     $rights->delete();
     $this->manager->persist($rights);
@@ -234,6 +236,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
       $board = $boardRepository->getBoardByLink($boardId, $user);
     else
       $board = $boardRepository->getBoard($boardId, $user);
+
     if($board === null)
       throw new AuthenticationException('No board found');
 

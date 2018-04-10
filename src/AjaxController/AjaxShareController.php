@@ -19,11 +19,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class AjaxShareController extends Controller {
 
   /**
-   * @Route("/ajax/boardChangeShareRights", name="board_ajax_change_rights")
+   * @Route("/ajax/entityChangeShareRights", name="entity_ajax_change_rights")
+   * @param Request $request
+   * @return JsonResponse
    */
-  public function boardChangeRights(Request $request) {
+  public function entityChangeRights(Request $request) {
     if ($request->isXmlHttpRequest()) {
-      $board = $request->request->get('board');
+      $entityId = $request->request->get('entity');
       $option = $request->request->get('option');
       $anonymous = $request->request->get('anonymous');
 
@@ -36,249 +38,208 @@ class AjaxShareController extends Controller {
 
       /** @var BoardRepository $boardRepository */
       $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $boardRepository->getBoard($board);
-      $new = $boardRepository->changeBoardShareRights($this->getUser(), $role);
+      $board = $boardRepository->getBoard($entityId);
+      if($board !== null) { // its Board
+        $new = $boardRepository->changeBoardShareRights($this->getUser(), $role);
+      }
+      else { // its Issue
+        /** @var IssueRepository $issueRepository */
+        $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+        $issueRepository->getIssueByLink($entityId, $this->getUser());
+        $new = $issueRepository->changeIssueShareRights($this->getUser(), $role);
+      }
 
-      $arrData = ['board' => $board, 'option' => $new, 'anonymous' => $anonymous, 'input' => $option];
+      $arrData = ['entity' => $entityId, 'option' => $new, 'anonymous' => $anonymous, 'input' => $option];
       return new JsonResponse($arrData);
-    }
-  }
-
-  /**
-   * @Route("/ajax/issueChangeShareRights", name="issue_ajax_change_rights")
-   */
-  public function issueChangeRights(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $issue = $request->request->get('issue');
-      $option = $request->request->get('option');
-      $anonymous = $request->request->get('anonymous');
-
-      if($option === Board::ROLE_WRITE && $anonymous === "true")
-        $role = Board::ROLE_ANON;
-      else if($option === Board::ROLE_WRITE)
-        $role = Board::ROLE_WRITE;
-      else
-        $role = Board::ROLE_READ;
-
-      /** @var IssueRepository $issueRepository */
-      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issueRepository->getIssue($issue);
-      $new = $issueRepository->changeIssueShareRights($this->getUser(), $role);
-
-      $arrData = ['issue' => $issue, 'option' => $new, 'anonymous' => $anonymous, 'input' => $option];
-      return new JsonResponse($arrData);
-    }
+    } else return null;
   }
 
   /**
    * Toggle the availability of share link - to enable or disable it
-   * @Route("/ajax/boardChangeShare", name="board_ajax_change_share")
+   * @Route("/ajax/entityChangeShare", name="entity_ajax_change_share")
+   * @param Request $request
+   * @return JsonResponse
    */
-  public function boardChangeShare(Request $request) {
+  public function entityChangeShare(Request $request) {
     if ($request->isXmlHttpRequest()) {
-      $board = $request->request->get('board');
+      $entityId = $request->request->get('entity');
       $enable = $request->request->get('enable');
 
       /** @var BoardRepository $boardRepository */
       $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $boardRepository->getBoard($board);
-      $new = $boardRepository->changeBoardShareEnabled($this->getUser(), $enable === 'true');
+      $board = $boardRepository->getBoard($entityId);
+      if($board !== null) { // its Board
+        $new = $boardRepository->changeBoardShareEnabled($this->getUser(), $enable === 'true');
+      }
+      else {
+        /** @var IssueRepository $issueRepository */
+        $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+        $issueRepository->getIssueByLink($entityId, $this->getUser());
+        $new = $issueRepository->changeIssueShareEnabled($this->getUser(), $enable === 'true');
+      }
 
-      $arrData = ['board' => $board, 'enable' => $new];
+      $arrData = ['entity' => $entityId, 'enable' => $new];
       return new JsonResponse($arrData);
-    }
+    } else return null;
   }
 
   /**
-   * @Route("/ajax/issueChangeShare", name="issue_ajax_change_share")
+   * @Route("/ajax/entityInviteUser", name="ajax_entity_user_invite")
+   * @param Request $request
+   * @return JsonResponse
    */
-  public function issueChangeShare(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $issue = $request->request->get('issue');
-      $enable = $request->request->get('enable');
-
-      /** @var IssueRepository $issueRepository */
-      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issueRepository->getIssue($issue);
-      $new = $issueRepository->changeIssueShareEnabled($this->getUser(), $enable === 'true');
-
-      $arrData = ['issue' => $issue, 'enable' => $new];
-      return new JsonResponse($arrData);
-    }
-  }
-
-  /**
-   * @Route("/ajax/boardInviteUser", name="ajax_board_user_invite")
-   */
-  public function boardInviteUser(Request $request) {
+  public function entityInviteUser(Request $request) {
     if ($request->isXmlHttpRequest()) {
       $username = $request->request->get('username');
       $role = $request->request->get('role');
-      $board = $request->request->get('board');
+      $entityId = $request->request->get('entity');
 
-      $arrData = ['name' => $username, 'role' => $role, 'board' => $board];
+      $arrData = ['name' => $username, 'role' => $role, 'entity' => $entityId];
       return new JsonResponse($arrData);
-    }
+    } else return null;
   }
 
   /**
-   * @Route("/ajax/issueInviteUser", name="ajax_issue_user_invite")
+   * @Route("/ajax/entityChangeUser", name="ajax_entity_user_change")
+   * @param Request $request
+   * @return null|JsonResponse
    */
-  public function issueInviteUser(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $username = $request->request->get('username');
-      $role = $request->request->get('role');
-      $issue = $request->request->get('issue');
-
-      $arrData = ['name' => $username, 'role' => $role, 'issue' => $issue ];
-      return new JsonResponse($arrData);
-    }
-  }
-
-  /**
-   * @Route("/ajax/boardChangeUser", name="ajax_board_user_change")
-   */
-  public function boardChangeUser(Request $request) {
+  public function entityChangeUser(Request $request) {
     if ($request->isXmlHttpRequest()) {
       $user = $request->request->get('user');
-      $board = $request->request->get('board');
+      $entityId = $request->request->get('entity');
       $newRole = $request->request->get('role');
       $enabled = true;
 
       /** @var BoardRoleRepository $roleRepository */
       $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
       try {
-        $enabled = $roleRepository->changeUserRights($this->getUser(), $board, $user, $newRole);
+        $enabled = $roleRepository->changeUserRights($this->getUser(), $entityId, $user, $newRole);
         $success = true;
       }
-      catch (Exception $e) {
-        $success = false;
+      catch (AuthenticationException $e) {
+        /** @var IssueRoleRepository $roleRepository */
+        $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+        try {
+          $enabled = $roleRepository->changeUserRights($this->getUser(), $entityId, $user, $newRole);
+          $success = true;
+        }
+        catch (AuthenticationException $e) {
+          $success = false;
+        }
       }
 
-      $arrData = ['name' => $user, 'board' => $board, 'enabled' => $enabled, 'success' => $success];
+      $arrData = ['name' => $user, 'entity' => $entityId, 'enabled' => $enabled, 'success' => $success];
       return new JsonResponse($arrData);
-    }
+    } else return null;
   }
-
-  /**
-   * @Route("/ajax/issueChangeUser", name="ajax_issue_user_change")
-   */
-  public function issueChangeUser(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $user = $request->request->get('user');
-      $issue = $request->request->get('issue');
-      $newRole = $request->request->get('role');
-      $enabled = true;
-
-      /** @var IssueRoleRepository $roleRepository */
-      $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
-      try {
-        $enabled = $roleRepository->changeUserRights($this->getUser(), $issue, $user, $newRole);
-        $success = true;
-      }
-      catch (Exception $e) {
-        $success = false;
-      }
-
-      $arrData = ['name' => $user, 'issue' => $issue, 'enabled' => $enabled, 'success' => $success];
-      return new JsonResponse($arrData);
-    }
-  }
-
 
   /**
    * @Route("/tests", name="tests")
    */
   public function tests() {
-//        $user = "5ab2cfaf237527.88179802";
-//    $user = "5ab3860491add4.72831813";
-    $user = "5ac4cc04a79c88.95626601";
-
-    $board = '1';
-    $issue = 29;
-    $newRole = 'ROLE_ISSUE_READ';
-
-    //    $board = $request->request->get('board');
-    $option = 'ROLE_ISSUE_WRITE';
-    $anonymous = "true";
-
-    $enabled = true;
-    $render = '';
-
-    /** @var BoardRoleRepository $roleRepository */
-    $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
-    try {
-      $roleRepository->deleteUser($this->getUser(), $board, $user);
-      $users = $roleRepository->getBoardUsers($board);
-      $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
-      $success = true;
-    }
-    catch (AuthenticationException $e) {
-      $success = false;
-    }
-
-    $arrData = ['name' => $user, 'board' => $board, 'result' => $render, 'success' => $success];
-    die(var_dump($arrData));
-  }
-
-
-  /**
-   * @Route("/ajax/boardRemoveUser", name="ajax_board_user_remove")
-   */
-  public function boardRemoveUser(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $user = $request->request->get('user');
-      $board = $request->request->get('board');
+      $user ='5acb2945384d19.23811990';
+      $entityId = 'c4f8844e';
       $render = '';
 
       /** @var BoardRoleRepository $roleRepository */
       $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
       try {
-        $roleRepository->deleteUser($this->getUser(), $board, $user);
-        $users = $roleRepository->getBoardUsers($board);
+        $roleRepository->deleteUser($this->getUser(), $entityId, $user);
+        $users = $roleRepository->getBoardUsers($entityId);
         $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
         $success = true;
       }
       catch (AuthenticationException $e) {
-        $success = false;
+        /** @var IssueRoleRepository $roleRepository */
+        $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+        try {
+          $roleRepository->deleteUser($this->getUser(), $entityId, $user);
+          /** @var IssueRepository $issueRepository */
+          $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+          $id = $issueRepository->getIdByLink($entityId);
+          /** @var IssueRoleRepository $roleRepository */
+          $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+          $users = $roleRepository->getIssueUsers($id);
+          $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
+          $success = true;
+        }
+        catch (AuthenticationException $e) {
+          $success = false;
+        }
       }
 
-      $arrData = ['name' => $user, 'board' => $board, 'result' => $render, 'success' => $success];
-      return new JsonResponse($arrData);
-    }
+      $arrData = ['name' => $user, 'entity' => $entityId, 'result' => $render, 'success' => $success];
+      die(var_dump($arrData));
   }
 
   /**
-   * @Route("/ajax/boardGetUserlist", name="ajax_board_userlist_get")
+   * @Route("/ajax/entityRemoveUser", name="ajax_entity_user_remove")
+   * @param Request $request
+   * @return null|JsonResponse
    */
-  public function boardGetUserlist(Request $request) {
+  public function entityRemoveUser(Request $request) {
     if ($request->isXmlHttpRequest()) {
-      $board = $request->request->get('board');
+      $user = $request->request->get('user');
+      $entityId = $request->request->get('entity');
+      $render = '';
 
       /** @var BoardRoleRepository $roleRepository */
       $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
-      $users = $roleRepository->getBoardUsers($board);
-      $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
+      try {
+        $roleRepository->deleteUser($this->getUser(), $entityId, $user);
+        $users = $roleRepository->getBoardUsers($entityId);
+        $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
+        $success = true;
+      }
+      catch (AuthenticationException $e) {
+        /** @var IssueRoleRepository $roleRepository */
+        $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+        try {
+          $roleRepository->deleteUser($this->getUser(), $entityId, $user);
+          /** @var IssueRepository $issueRepository */
+          $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+          $id = $issueRepository->getIdByLink($entityId);
+          /** @var IssueRoleRepository $roleRepository */
+          $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+          $users = $roleRepository->getIssueUsers($id);
+          $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
+          $success = true;
+        }
+        catch (AuthenticationException $e) {
+          $success = false;
+        }
+      }
 
-      $arrData = ['board' => $board, 'result' => $render];
+      $arrData = ['name' => $user, 'entity' => $entityId, 'result' => $render, 'success' => $success];
       return new JsonResponse($arrData);
-    }
+    } else return null;
   }
 
   /**
-   * @Route("/ajax/issueGetUserlist", name="ajax_issue_userlist_get")
+   * @Route("/ajax/entityGetUserlist", name="ajax_entity_userlist_get")
+   * @param Request $request
+   * @return null|JsonResponse
    */
-  public function issueGetUserlist(Request $request) {
+  public function entityGetUserlist(Request $request) {
     if ($request->isXmlHttpRequest()) {
-      $issue = $request->request->get('issue');
+      $entityId = $request->request->get('entity');
 
-      /** @var IssueRoleRepository $roleRepository */
-      $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
-      $users = $roleRepository->getIssueUsers($issue);
+      /** @var BoardRoleRepository $roleRepository */
+      $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
+      $users = $roleRepository->getBoardUsers($entityId);
+      if(sizeof($users) === 0) { // its not Board, try Issue
+        /** @var IssueRepository $issueRepository */
+        $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+        $id = $issueRepository->getIdByLink($entityId);
+        /** @var IssueRoleRepository $roleRepository */
+        $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+        $users = $roleRepository->getIssueUsers($id);
+      }
       $render = $this->renderView('board/share-userlist.html.twig', ["users" => $users]);
 
-      $arrData = ['issue' => $issue, 'result' => $render];
+      $arrData = ['entity' => $entityId, 'result' => $render];
       return new JsonResponse($arrData);
-    }
+    } else return null;
   }
 }

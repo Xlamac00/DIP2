@@ -3,7 +3,7 @@
     <tr>
         <td>{{ include('user/user-icon.html.twig', {'user': role.user, 'size': 'small'}) }}</td>
         <td><span class="userName {% if role.isActive != 1 %}text-secondary{% endif %}"
-                  id="modalBoardShareUser{{ role.user.uniquelink }}">{{ role.user.username }}</span></td>
+                  id="modalShareUser{{ role.user.uniquelink }}">{{ role.user.username }}</span></td>
         <td>
             {% if role.rights is constant('App\\Entity\\Board::ROLE_ADMIN') %}
                 <span class="text-secondary">Is owner</span>

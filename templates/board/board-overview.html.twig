@@ -7,8 +7,8 @@
 {% block stylesheets %}
     {{  parent() }}
     <script src="{{ asset('build/chart.js') }}"></script>
+    <script src="{{ asset('build/sharing.js') }}"></script>
     <script src="{{ asset('build/board.js') }}"></script>
-    <script src="{{ asset('build/issue-share.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
     <script>
         var options = {
@@ -105,6 +105,15 @@
                             <input type="hidden" id="modalIssueDeleteId" value="">
                             <button type="button" class="btn btn-danger" id="modalIssueDeleteBtn">Delete Issue</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalIssueShare" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
                         </div>
                     </div>
                 </div>

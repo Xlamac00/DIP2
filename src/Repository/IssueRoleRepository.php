@@ -67,6 +67,7 @@ class IssueRoleRepository extends ServiceEntityRepository {
     /** @var IssueRepository $issueRepository */
     $issueRepository = $this->manager->getRepository(Issue::class);
     $issue = $issueRepository->getIssueByLink($pageId, $user);
+    if($issue == null) throw new AuthenticationException('No issue found');
 
     $rights = $this->getUserRights($user, $issue);
     if($rights == null || !$rights->isShareEnabled()) throw new AuthenticationException('No rights found');
@@ -130,7 +131,7 @@ class IssueRoleRepository extends ServiceEntityRepository {
 
     /** @var IssueRepository $issueRepository */
     $issueRepository = $this->manager->getRepository(Issue::class);
-    $issue = $issueRepository->getIssue($issueId);
+    $issue = $issueRepository->getIssue($issueId, $user);
     if($issue === null) throw new AuthenticationException('Issue not found');
 
     $issueRole = $this->getUserRights($user, $issue);
@@ -158,6 +159,40 @@ class IssueRoleRepository extends ServiceEntityRepository {
       $issueRole->setActive(true);
     }
     $this->manager->persist($issueRole);
+    $this->manager->flush();
+    return $issueRole->isActive();
+  }
+
+  /** Removes users rights to see this Issue
+   *
+   * @param UserInterface $admin - currently logged user
+   * @param string $issue - id of the issue
+   * @param string $uniquelink - users unique link which rights have to be changed
+   *
+   * @throws AuthenticationException - not enough rights to make this change
+   */
+  public function deleteUser($admin, $issue, $uniquelink) {
+    $role = $this->checkUsersRights($issue, $admin);
+    if($role != Board::ROLE_ADMIN)
+      throw new AuthenticationException('Not enough rights to make this change');
+
+    /** @var UserRepository $userRepository */
+    $userRepository = $this->manager->getRepository(User::class);
+    if(is_numeric($uniquelink)) // google id
+      $user = $userRepository->loadUserByGoogleId($uniquelink);
+    else
+      $user = $userRepository->loadUserByUsername($uniquelink);
+    if($user === null)
+      throw new AuthenticationException('No user found to change his rights');
+
+    /** @var IssueRepository $issueRepository */
+    $issueRepository = $this->manager->getRepository(Issue::class);
+    $issue = $issueRepository->getIssue($issue, $user);
+    if($issue === null)
+      throw new AuthenticationException('No Issue found');
+    $rights = $this->getUserRights($user, $issue);
+    $rights->delete();
+    $this->manager->persist($rights);
     $this->manager->flush();
   }
 

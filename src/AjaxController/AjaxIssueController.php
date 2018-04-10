@@ -79,6 +79,26 @@ class AjaxIssueController extends Controller {
   }
 
   /**
+   * @Route("/ajax/issueGetShareModal", name="issue_ajax_share_modal")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function issueGetShareModal(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issueLink = $request->request->get('issue');
+
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issue = $issueRepository->getIssueByLink($issueLink, $this->getUser());
+
+      $render = $this->renderView('issue/share-modal.html.twig',['issue' => $issue]);
+
+      $arrData = ['render' => $render, 'link' => $issueLink];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /**
    * @Route("/ajax/issueGraphChange", name="issue_ajax_graphChange")
    * @param Request $request - ajax Request
    * @return null|JsonResponse

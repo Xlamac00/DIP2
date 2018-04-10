@@ -11,7 +11,7 @@
     {% if issue.canUserWrite %}
         <script src="{{ asset('build/chart-resizable.js') }}"></script>
     {% endif %}
-    <script src="{{ asset('build/issue-share.js') }}"></script>
+    <script src="{{ asset('build/sharing.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
     <script>
         // Variable used in chart-resizable to get route to Ajax respond
@@ -88,12 +88,24 @@
                             <span class="startTooltip" data-toggle="tooltip"
                                     data-placement="bottom" title="Share with other users">
                             <button type="button" class="nobtn mx-2 pointer"
-                                    name="{{ issue.link }}"
-                                    data-toggle="modal" data-target="#modal{{ issue.link }}">
+                                    data-id="{{ issue.pageId }}"
+                                    data-toggle="modal" data-target="#modalIssueShare">
                                 <i class="fas fa-2x fa-share"></i>
                             </button>
                             </span>
-                            {{ include('issue/share-modal.html.twig', {'issue': issue}) }}
+
+                            {#<div class="modal fade modalShareIssue" id="modal{{ issue.link }}" tabindex="-1" role="dialog"#}
+                            {#aria-labelledby="exampleModalLongTitle" aria-hidden="true">#}
+                            <div class="modal fade modalShareIssue" tabindex="-1" role="dialog" aria-hidden="true"
+                                 id="modalIssueShare">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
                         {% if issue.canUserManage %}
                             <div class="dropdown mx-2">

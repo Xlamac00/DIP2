@@ -42,9 +42,20 @@ class IssueRepository extends AbstractSharableEntityRepository {
   public function getIssueByLink($link, $user) {
     if(!isset($this->issue)) {
       $this->issue = $this->findOneBy(["linkId" => $link]);
+      if($this->issue === null) return null;
       $this->loadIssue($user);
     }
     return $this->issue;
+  }
+
+  /** Returns my shord db id for Issue from its link
+   * @param string $link - 8 char unique string
+   * @return integer $id
+   */
+  public function getIdByLink($link) {
+    $issue = $this->findOneBy(["linkId" => $link]);
+    if($issue === null) return null;
+    return $issue->getId();
   }
 
   private function loadIssue($user) {

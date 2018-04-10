@@ -18,7 +18,7 @@ Encore
     .addEntry('fonts-regular', './assets/js/fa-regular.min.js')
     .addEntry('board', './assets/js/frontend/board.js')
     .addEntry('dashboard', './assets/js/frontend/dashboard.js')
-    .addEntry('issue-share', './assets/js/frontend/issue-share.js')
+    .addEntry('sharing', './assets/js/frontend/entity-sharing.js')
     .addEntry('typeahead', './assets/js/bootstrap3-typeahead.min.js')
     .addEntry('app-bundle', './assets/js/app.bundle.js')
     .addEntry('bootjs', './assets/js/bootstrap.bundle.min.js')

@@ -1,5 +1,7 @@
 
-$(document).ready(function() {
+// $(document).ready(function() {
+function initIssueShare() {
+    console.log('init');
 
     // On modal window open initiate all the buttons[[[[
     $(".modalShareIssue").on('shown.bs.modal', function(){
@@ -208,4 +210,4 @@ $(document).ready(function() {
             }
         }
     });
-});
+}
