@@ -87,11 +87,11 @@
                         {% if issue.shareEnabled or issue.canUserManage %}
                             <span class="startTooltip" data-toggle="tooltip"
                                     data-placement="bottom" title="Share with other users">
-                            <button type="button" class="nobtn mx-2 pointer"
-                                    data-id="{{ issue.pageId }}"
-                                    data-toggle="modal" data-target="#modalIssueShare">
-                                <i class="fas fa-2x fa-share"></i>
-                            </button>
+                                <button type="button" class="nobtn mx-2 pointer"
+                                        data-id="{{ issue.pageId }}"
+                                        data-toggle="modal" data-target="#modalIssueShare">
+                                    <i class="fas fa-2x fa-share"></i>
+                                </button>
                             </span>
 
                             {#<div class="modal fade modalShareIssue" id="modal{{ issue.link }}" tabindex="-1" role="dialog"#}

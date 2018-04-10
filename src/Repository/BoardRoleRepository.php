@@ -26,7 +26,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
    * Once deleted users are not returned!
    *
    * @param string $board - board id (db)
-   * @return array $users - list of all users in BoardRole
+   * @return BoardRole[] $users - list of all users in BoardRole
    */
   public function getBoardUsers($board) {
     return $this->findBy(['board' => $board, 'isDeleted' => 0]);

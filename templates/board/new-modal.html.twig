@@ -34,10 +34,15 @@
                     </label>
                 </form>
                 <input type="text" placeholder="New project name" class="form-control" id="modalNewBoardName">
-            </div>
-            <div class="modal-footer d-flex justify-content-between">
-                <button type="button" class="btn btn-primary float-left pointer"
+                <button type="button" class="btn btn-primary float-left pointer mt-3"
                         id="modalNewBoardCreateBtn">Create</button>
+            </div>
+            <div class="modalNewBoardDeleteSection">
+                <div class="modal-footer d-flex justify-content-between">
+                    <span class="text-warning"><i class="fas fa-exclamation-triangle"></i>
+                        This change will be permanent!</span>
+                    <button class="btn btn-danger mt-2" id="modalBoardDeleteBtn">Delete project</button>
+                </div>
             </div>
         </div>
     </div>

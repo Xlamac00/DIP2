@@ -62,7 +62,7 @@ $(document).ready(function() {
         };
     }
     function ajaxNewIssue() {
-        var board = document.getElementById('dashboardId');
+        var board = document.getElementById('boardId');
         $.ajax({
             url: '/ajax/issueNew',
             type: "POST",
@@ -107,6 +107,22 @@ $(document).ready(function() {
                 }
             });
         }
+    };
+    document.getElementById('modalBoardDeleteBtn').onclick = function () {
+        var board = document.getElementById('boardId');
+        $.ajax({
+            url: '/ajax/boardDelete',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "board": board.value
+            },
+            async: true,
+            success: function (data) {
+                console.log(data);
+                location.href = '../../dashboard';
+            }
+        });
     };
     $('.issueCardRestore').click(function () {
         if(this.name.length > 0) {

@@ -66,9 +66,19 @@
         <main role="main" class="col-xl-12">
         <div class="clearfix">
             <div class="float-left">
-                <h1>{{ board.name }}</h1>
+                <h1 id="boardNameH1">{{ board.name }}</h1>
                 <input type="hidden" id="boardId" value="{{ board.id }}">
             </div>
+            {% if board.canUserManage %}
+                <span class="startTooltip mt-3 ml-3 float-right" data-toggle="tooltip" id="boardEditNameTooltip"
+                      data-placement="bottom" title="Edit project name">
+                    <button type="button" class="nobtn pointer" id="boardEditNameBtn"
+                            data-color="{{ board.color }}" data-name="{{ board.name }}" data-id="{{ board.pageId }}"
+                            data-toggle="modal" data-target="#modalNewBoard">
+                        <i class="fas fa-2x fa-edit"></i>
+                    </button>
+                </span>
+            {% endif %}
             {% if board.canUserManage or (board.isShareEnabled and board.thisuserrights.boardhistory is not null) %}
                 <button class="nobtn mt-3 pointer float-right" type="button" data-toggle="modal"
                         data-target="#modalShareBoard">
@@ -139,7 +149,6 @@
                                         id="dashboardIssueNameClose">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
-                                <input type="hidden" id="dashboardId" value="{{ board.id }}">
                             </div>
                         </div>
                     </div>

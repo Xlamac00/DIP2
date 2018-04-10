@@ -5,9 +5,11 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BoardRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  * @ORM\Table(name="board")
  */
 class Board extends AbstractSharableEntity {
@@ -81,6 +83,19 @@ class Board extends AbstractSharableEntity {
 
   public function getBackground() {
     return 'bg-'.substr($this->color,1);
+  }
+
+  /**
+   * @ORM\Column(type="datetime", nullable=true)
+   */
+  private $deletedAt;
+
+  public function setDeletedAt($deletedAt) {
+    $this->deletedAt = $deletedAt;
+  }
+
+  public function isDeleted() {
+    return $this->deletedAt !== null;
   }
 
   /**

@@ -19,7 +19,7 @@
 <body>
 {% block menu %}
     <header>
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top
+        <nav id="topNavBar" class="navbar navbar-expand-md navbar-dark fixed-top
                     {% if board is defined %}{{ board.background }}{% else %}my-primary-dark{% endif %}">
             <div class="container">
                 <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">Logo</a>
@@ -31,7 +31,8 @@
                     <div class="btn-group">
                         {% if board is defined %}
                             <a href="../../{{ board.url }}">
-                                <button class="btn menubtn text-light pointer {{ board.background }}">
+                                <button class="btn menubtn text-light pointer {{ board.background }}"
+                                        id="navbarProjectNameBtn">
                                     {{ board.name }}
                                 </button>
                             </a>

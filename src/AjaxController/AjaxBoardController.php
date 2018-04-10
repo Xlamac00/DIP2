@@ -34,12 +34,52 @@ class AjaxBoardController extends Controller {
     if ($request->isXmlHttpRequest()) {
       $name = $request->request->get('name');
       $color = $request->request->get('color');
+      $oldBoard = $request->request->get('oldBoard');
 
       /** @var BoardRepository $boardRepository */
       $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $link = $boardRepository->createNewBoard($name, $color, $this->getUser());
+      if($oldBoard === null || $oldBoard === '') {
+        $link = $boardRepository->createNewBoard($name, $color, $this->getUser());
 
-      $arrData = ['name' => $name, 'color' => $color, 'link' => $link];
+        $arrData = ['name' => $name, 'color' => $color, 'link' => $link];
+      }
+      else { // just change boards name and color
+        $board = $boardRepository->getBoardByLink($oldBoard, $this->getUser());
+        $board->setColor($color);
+        $board->setName($name);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($board);
+        $entityManager->flush();
+        $arrData = ['name' => $name, 'color' => $color];
+      }
+
+      return new JsonResponse($arrData);
+    }
+  }
+
+  /**
+   * @Route("/ajax/boardDelete", name="boardDelete")
+   */
+  public function boardDelete(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $boardId = $request->request->get('board');
+
+      $entityManager = $this->getDoctrine()->getManager();
+      /** @var BoardRoleRepository $boardRoleRepository */
+      $boardRoleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
+      $roles = $boardRoleRepository->getBoardUsers($boardId);
+      foreach($roles as $role) {
+        $role->delete();
+        $entityManager->persist($role);
+      }
+
+      /** @var BoardRepository $boardRepository */
+      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
+      $board = $boardRepository->getBoard($boardId);
+      $entityManager->remove($board);
+      $entityManager->flush();
+
+      $arrData = ['board' => $boardId];
       return new JsonResponse($arrData);
     }
   }

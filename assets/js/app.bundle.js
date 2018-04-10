@@ -65,9 +65,38 @@ $(document).ready(function() {
         };
         var name = document.getElementById('modalNewBoardName');
         var colors = document.getElementById('modalNewBoardColors');
-        $('#modalNewBoard').on('shown.bs.modal', function () {
+        var oldBoardId = null;
+        $('#modalNewBoard').on('shown.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var label = document.getElementById('modalNewBoardLabel');
+            var create = document.getElementById('modalNewBoardCreateBtn');
+            var input = document.getElementById('modalNewBoardName');
+            if(id !== null && typeof id !== 'undefined') { // clicked button to edit board
+                var editBtn = document.getElementById('boardEditNameBtn');
+                var boardname = editBtn.getAttribute('data-name');
+                var color = editBtn.getAttribute('data-color');
+                label.innerHTML = "Edit "+boardname;
+                create.innerHTML = "Save changes";
+                input.value = boardname;
+                $('input[name=color][value='+color.substr(1)+']').prop("checked", true);
+                oldBoardId = id;
+                name.select();
+            }
+            else { // clicked button to create new board
+                label.innerHTML = "Create new project";
+                create.innerHTML = "Create";
+                input.value = "";
+                oldBoardId = null;
+                name.focus();
+            }
             setHeaderBackground(colors);
-            name.focus();
+            name.onkeypress = function (e) {
+                e = e || window.event;
+                if (e.keyCode === 13) { // Enter
+                    modalBoardCreateBtnPress();
+                }
+            };
         });
         $('.radio-container').click(function () {
             setHeaderBackground(this);
@@ -82,7 +111,10 @@ $(document).ready(function() {
             }
         }
         var createBtn = document.getElementById('modalNewBoardCreateBtn');
-        createBtn.onmousedown = function() {
+        createBtn.onmousedown = function () {
+            modalBoardCreateBtnPress();
+        };
+        function modalBoardCreateBtnPress() {
             if(name.value.length <= 0) {
                 name.classList.add('is-invalid');
                 name.focus();
@@ -91,9 +123,10 @@ $(document).ready(function() {
                 name.classList.remove('is-invalid');
                 ajaxNewBoard();
             }
-        };
+        }
         function ajaxNewBoard() {
             var loading = document.getElementById('modalNewBoardHeader');
+            var oldHtml = loading.innerHTML;
             loading.innerHTML =  '<i class="fa fa-2x fa-spinner fa-spin">';
             var color = $('input[name=color]:checked', colors).val();
             $.ajax({
@@ -102,11 +135,40 @@ $(document).ready(function() {
                 dataType: "json",
                 data: {
                     "name": name.value,
-                    "color": color
+                    "color": color,
+                    "oldBoard": oldBoardId
                 },
                 async: true,
                 success: function (data) {
-                    location.href = data.link;
+                    if(data.link !== null && typeof data.link !== 'undefined') // was created new, redirect
+                        location.href = '../../'+data.link;
+                    else { // was changing old one, stay, but change all values in overview
+                        $('#modalNewBoard').modal('hide');
+
+                        var navbar = document.getElementById('topNavBar');
+
+                        var title = document.getElementById('boardNameH1'); //update Issue name
+                        title.innerHTML = data.name;
+
+                        var editBtn = document.getElementById('boardEditNameBtn'); // update editBtn attributes
+                        editBtn.setAttribute('data-color', data.color);
+                        editBtn.setAttribute('data-name', data.name);
+
+                        var projectNameBtn = document.getElementById('navbarProjectNameBtn'); //update navbar btn name & color
+                        projectNameBtn.classList.remove(navbar.classList[navbar.classList.length-1]);
+                        projectNameBtn.classList.add('bg-'+data.color);
+                        projectNameBtn.innerHTML = data.name;
+
+                        var projectBtn = document.getElementById('navbarProjectBtn'); // update navbar name & color
+                        projectBtn.classList.remove(navbar.classList[navbar.classList.length-1]);
+                        projectBtn.classList.add('bg-'+data.color);
+                        navbar.classList.remove(navbar.classList[navbar.classList.length-1]);
+                        navbar.classList.add('bg-'+data.color);
+
+                        $('#boardEditNameTooltip').tooltip('dispose');
+
+                        loading.innerHTML = oldHtml;
+                    }
                 }
             });
         }
