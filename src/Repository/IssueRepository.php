@@ -181,7 +181,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
       ->getQuery();
     $changes = $qb->execute();
     foreach($changes as $change) {
-      array_push($result, $change[0]->getUser());
+      array_push($result, array('user'=>$change[0]->getUser(), 'changes'=>$change['pocet']));
     }
 
     if(empty($result)) { // If there are no changes by users, add at least all admins
@@ -196,7 +196,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
         ->getQuery();
       $users = $qb->execute();
       foreach($users as $user) { // get all admins to start
-        array_unshift($result, $user->getUser());
+        array_unshift($result, array('user'=>$user->getUser(),'changes'=>'0'));
       }
     }
 

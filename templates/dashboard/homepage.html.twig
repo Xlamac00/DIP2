@@ -43,6 +43,15 @@
                 {% for role in boards %}
                     {{ include('dashboard/board-card.html.twig', {'role': role, 'section': ''}) }}
                 {% endfor %}
+                <div class="modal fade" id="modalUserlist" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% if not is_granted('ROLE_ANONYMOUS') %}
                     <div class="col-md-3 p-0 h-75">
                         <div class="card">

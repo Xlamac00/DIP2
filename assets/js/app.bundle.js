@@ -111,4 +111,25 @@ $(document).ready(function() {
             });
         }
     }
+
+    /** **************************************************************** **
+     *  ************      DASHBOARD & PROJECT - USERLIST     ***********
+     ** **************************************************************** **/
+    // On modal window open download content
+    $('#modalUserlist').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var name = button.data('name');
+        var id = button.data('id');
+        $.ajax({
+            url: '/ajax/entityGetActiveUserlist',
+            type: "POST",
+            dataType: "json",
+            data: { "name": name, "entity": id },
+            async: true,
+            success: function (data) {
+                var modal = document.getElementById('modalUserlist');
+                modal.innerHTML = data.render;
+            }
+        });
+    });
 });

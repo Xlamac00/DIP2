@@ -17,9 +17,8 @@ $(document).ready(function() {
                 var modal = document.getElementById('modalIssueShare');
                 modal.innerHTML = data.render;
                 initEntitySharing('modal'+data.link, data.link);
-                // var copyText = document.getElementById("modal"+data.link+"Link");
-                // copyText.select();
-                // initView();
+                var copyText = document.getElementById("modal"+data.link+"Link");
+                copyText.select();
             }
         });
     });
@@ -267,7 +266,7 @@ $(document).ready(function() {
                         "role": option
                     },
                     async: true,
-                    success: function (data) {
+                    success: function () {
                         document.getElementById(name+"InviteBtn").style.display = 'none';
                         username.value = ''; // reset the input
                         loading.style.display = 'none'; // hide loading

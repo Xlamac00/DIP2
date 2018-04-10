@@ -114,13 +114,13 @@ class BoardRepository extends AbstractSharableEntityRepository {
       foreach($active as $user) {
         $found = false;
         foreach($activeUsers as $active) { // check if the user isnt in the array already
-          if($active->getId() === $user->getId()) {
+          if($active['user']->getId() === $user['user']->getId()) {
             $found = true;
-            break;
+            $activeUsers[$user['user']->getId()]['changes'] += $user['changes'];
           }
         }
         if($found === false) // add new user
-          $activeUsers[] = $user;
+          $activeUsers[$user['user']->getId()] = $user;
       }
     }
 

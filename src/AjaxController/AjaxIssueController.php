@@ -7,6 +7,7 @@ use App\Entity\Issue;
 use App\Repository\GaugeChangesRepository;
 use App\Repository\GaugeRepository;
 use App\Repository\IssueRepository;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -65,6 +66,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      /** @var EntityManager $entityManager */
       $entityManager = $this->getDoctrine()->getManager();
       $entityManager->getFilters()->disable('softdeleteable'); // allow to load even deleted Issues
       $issue = $issueRepository->getIssueByLink($link, $this->getUser());
@@ -224,7 +226,9 @@ class AjaxIssueController extends Controller {
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssue($issue_id, true);
 
-      $changes = $this->getDoctrine()->getRepository(GaugeChanges::class)->getAllChangesForIssue($issue->getId());
+      /** @var GaugeChangesRepository $gaugeChangesRepository */
+      $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
+      $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
 
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);

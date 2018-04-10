@@ -1,4 +1,9 @@
-{% if user is iterable %} {# if its an array and not a user object - show there are some more users #}
+
+{% if user['user'] is defined %}
+    {% set user = user['user'] %}
+{% endif %}
+
+{% if user['count'] is defined %} {# if its an array and not a user object - show there are some more users #}
     {#<div class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">#}
         {#<i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }}"#}
            {#style="color: #ddd; position: relative;"></i>#}
@@ -6,12 +11,17 @@
         {#<span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-3"#}
         {#style="font-weight:900;">+{{ user['count'] }}</span>#}
     {#</div>#}
-    <div class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">
+    <div class="fa-layers fa-fw mr-3 p-0 {% if entity is defined %}pointer{% endif %}"
+         title="And {{ user['count'] }} more users"
+         {% if entity is defined %}
+             data-target="#modalUserlist" data-toggle="modal"
+             data-name="{{ entity.name }}" data-id="{{ entity.pageId }}"
+         {% endif %}>
         <i class="fas fa-2x fa-user-circle  user-image-anonymous-{{ size }}"
            style="position: absolute; top: 18px; color: #ddd"></i>
         <div class="user-image-anonymous-bg bg-light"></div>
-        <span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-4"
-        style="font-weight:900; z-index: 5">+{{ user['count'] }}</span>
+        <b class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-4"
+        style="font-weight:900; z-index: 5">+{{ user['count'] }}</b>
     </div>
 {% elseif user.isAnonymous %}
     <div class="mr-1 p-0 user-portrait float-left" title="{{ user.username }}">

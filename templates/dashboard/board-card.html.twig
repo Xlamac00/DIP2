@@ -15,7 +15,7 @@
             <div class="position-absolute" style="height: 1px">
                 <div class="dashboard-userlist">
                     {% for user in role.board.activeUsers %}
-                        {{ include('user/user-icon.html.twig', {'user': user, 'size': 'small'}) }}
+                        {{ include('user/user-icon.html.twig', {'user': user, 'size': 'small', 'entity': role.board}) }}
                     {% endfor %}
                 </div>
             </div>
