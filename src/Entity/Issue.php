@@ -50,6 +50,10 @@ class Issue extends AbstractSharableEntity {
     $this->deletedAt = $deletedAt;
   }
 
+  public function restore() {
+    $this->deletedAt = null;
+  }
+
   /** Variable with array of users that contributed to the issue.
    * Has to be manually set (eg. from boardrepository) */
   private $activeUsers;

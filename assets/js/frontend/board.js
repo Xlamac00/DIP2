@@ -83,22 +83,58 @@ $(document).ready(function() {
             }
         });
     }
-    $('.issueDelete').click(ajaxDeleteIssue);
-    function ajaxDeleteIssue() {
-        $.ajax({
-            url: '/ajax/issueDelete',
-            type: "POST",
-            dataType: "json",
-            data: {
-                "link": this.name
-            },
-            async: true,
-            success: function (data) {
-                var elem =  document.getElementById('issue-'+data.link);
-                elem.parentNode.removeChild(elem);
-            }
-        });
-    }
+    // One modal window to delete any Issue - on open insert issue name and id
+    $('#modalIssueDelete').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var name = button.data('name');
+        var id = button.data('id');
+        var modal = $(this);
+        modal.find('.modal-title').text('Delete ' + name);
+        document.getElementById('modalIssueDeleteId').value = id;
+    });
+    document.getElementById('modalIssueDeleteBtn').onclick = function () {
+        var link = document.getElementById('modalIssueDeleteId').value;
+        var loading = document.getElementById('modalIssueDeleteLoading');
+        if(link.length > 0) {
+            loading.className = 'd-block';
+            $.ajax({
+                url: '/ajax/issueDelete',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "link": link
+                },
+                async: true,
+                success: function (data) {
+                    document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-none';
+                    document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-block';
+                    $('#modalIssueDelete').modal('hide');
+                    loading.className = "d-none";
+                }
+            });
+        }
+    };
+    $('.issueCardRestore').click(function () {
+        if(this.name.length > 0) {
+            var loading = document.getElementById('issueCard'+this.name+'RestoreLoading');
+            loading.className = 'd-block';
+            $.ajax({
+                url: '/ajax/issueRestore',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "link": this.name
+                },
+                async: true,
+                success: function (data) {
+                    console.log(data);
+                    document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-block';
+                    document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-none';
+                    loading.className = "d-none";
+                }
+            });
+        }
+    });
 
     /** ********************************************************************************* **
      ** **************************** BOARD SHARING **************************** **
@@ -129,7 +165,7 @@ $(document).ready(function() {
         var anonymous = document.getElementById('modalBoardShareAnonymous');
         var loading = document.getElementById('modalBoardShareOptions');
         var loadingOld = loading.innerHTML;
-        loading.innerHTML =  '<i class="fa fa-spinner fa-spin">';
+        loading.innerHTML =  '<i class="fa fa-spinner fa-spin"></i>';
         $.ajax({
             url: '/ajax/boardChangeShareRights',
             type: "POST",

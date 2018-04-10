@@ -55,6 +55,30 @@ class AjaxIssueController extends Controller {
   }
 
   /**
+   * @Route("/ajax/issueRestore", name="issue_ajax_restore")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function issueRestore(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $link = $request->request->get('link');
+
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->getFilters()->disable('softdeleteable'); // allow to load even deleted Issues
+      $issue = $issueRepository->getIssueByLink($link, $this->getUser());
+      $issue->restore();
+      $entityManager->persist($issue);
+      $entityManager->flush();
+      $entityManager->getFilters()->enable('softdeleteable');
+
+      $arrData = ['link' => $link];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /**
    * @Route("/ajax/issueGraphChange", name="issue_ajax_graphChange")
    * @param Request $request - ajax Request
    * @return null|JsonResponse
