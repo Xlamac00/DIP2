@@ -197,4 +197,40 @@ $(document).ready(function() {
             }
         });
     });
+
+
+    /** **************************************************************** **
+     *  ********       BUG REPORT - REMOVE FROM LIVE VERSION     !!!!!!!
+     ** **************************************************************** **/
+
+    var text = document.getElementById('bugReportText');
+    text.onkeypress = function (e) {
+        e = e || window.event;
+        if (e.keyCode === 13) { // Enter
+            $("#bugReportBtn").dropdown("toggle");
+            ajaxReportBug();
+        }
+    };
+    var bugSend = document.getElementById('bugReportSend');
+    bugSend.onclick = function () { ajaxReportBug() };
+    function ajaxReportBug() {
+        if(text.value.length > 0) {
+            var btn = document.getElementById('bugReportBtn');
+            btn.innerHTML = '<i class="fas fa-1x fa-spinner fa-spin"></i> Sending';
+            $.ajax({
+                url: '/ajax/reportBug',
+                type: "POST",
+                dataType: "json",
+                data: { "text": text.value },
+                async: true,
+                success: function () {
+                    text.value = '';
+                    btn.innerHTML = "Thanks ;) ";
+                    setTimeout(function () {
+                        btn.innerHTML = "Report bug";
+                    }, 1500);
+                }
+            });
+        }
+    }
 });

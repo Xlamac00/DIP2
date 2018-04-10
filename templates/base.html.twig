@@ -62,6 +62,17 @@
     </div>
     {{ include('board/new-modal.html.twig') }}
 </div>
+<div class="fixed-bottom" >
+    <div class="btn-group dropup rounded m-1">
+     <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="bugReportBtn"
+             class="btn btn-secondary pointer dropdown-toggle"> Report bug</button>
+    <div class="dropdown-menu p-2">
+        <label for="bugReportText">This is alpha version of this application. Any feedback will be really
+            appreciated.</label>
+        <textarea id="bugReportText"></textarea>
+        <button class="btn" id="bugReportSend">Send</button>
+    </div>
+</div>
 
 {% block javascripts %}
 {% endblock %}

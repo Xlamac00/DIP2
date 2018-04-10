@@ -3,6 +3,7 @@
 namespace App\AjaxController;
 
 use App\Entity\Board;
+use App\Entity\Bug;
 use App\Entity\Issue;
 use App\Entity\User;
 use App\Repository\BoardRepository;
@@ -81,6 +82,27 @@ class AjaxUserController extends Controller {
         ['name' => $name, 'users' => $users, 'type' => $type]);
 
       $arrData = ['render' => $render, 'name' => $name, "entity" => $entityId];
+      return new JsonResponse($arrData);
+    }
+  }
+
+  /**
+   * @Route("/ajax/reportBug", name="ajax_bug")
+   */
+  public function reportBug(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $text = $request->request->get('text');
+
+      $bug = new Bug();
+      $bug->setUser($this->getUser());
+      $bug->setText($text);
+      $bug->setTime();
+
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->persist($bug);
+      $entityManager->flush();
+
+      $arrData = ['text' => $text];
       return new JsonResponse($arrData);
     }
   }
