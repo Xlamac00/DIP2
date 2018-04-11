@@ -34,7 +34,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
 
   /** Returns all boards this user has access to.
    * @param UserInterface $user - currently logged user
-   * @return array
+   * @return BoardRole[]
    */
   public function getUserBoards($user) {
     return $this->findBy(['user' => $user, 'isDeleted' => 0]);
@@ -269,23 +269,35 @@ class BoardRoleRepository extends ServiceEntityRepository {
     $bHistory->setUser($user);
     $bHistory->setBoard($board);
     $this->manager->persist($bHistory);
+    $this->manager->flush();
 
-    // set the rights for this user and this board
-    $role = new BoardRole();
-    $role->setBoard($board);
-    $role->setRole($rights);
-    $role->setUser($user);
-    $role->setBoardHistory($bHistory);
-    $this->manager->persist($role);
+    $this->giveUserRightsToBoard($user, $board, $rights, $bHistory);
+
+    return $rights;
+  }
+
+  /** Gives user $rights to given Board and all its Issues
+   * @param User $user
+   * @param Board $board
+   * @param string $rights
+   * @param BoardShareHistory $boardHistory
+   */
+  public function giveUserRightsToBoard($user, $board, $rights, $boardHistory) {
+    $check = $this->getUserRights($user, $board);
+    if($check === null) {
+      // set the rights for this user and this board
+      $role = new BoardRole();
+      $role->setBoard($board);
+      $role->setRole($rights);
+      $role->setUser($user);
+      $role->setBoardHistory($boardHistory);
+      $this->manager->persist($role);
+    }
 
     /** @var IssueRoleRepository $issueRoleRepository */
     $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
     // set same rights for each Issue in this Board
-    $query = $this->manager->createQuery(
-      'SELECT i FROM App\Entity\Issue i WHERE i.board = :id'
-    )->setParameter('id', $board->getId());
-    $issues = $query->execute();
-    foreach($issues as $issue) {
+    foreach($board->getIssues() as $issue) {
       $check = $issueRoleRepository->getUserRights($user, $issue);
       if($check !== null && !$check->isDeleted()) continue; // skip issues that already have rights for this user
 
@@ -293,7 +305,8 @@ class BoardRoleRepository extends ServiceEntityRepository {
       $role->setUser($user);
       $role->setIssue($issue);
       $role->setRole($rights);
-      $role->setBoardHistory($bHistory);
+      $role->setIssueHistory(null);
+      $role->setBoardHistory($boardHistory);
       $this->manager->persist($role);
 
       // insert share history for issue as well
@@ -301,10 +314,9 @@ class BoardRoleRepository extends ServiceEntityRepository {
       $history->setRole($rights);
       $history->setUser($user);
       $history->setIssue($issue);
-      $history->setBoardHistory($bHistory);
+      $history->setBoardHistory($boardHistory);
       $this->manager->persist($history);
     }
     $this->manager->flush();
-    return $rights;
   }
 }

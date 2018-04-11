@@ -104,7 +104,7 @@ abstract class AbstractSharableEntity extends AbstractLinkableEntity {
       if($this->userRights->getUser()->isAnonymous()) // user is anonymous, is it allowed them to write?
         return $this->userRights->getRights() === Board::ROLE_ANON;
       else
-        return in_array($this->userRights->getRights(),[Board::ROLE_ADMIN, Board::ROLE_WRITE]);
+        return in_array($this->userRights->getRights(),[Board::ROLE_WRITE, Board::ROLE_ANON]);
     }
     return false;
   }

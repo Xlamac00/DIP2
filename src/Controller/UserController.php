@@ -1,12 +1,10 @@
 <?php
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Entity\Board;
+use App\Repository\BoardRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends Controller {
   /**
@@ -29,24 +27,17 @@ class UserController extends Controller {
   }
 
   /**
-   * @Route("/ajax/userNameChange", name="user_name_change")
+   * @Route("/u/{link}/{name}", name="user_share")
    */
-  public function changeName(Request $request) {
-    if ($request->isXmlHttpRequest()) {
-      $name = $request->request->get('name');
-      $googleId = $request->cookies->get('googleId');
-      $userId = $request->cookies->get('clientId');
-
-      $userRepository = $this->getDoctrine()->getRepository(User::class);
-      if(sizeof($googleId) > 0)
-        $userRepository->loadUserByGoogleId($googleId);
-      else
-        $userRepository->loadUserByUsername($userId);
-      $userRepository->updateUsername($name);
-
-      $arrData = ['name' => $name];
-      return new JsonResponse($arrData);
+  public function showBoard($link, $name) {
+    /** @var BoardRepository $boardRepository */
+    $boardRepository = $this->getDoctrine()->getRepository(Board::class);
+    $board = $boardRepository->getBoardByLink($link, $this->getUser());
+    if($board !== null) { // Its Board
+      return $this->redirectToRoute('board', array('link' => $link, 'name' => $name));
+    }
+    else { // Its Issue
+      return $this->redirectToRoute('issue', array('link' => $link, 'name' => $name));
     }
   }
-
 }

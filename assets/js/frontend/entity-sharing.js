@@ -249,11 +249,10 @@ $(document).ready(function() {
         function ajaxInviteUser () {
             var username = document.getElementById(name+'AddUser');
             // regex to match either email address, or my user from db (name@ ... )
-            var re = /^.+\(.{2,}@ \.\.\. \)$|^.{2,}@[a-z0-9]{2,}\.[a-z0-9]+$/i;
+            var re = /^.+\(.{2,}@ \.\.\. \)$|^.{2,}@[a-z0-9\.\-]{2,}\.[a-z0-9]+$/i;
             if(username.value.match(re)) {
                 var loading = document.getElementById(name+'InviteLoading');
                 loading.style.display = 'block'; // show loading button
-                username.className = 'form-control';
                 var roleSelect = document.getElementById(name+'InviteRole');
                 var option = roleSelect.options[roleSelect.selectedIndex].value;
                 $.ajax({
@@ -266,11 +265,20 @@ $(document).ready(function() {
                         "role": option
                     },
                     async: true,
-                    success: function () {
-                        document.getElementById(name+"InviteBtn").style.display = 'none';
-                        username.value = ''; // reset the input
+                    success: function (data) {
+                        console.log(data);
                         loading.style.display = 'none'; // hide loading
                         var tip = $('#'+name+'AddUser');
+                        if(data.email !== false) {
+                            username.className = 'form-control';
+                            document.getElementById(name+"InviteBtn").style.display = 'none';
+                            username.value = ''; // reset the input
+                            tip.attr("title","Email with invitation was send");
+                        }
+                        else {
+                            tip.attr("title","Email was NOT found!");
+                            username.className = 'form-control is-invalid';
+                        }
                         tip.tooltip('show'); // show 'user invited' msg
                         setTimeout(function(){
                             tip.tooltip('dispose');

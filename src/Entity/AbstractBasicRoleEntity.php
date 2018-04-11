@@ -46,18 +46,18 @@ abstract class AbstractBasicRoleEntity {
   public function setRole($roleText) {
     switch ($roleText) {
       case 'admin':
-      case Board::ROLE_ADMIN:
-        $role = Board::ROLE_ADMIN; break;
+      case AbstractSharableEntity::ROLE_ADMIN:
+        $role = AbstractSharableEntity::ROLE_ADMIN; break;
       case 'anonwrite':
-      case Board::ROLE_ANON:
-        $role = Board::ROLE_ANON; break;
+      case AbstractSharableEntity::ROLE_ANON:
+        $role = AbstractSharableEntity::ROLE_ANON; break;
       case 'write':
-      case Board::ROLE_WRITE:
-        $role = Board::ROLE_WRITE; break;
+      case AbstractSharableEntity::ROLE_WRITE:
+        $role = AbstractSharableEntity::ROLE_WRITE; break;
       case 'read':
-      case Board::ROLE_READ:
+      case AbstractSharableEntity::ROLE_READ:
       default:
-        $role = Board::ROLE_READ; break;
+        $role = AbstractSharableEntity::ROLE_READ; break;
     }
     $this->role = $role;
   }

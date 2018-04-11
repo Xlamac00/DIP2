@@ -3,6 +3,7 @@ namespace App\Security;
 
 use App\Repository\BoardRoleRepository;
 use App\Repository\IssueRoleRepository;
+use App\Repository\UserShareRepository;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,13 +18,15 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   private $router;
   private $issueRepository;
   private $boardRepository;
+  private $userRepository;
 
   // Not required by GuardAuthneticator, added because of UrlGenerator
   public function __construct(UrlGeneratorInterface $router, IssueRoleRepository $issueRepository,
-                              BoardRoleRepository $boardRoleRepository) {
+                              BoardRoleRepository $boardRoleRepository, UserShareRepository $userShareRepository) {
     $this->router = $router;
     $this->issueRepository = $issueRepository;
     $this->boardRepository = $boardRoleRepository;
+    $this->userRepository = $userShareRepository;
   }
 
   /**
@@ -42,7 +45,7 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
    */
   public function getCredentials(Request $request) {
     $uri = $request->server->get('REQUEST_URI');
-    preg_match('/\/[i,b]\/[0-9A-z]{8}\//', $uri, $matches); // get page id from url
+    preg_match('/\/[i,b,u]\/[0-9A-z]{8}\//', $uri, $matches); // get page id from url
     return array(
       'clientId' => $request->cookies->get('clientId'),
       'googleId' => $request->cookies->get('googleId'),
@@ -90,6 +93,11 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
       $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
+    else if($credentials['pageType'] === 'u') { // shared link for specific user
+      $role = $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
+      $user->setPagePermission($credentials['pageId'], $role);
+      return true;
+    }
     else
       return true;
   }
@@ -113,7 +121,7 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   }
 
   public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {
-//    die('chyba');
+//    die('chyba'.$request->headers->get('referer'));
     new RedirectResponse('/error/404');
   }
 

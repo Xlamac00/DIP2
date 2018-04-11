@@ -49,6 +49,37 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
       );
   }
 
+  /** Returns User based on part of his username and part of his email.
+   * Used for example when inviting user to app by email.
+   *
+   * @param $partOfName - part of his username
+   * @param $partOfEmail - first part of email (part before @)
+   * @return User $user
+   */
+  public function findUserByNameAndEmail($partOfName, $partOfEmail) {
+    $qb = $this->createQueryBuilder('u')
+      ->andWhere('u.isActive = 1')
+      ->andWhere('u.email IS NOT NULL')
+      ->andWhere('u.email LIKE :mail AND u.username LIKE :name')
+      ->setParameter('name', '%'.$partOfName.'%')
+      ->setParameter('mail', $partOfEmail.'%')
+      ->getQuery();
+    $users = $qb->execute();
+    if(sizeof($users) != 1) return null;
+    else return $users[0];
+  }
+
+  /** Returns User based only on his (unique) email.
+   *
+   * @param $email
+   * @return User
+   */
+  public function findUserByEmail($email) {
+    /** @var User $user */
+    $user = $this->findOneBy(["email" => $email]);
+    return $user;
+  }
+
   /** Loads user either by Google ID or my UserLink.
    *
    * @param string $anyId - either 21+ numeric Google Id, or my 20 char alphanumeric id
@@ -93,6 +124,7 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
       ->getQuery();
     $users = $qb->execute();
     $result = array();
+    /** @var User $user */
     foreach($users as $user) {
       $mail = explode('@', $user->getEmail());
       $email = $mail[0]."@ ... ";

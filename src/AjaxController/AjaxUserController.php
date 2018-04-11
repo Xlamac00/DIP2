@@ -17,27 +17,25 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxUserController extends Controller {
 
   /**
-   * @Route("/testa", name="testa")
+   * @Route("/ajax/userNameChange", name="user_name_change")
    */
-  public function testd() {
-//    $input = 'ja';
-//
-    $name = 'kocicka';
-    $entityId = '52b54aab';
+  public function changeName(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $name = $request->request->get('name');
+      $googleId = $request->cookies->get('googleId');
+      $userId = $request->cookies->get('clientId');
 
-    /** @var IssueRepository $issueRepository */
-    $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-    $id = $issueRepository->getIdByLink($entityId);
-    if($id === null) { // its Board
-      $render = 'kocicka';
-    }
-    else {
-      $users = $issueRepository->getAllActiveUsers($id);
-      $render = $this->renderView('user/modal-userlist.html.twig', ['name' => $name, 'users' => $users]);
-    }
+      /** @var UserRepository $userRepository */
+      $userRepository = $this->getDoctrine()->getRepository(User::class);
+      if(sizeof($googleId) > 0)
+        $userRepository->loadUserByGoogleId($googleId);
+      else
+        $userRepository->loadUserByUsername($userId);
+      $userRepository->updateUsername($name);
 
-    $arrData = ['render' => $render, 'name' => $name, "entity" => $entityId];
-    die(var_dump($arrData));
+      $arrData = ['name' => $name];
+      return new JsonResponse($arrData);
+    }
   }
 
   /**

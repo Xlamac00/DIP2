@@ -32,6 +32,12 @@ class User implements UserInterface, \Serializable {
   private $email;
 
   /**
+   * Email for anonymous users who got access via email invitation
+   * @ORM\Column(type="string", length=64, nullable=true)
+   */
+  private $anonymousEmail;
+
+  /**
    * @ORM\Column(type="string", length=7)
    */
   private $color;
@@ -60,37 +66,12 @@ class User implements UserInterface, \Serializable {
     $this->permissionRole = $role;
   }
 
-//  public function getTest() {
-//    return $this->id.",".$this->permissionPageId.", ".$this->permissionRole;
-//  }
-
-//  /** Checks rights for the current page to edit.
-//   * These variables are set in page authenticator.
-//   * @param $pageId - 8 char id of the page the rights are for
-//   * @return boolean - if the user has rights to edit given page
-//   */
-//  public function canWrite($pageId) {
-//    if($this->permissionPageId === $pageId) {
-//      switch ($this->permissionRole) {
-//        case Board::ROLE_ANON:
-//        case Board::ROLE_ADMIN:
-//          return true;
-//        case Board::ROLE_WRITE:
-//          return !$this->isAnonymous(); // anonymous users cant write
-//        case Board::ROLE_READ:
-//          return false;
-//      }
-//    }
-//    return false;
-//  }
-
   public function __construct() {
     $this->isActive = true;
     $this->email = null;
     $this->googleId = null;
     $this->googleImg = null;
-    // may not be needed, see section on salt below
-    // $this->salt = md5(uniqid('', true));
+    $this->anonymousEmail = null;
   }
 
   public function getId() {
@@ -107,6 +88,9 @@ class User implements UserInterface, \Serializable {
   }
   public function setEmail($email) {
     $this->email = $email;
+  }
+  public function setAnonymousEmail($email) {
+    $this->anonymousEmail = $email;
   }
   public function setImageLink($image) {
     $this->googleImg = $image;
@@ -128,6 +112,9 @@ class User implements UserInterface, \Serializable {
   }
   public function getColor() {
       return $this->color;
+  }
+  public function getAnonymousEmail() {
+    return $this->anonymousEmail;
   }
 
   // Username is unique 20 char string
@@ -152,8 +139,6 @@ class User implements UserInterface, \Serializable {
   }
 
   public function getSalt() {
-    // you *may* need a real salt depending on your encoder
-    // see section on salt below
     return null;
   }
 
@@ -174,8 +159,6 @@ class User implements UserInterface, \Serializable {
       $this->username,
       $this->link,
       $this->googleId,
-      // see section on salt below
-      // $this->salt,
     ));
   }
 
@@ -186,8 +169,6 @@ class User implements UserInterface, \Serializable {
       $this->username,
       $this->link,
       $this->googleId,
-      // see section on salt below
-      // $this->salt
       ) = unserialize($serialized);
   }
 }

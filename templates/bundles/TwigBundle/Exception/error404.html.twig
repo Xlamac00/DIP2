@@ -1,0 +1,22 @@
+{# templates/bundles/TwigBundle/Exception/error404.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main role="main" class="col-xl-12">
+        <div class="clearfix">
+            <h1>Error 404</h1>
+        </div>
+        <p class="clearfix">Content was not found or insufficient rights to view it.</p>
+
+        {% if is_granted('ROLE_ANONYMOUS') %}
+            <div class="text-center">
+                <h3 class="text-secondary">Login for free</h3>
+                <p>To create your own projects</p>
+                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google'}) }}">
+                    <img src="{{ asset('build/images/signin_normal.696c081a.png') }}">
+                </a>
+            </div>
+        {% endif %}
+    </main>
+
+{% endblock %}
