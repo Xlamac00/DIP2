@@ -72,12 +72,10 @@ $(document).ready(function() {
             var label = document.getElementById('modalNewBoardLabel');
             var create = document.getElementById('modalNewBoardCreateBtn');
             var input = document.getElementById('modalNewBoardName');
-            var deleteSection = document.getElementById('modalNewBoardDeleteSection');
             if(id !== null && typeof id !== 'undefined') { // clicked button to edit board
                 var editBtn = document.getElementById('boardEditNameBtn');
                 var boardname = editBtn.getAttribute('data-name');
                 var color = editBtn.getAttribute('data-color');
-                deleteSection.className = 'd-block';
                 label.innerHTML = "Edit "+boardname;
                 create.innerHTML = "Save changes";
                 input.value = boardname;
@@ -86,7 +84,6 @@ $(document).ready(function() {
                 name.select();
             }
             else { // clicked button to create new board
-                deleteSection.className = 'd-none';
                 label.innerHTML = "Create new project";
                 create.innerHTML = "Create";
                 input.value = "";

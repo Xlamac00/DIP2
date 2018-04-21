@@ -1,13 +1,7 @@
 
 <div class="media mb-3">
     <span title="{{ change.user.username }}" class="ml-1 mr-3">
-        {% if change.user.roles[0] == 'ROLE_ANONYMOUS' %}
-            <div class="mt-1 p-0 user-portrait" style="background-color: {{ change.user.color }}">
-                <i class="fas fa-2x fa-user-circle user-image-anonymous-big text-light"  ></i>
-            </div>
-        {% else %}
-            <img src="{{ change.user.imagelink }}" class="user-portrait user-image-google-big">
-        {% endif %}
+        {{ include('user/user-icon.html.twig', {'user': change.user, 'size': 'big'}) }}
     </span>
     <div class="media-body mb-3">
         <div class="d-flex justify-content-between">

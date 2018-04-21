@@ -78,51 +78,60 @@ $(document).ready(function() {
         });
     }
     // One modal window to delete any Issue - on open insert issue name and id
-    $('#modalIssueDelete').on('show.bs.modal', function (event) {
+    $('#modalEntityDelete').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var name = button.data('name');
         var id = button.data('id');
+        var type = button.data('type');
+        var color = button.data('color');
         var modal = $(this);
+        var header = document.getElementById('modalEntityDeleteHeader');
+        header.className = 'modal-header text-white bg-'+color.substr(1);
         modal.find('.modal-title').text('Delete ' + name);
+        modal.find('#modalDeleteQuestion').text('Do you really want to delete ' + name + '?');
         document.getElementById('modalIssueDeleteId').value = id;
+        document.getElementById('modalEntityDeleteType').value = type;
+        document.getElementById('modalEntityDeleteBtn').innerHTML = 'Delete ' + type;
     });
-    document.getElementById('modalIssueDeleteBtn').onclick = function () {
+    document.getElementById('modalEntityDeleteBtn').onclick = function () {
+        var type = document.getElementById('modalEntityDeleteType').value;
         var link = document.getElementById('modalIssueDeleteId').value;
         var loading = document.getElementById('modalIssueDeleteLoading');
         if(link.length > 0) {
             loading.className = 'd-block';
-            $.ajax({
-                url: '/ajax/issueDelete',
-                type: "POST",
-                dataType: "json",
-                data: {
-                    "link": link
-                },
-                async: true,
-                success: function (data) {
-                    document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-none';
-                    document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-block';
-                    $('#modalIssueDelete').modal('hide');
-                    loading.className = "d-none";
-                }
-            });
-        }
-    };
-    document.getElementById('modalBoardDeleteBtn').onclick = function () {
-        var board = document.getElementById('boardId');
-        $.ajax({
-            url: '/ajax/boardDelete',
-            type: "POST",
-            dataType: "json",
-            data: {
-                "board": board.value
-            },
-            async: true,
-            success: function (data) {
-                console.log(data);
-                location.href = '../../dashboard';
+            if(type === 'project') {
+                $.ajax({
+                    url: '/ajax/boardDelete',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "board": link
+                    },
+                    async: true,
+                    success: function (data) {
+                        console.log(data);
+                        location.href = '../../dashboard';
+                    }
+                });
             }
-        });
+            else if(type === 'issue') {
+                $.ajax({
+                    url: '/ajax/issueDelete',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "value1": link
+                    },
+                    async: true,
+                    success: function (data) {
+                        document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-none';
+                        document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-block';
+                        $('#modalEntityDelete').modal('hide');
+                        loading.className = "d-none";
+                    }
+                });
+            }
+        }
     };
     $('.issueCardRestore').click(function () {
         if(this.name.length > 0) {

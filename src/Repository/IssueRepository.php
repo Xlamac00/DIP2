@@ -37,7 +37,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
    *
    * @param string $link
    * @param User   $user
-   * @return Issue|null
+   * @return Issue
    */
   public function getIssueByLink($link, $user) {
     if(!isset($this->issue)) {

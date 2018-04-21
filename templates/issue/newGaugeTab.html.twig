@@ -1,11 +1,12 @@
 
 <div class="d-flex justify-content-between">
     <h3>{{ title|default('Add a new task:') }}</h3>
-    <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
+    <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close" title="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-<input type="text" class="form-control" placeholder="Task name" id="gaugeAddNewName" value="{{ name|default('') }}">
+<input type="text" class="form-control" placeholder="Task name" id="gaugeAddNewName{{ id|default('') }}"
+       value="{{ name|default('') }}">
 <input type="hidden" id="gaugeUpdateId" value="{{ id|default('') }}">
 <br>
 
@@ -65,5 +66,6 @@
 </form>
 
 <br>
-<button class="btn btn-success mx-auto" style="display: block; width: 130px;"
+<button class="btn btn-success mx-auto pointer" style="display: block; width: 130px;"
         id="gaugeAddNewSaveBtn">Save task</button>
+<div class="m-0 p-0 d-md-block d-lg-none">&nbsp;</div>

@@ -1,11 +1,5 @@
 
-<ul class="navbar-nav mr-auto">
-    {#<li class="nav-item active">#}
-        {#<a class="nav-link" href="{{ url('homepage') }}">{% trans %}Home{% endtrans %} <span class="sr-only">(current)</span></a>#}
-    {#</li>#}
-</ul>
-
-<div class="dropdown">
+<div class="dropdown float-right">
     <button class="nobtn float-right pointer m-0 p-0 " data-toggle="dropdown" aria-haspopup="false"
             type="button" aria-expanded="true" id="dropdownMenuUser">
         {{ include('user/user-icon.html.twig', {'user': app.user, 'size': 'big'}) }}

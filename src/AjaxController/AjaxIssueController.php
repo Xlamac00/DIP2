@@ -41,16 +41,17 @@ class AjaxIssueController extends Controller {
    */
   public function issueDelete(Request $request) {
     if ($request->isXmlHttpRequest()) {
-      $link = $request->request->get('link');
+      $link = $request->request->get('value1');
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssueByLink($link, $this->getUser());
+      $return = $issue->getBoard()->getUrl();
       $entityManager = $this->getDoctrine()->getManager();
       $entityManager->remove($issue);
       $entityManager->flush();
 
-      $arrData = ['link' => $link];
+      $arrData = ['link' => $link, 'type' => 'issueDelete', 'return' => $return];
       return new JsonResponse($arrData);
     } else return null;
   }
@@ -190,7 +191,7 @@ class AjaxIssueController extends Controller {
       $gaugeRepository->setGauge($gauge);
       $gaugeRepository->gaugeValueLog(1, $userId);
 
-      $issue = $issueRepository->getIssue($issueId, true);
+      $issue = $issueRepository->getIssue($issueId, $this->getUser());
       $gaugeCount = $issueRepository->getNumberOfGauges();
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
@@ -224,7 +225,7 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssue($issue_id, true);
+      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
 
       /** @var GaugeChangesRepository $gaugeChangesRepository */
       $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
@@ -280,7 +281,7 @@ class AjaxIssueController extends Controller {
       $tab = $this->renderView('issue/newGaugeTab.html.twig',
         ['name' => $gauge->getName(), 'title' => 'Edit '.$gauge->getName().":",
          'color' => $gauge->getColor(), 'id' => $gauge_id]);
-      return new JsonResponse($tab);
+      return new JsonResponse(array('id' => $gauge_id, 'render' => $tab));
     } else return null;
   }
 
@@ -348,7 +349,7 @@ class AjaxIssueController extends Controller {
 
       $entityManager = $this->getDoctrine()->getManager();
       $entityManager->clear();
-      $issue = $issueRepository->getIssue($issue_id, true);
+      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);

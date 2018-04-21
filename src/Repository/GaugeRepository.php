@@ -8,6 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class GaugeRepository extends ServiceEntityRepository  {
+  /** @var  Gauge */
   private $gauge;
   private $manager;
   private $registry;

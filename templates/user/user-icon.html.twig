@@ -4,13 +4,6 @@
 {% endif %}
 
 {% if user['count'] is defined %} {# if its an array and not a user object - show there are some more users #}
-    {#<div class="fa-layers fa-fw mr-3 p-0" title="And {{ user['count'] }} more users">#}
-        {#<i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }}"#}
-           {#style="color: #ddd; position: relative;"></i>#}
-        {#<div class="user-image-anonymous-bg bg-success" ></div>#}
-        {#<span class="fa-layers-text text-dark fa-2x" data-fa-transform="shrink-8 right-3 down-3"#}
-        {#style="font-weight:900;">+{{ user['count'] }}</span>#}
-    {#</div>#}
     <div class="fa-layers fa-fw mr-3 p-0 {% if entity is defined %}pointer{% endif %}"
          title="And {{ user['count'] }} more users"
          {% if entity is defined %}
@@ -26,7 +19,7 @@
 {% elseif user.isAnonymous %}
     <div class="mr-1 p-0 user-portrait float-left" title="{{ user.username }}">
         <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }} text-light position-absolute"></i>
-        <div class="user-image-anonymous-bg" style="background-color: {{ user.color }}"></div>
+        <div class="user-image-anonymous-bg-{{ size }}" style="background-color: {{ user.color }}"></div>
     </div>
 {% else %}
     <img src="{{ user.imagelink }}" class="mr-1 p-0 user-portrait user-image-google-{{ size }} float-left"

@@ -201,6 +201,7 @@ $(document).ready(function() {
         if(count <= 0) { // there are no gauges, show create new dialog
             hideAllSections(false);
             document.getElementById('gaugeNewSection').style.display = 'block';
+            document.getElementById('gaugeAddNewName').focus();
         }
         else if(count >= 4) { // not allowed to have more then 4 gauges
             document.getElementById('gaugeAddNewBtn').disabled = true;
@@ -305,6 +306,8 @@ $(document).ready(function() {
             hideAllSections();
             document.getElementById('gaugeNewSection').style.display = 'block';
             addNewBtn.blur();
+            var text = document.getElementById('gaugeAddNewName');
+            text.focus();
         }
     }
 
@@ -322,6 +325,8 @@ $(document).ready(function() {
     function showEditIssue() {
         hideAllSections();
         document.getElementById('gaugeEditIssueSection').style.display = 'block'; // make issue edit section visible
+        var text = document.getElementById('issueEditName');
+        text.select();
     }
 
     $('#questionNo').click(hideCurrentSection);
@@ -330,7 +335,7 @@ $(document).ready(function() {
         hideAllSections();
         $('.gaugeDelete').blur();
         document.getElementById('questionText').innerHTML = 'delete this task';
-        document.getElementById('questionCall').value = 'path_ajax_gaugeDelete';
+        document.getElementById('questionCall').value = '/ajax/issueGaugeDelete';
         document.getElementById('questionValue1').value = this.name;
         document.getElementById('questionValue2').value = chart.config.issueId;
         document.getElementById('questionSection').style.display = 'block';
@@ -497,15 +502,28 @@ $(document).ready(function() {
             document.getElementById('issueEditName').className = 'form-control is-invalid';
     }
 
+    $('#issueEditDelete').click(showIssueDeleteDialog);
+    function showIssueDeleteDialog() {
+        hideAllSections();
+        $('.gaugeDelete').blur();
+        document.getElementById('questionText').innerHTML = 'delete this issue';
+        document.getElementById('questionCall').value = '/ajax/issueDelete';
+        document.getElementById('questionValue1').value = document.getElementById('issueDeleteId').value;
+        document.getElementById('questionValue2').value = '';
+        document.getElementById('questionSection').style.display = 'block';
+    }
+
     function ajaxUpdateGauge() {
+        var id = $("#gaugeEditOneSection #gaugeUpdateId").val();
+        var name = document.getElementById('gaugeAddNewName'+id).value;
         $.ajax({
             url: path_ajax_gaugeUpdate,
             type: "POST",
             dataType: "json",
             data: {
                 "issueId": chart.config.issueId,
-                "gaugeId": $("#gaugeEditOneSection #gaugeUpdateId").val(),
-                "name": $('#gaugeEditOneSection #gaugeAddNewName').val(),
+                "gaugeId": id,
+                "name": name,
                 "color": $('input[name=radio]:checked', '#gaugeEditOneSection #gaugeAddNewForm').val()
             },
             async: true,
@@ -517,6 +535,9 @@ $(document).ready(function() {
                 $('#gaugeChangeResetBtn').click(ajaxDiscardChange); // bind actions to the buttons (again)
                 $('#gaugeChangeConfirmBtn').click(ajaxCommentChange);
                 toggleAllComments(); // hide more then x first comments
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown ) {
+                console.log(textStatus+","+errorThrown);
             }
         });
     }
@@ -534,17 +555,19 @@ $(document).ready(function() {
                 hideAllSections();
                 var section = document.getElementById('gaugeEditOneSection');
                 section.style.display = 'block'; // make gauge edit section visible
-                section.innerHTML = data;
+                section.innerHTML = data.render;
                 $('.gaugeEdit').blur();
                 $('.gaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
                 $('#gaugeEditOneSection #gaugeAddNewSaveBtn').click(ajaxUpdateGauge); //bind action to close btn
+                var text = document.getElementById('gaugeAddNewName'+data.id);
+                text.focus();
             }
         });
     }
 
     function ajaxSendQuestion() {
         $.ajax({
-            url: window[document.getElementById('questionCall').value], // this value has to be set in question
+            url: document.getElementById('questionCall').value, // this value has to be set in question
             type: "POST",
             dataType: "json",
             data: {
@@ -562,6 +585,9 @@ $(document).ready(function() {
                     $('#gaugeChangeConfirmBtn').click(ajaxCommentChange);
                     toggleAllComments();
                     hideAddNewGaugesBtn(data.gaugeCount); //potentially show add new gauge button
+                }
+                else if(data.type === 'issueDelete') {
+                    location.href = '../../'+data.return;
                 }
             }
         });

@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}
+    {{ issue.name }} - {{ issue.board.name }}
+{% endblock %}
+
 {% block menu %}
     {% set board = issue.board %}
     {{  parent() }}
@@ -22,7 +26,6 @@
         var path_ajax_gaugesInfo = '{{ (path('issue_ajax_gaugesInfo')) }}';
         var path_ajax_oneGaugeInfo = '{{ (path('issue_ajax_oneGaugeInfo')) }}';
         var path_ajax_gaugeUpdate = '{{ (path('issue_ajax_gaugeUpdate')) }}';
-        var path_ajax_gaugeDelete = '{{ (path('issue_ajax_gaugeDelete')) }}';
         var path_ajax_issueUpdate = '{{ (path('issue_ajax_issueUpdate')) }}';
         var options = {
             scales: {
@@ -75,12 +78,19 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="clearfix">
-                    <h2 id="issueName" class="float-left">{{  issue.name }}</h2>
+                    <h2 id="issueName" class="float-left" style="max-width: {% if issue.canUserManage %}60%{% else %}75%{% endif %}">
+                        <span class="overflow-text" title="{{ issue.name }}">{{ issue.name }}</span>
+                    </h2>
                     <div class="float-right row">
                         {% if issue.canUserWrite %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="gaugeAddNewBtn"
                                     value="{{ gaugeCount }}"
                                     data-toggle="tooltip" data-placement="bottom" title="Add a new task">
+                                <i class="fas fa-2x fa-plus"></i>
+                            </button>
+                        {% elseif issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
+                            <button type="button" class="nobtn mx-2 startTooltip" disabled
+                                    data-toggle="tooltip" data-placement="bottom" title="Must login to edit">
                                 <i class="fas fa-2x fa-plus"></i>
                             </button>
                         {% endif %}
@@ -94,9 +104,6 @@
                                     <i class="fas fa-2x fa-share"></i>
                                 </button>
                             </span>
-
-                            {#<div class="modal fade modalShareIssue" id="modal{{ issue.link }}" tabindex="-1" role="dialog"#}
-                            {#aria-labelledby="exampleModalLongTitle" aria-hidden="true">#}
                             <div class="modal fade modalShareIssue" tabindex="-1" role="dialog" aria-hidden="true"
                                  id="modalIssueShare">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -110,7 +117,7 @@
                         {% endif %}
                         {% if issue.canUserManage %}
                             <div class="dropdown mx-2">
-                                <button type="button" class="nobtn dropdown-toggle" id="gaugeEditBtn"
+                                <button type="button" class="nobtn dropdown-toggle pointer" id="gaugeEditBtn"
                                         data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
                                     <i class="fas fa-2x fa-cog "></i>
                                 </button>
@@ -123,7 +130,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="mb-3 clearfix float-left">
+                <div class="mb-3 clearfix float-left d-none d-md-block">
                     {% for user in users %}
                         {{ include('user/user-icon.html.twig', {'user': user, 'size': 'big'}) }}
                     {% endfor %}

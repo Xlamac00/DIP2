@@ -13,18 +13,19 @@
             {% if issue.isShareEnabled or issue.canUserManage %}
                 <div class="dropdown-menu my-dropdown dropdown-menu-right" aria-labelledby="dropdownCard{{ issue.link }}">
                     {% if issue.isShareEnabled or issue.canUserManage %}
-                        <button class="dropdown-item pointer issueShare nobtn px-3 py-1" data-id="{{ issue.pageId }}"
+                        <button class="dropdown-item pointer issueShare btn-link px-3 py-1" data-id="{{ issue.pageId }}"
                                 data-toggle="modal" data-target="#modalIssueShare">Share</button>
                     {% endif %}
                     {% if issue.canUserManage %}
-                        <button class="dropdown-item pointer nobtn px-3 py-1" data-target="#modalIssueDelete"
+                        <button class="dropdown-item pointer btn-link px-3 py-1" data-target="#modalEntityDelete"
+                                data-type="issue" data-color="#secondary"
                                 data-name="{{ issue.name }}" data-id="{{ issue.pageId }}" data-toggle="modal">
                             Delete issue</button>
                     {% endif %}
                 </div>
             {% endif %}
         </div>
-        <div class="float-right">
+        <div class="float-right d-none d-md-block">
             {% for user in issue.activeUsers %}
                 {{ include('user/user-icon.html.twig', {'user': user, 'size': 'small', 'entity': issue}) }}
             {% endfor %}
@@ -50,7 +51,6 @@
             {% if issue.countGaugeComments > 2 %}
                 <div class="text-smallcaps text-right">
                     <a href="../../{{ issue.url }}">And {{ issue.countGaugeComments-2 }} more changes
-                        {#<i class="fas fa-angle-down"></i>#}
                     </a>
                 </div>
             {% endif %}

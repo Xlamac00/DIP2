@@ -2,7 +2,7 @@
 <div class="modal fade" id="modalShareBoard" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header text-white {{ board.background }}">
                 <h4 class="modal-title" id="exampleModalLongTitle">Share {{ board.name }}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -77,7 +77,8 @@
                             <div id="modalBoardShareDisabledSection"
                                  style="display: {% if not board.isShareEnabled %} block {% else %} none {% endif %}">
                                 <div class="d-flex justify-content-center">
-                                    <button class="btn btn-success" id="modalBoardShareEnable">Enabled link sharing</button>
+                                    <button class="btn btn-success pointer" id="modalBoardShareEnable">Enabled link
+                                        sharing</button>
                                 </div>
                             </div>
                         {% endif %}

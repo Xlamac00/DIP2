@@ -9,5 +9,21 @@
 <input type="text" class="form-control" placeholder="Issue name" id="issueEditName" value="{{ issue.name }}">
 <input type="hidden" id="issueEditId" value="{{ issue.id }}">
 <br>
-<button class="btn btn-success mx-auto" style="display: block; width: 130px;"
+<button class="btn btn-success mx-auto pointer" style="display: block; width: 130px;"
         id="issueEditSaveBtn">Save change</button>
+
+{% if issue.canUserManage %}
+    <div class="mt-5">
+        <h3>Danger zone:</h3>
+        <div class="d-flex justify-content-between">
+            <div>
+                <b class="float-left">Delete issue</b><br>
+                Permanently deletes this one issue.
+            </div>
+            <button class="btn btn-outline-danger mt-3 pointer float-right" id="issueEditDelete">Delete issue</button>
+        </div>
+        <input type="hidden" id="issueDeleteId" value="{{ issue.pageId }}">
+    </div>
+{% endif %}
+
+<div class="m-0 p-0 d-md-block d-lg-none">&nbsp;</div>

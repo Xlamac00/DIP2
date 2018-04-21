@@ -22,34 +22,45 @@
         <nav id="topNavBar" class="navbar navbar-expand-md navbar-dark fixed-top
                     {% if board is defined %}{{ board.background }}{% else %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">Alpha v0.20</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">Alpha v0.81</a>
+                <div class="btn-group d-none d-md-flex">
+                    {% if board is defined %}
+                        <a href="../../{{ board.url }}">
+                            <button class="btn menubtn text-light pointer {{ board.background }}"
+                                    id="navbarProjectNameBtn">
+                                {{ board.name }}
+                            </button>
+                        </a>
+                        <button type="button" id="navbarProjectBtn" data-toggle="dropdown"
+                                class="btn menubtn dropdown-toggle dropdown-toggle-split pointer text-light {{ board.background }}"
+                                aria-haspopup="true" aria-expanded="false">
+                            <span class="sr-only"> Others</span>
+                        </button>
+                    {% elseif not(is_granted('ROLE_ANONYMOUS')) or (boards is defined and boards|length > 0) %}
+                        <button type="button" class="btn menubtn dropdown-toggle pointer text-light my-primary-dark"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="navbarProjectBtn">
+                            Projects
+                        </button>
+                    {% endif %}
+                    <div class="dropdown-menu" id="navbarProjectsBody"></div>
+                </div>
                 <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-                    <div class="btn-group">
-                        {% if board is defined %}
-                            <a href="../../{{ board.url }}">
-                                <button class="btn menubtn text-light pointer {{ board.background }}"
-                                        id="navbarProjectNameBtn">
-                                    {{ board.name }}
-                                </button>
-                            </a>
-                            <button type="button" id="navbarProjectBtn" data-toggle="dropdown"
-                                    class="btn menubtn dropdown-toggle dropdown-toggle-split pointer text-light {{ board.background }}"
-                                     aria-haspopup="true" aria-expanded="false">
-                                <span class="sr-only"> Others</span>
-                            </button>
-                        {% elseif not(is_granted('ROLE_ANONYMOUS')) or (boards is defined and boards|length > 0) %}
-                            <button type="button" class="btn menubtn dropdown-toggle pointer text-light my-primary-dark"
-                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="navbarProjectBtn">
-                                Projects
-                            </button>
-                        {% endif %}
-                        <div class="dropdown-menu" id="navbarProjectsBody"></div>
+                    <div class="d-flex justify-content-end w-100">
+                    {#<div class="d-flex justify-content-between w-100">#}
+                        {#<div class="form-inline ml-3">#}
+                            {#<div class="btn-group">#}
+                                {#<input class="form-control rounded-left" type="search" placeholder="Search"#}
+                                       {#aria-label="Search" size="12">#}
+                                {#<button class="btn" type="submit">Search</button>#}
+                            {#</div>#}
+                        {#</div>#}
+                        {#<ul class="mx-auto"></ul>#}
+                        {{ include('navbar-user.html.twig') }}
                     </div>
-                    {{ include('navbar-user.html.twig') }}
                 </div>
             </div>
         </nav>
