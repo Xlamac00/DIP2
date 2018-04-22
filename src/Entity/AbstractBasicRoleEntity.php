@@ -56,8 +56,11 @@ abstract class AbstractBasicRoleEntity {
         $role = AbstractSharableEntity::ROLE_WRITE; break;
       case 'read':
       case AbstractSharableEntity::ROLE_READ:
-      default:
         $role = AbstractSharableEntity::ROLE_READ; break;
+      case 'void':
+      case AbstractSharableEntity::ROLE_VOID:
+      default:
+        $role = AbstractSharableEntity::ROLE_VOID; break;
     }
     $this->role = $role;
   }

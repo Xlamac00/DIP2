@@ -1,0 +1,58 @@
+
+<div class="d-flex justify-content-between">
+    <h3>Weekly progress:</h3>
+    <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<br>
+<p>Every selected day in the morning will send notifications to all users contributing to this issue to remind them
+    to update their progress.</p>
+
+<div class="userChecklist d-flex">
+    {% for role in roles %}
+        {% if role.isActive %} {# only active users with rights to write #}
+            {% if role.rights is constant('App\\Entity\\Board::ROLE_ADMIN')
+                or role.rights is constant('App\\Entity\\Board::ROLE_ANON')
+                or (role.rights is constant('App\\Entity\\Board::ROLE_WRITE') and not role.user.isAnonymous) %}
+                {{ include('user/user-checklist.html.twig', {'role': role, 'banned': data.users}) }}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
+
+<form class="mt-2">
+    <div class="days form-control">
+        <input type="checkbox" value="monday" id="monday" {% if data.days[0] == "true" %}checked{% endif %}>
+        <label for="monday">Mo</label>
+        <input type="checkbox" value="tuesday" id="tuesday" {% if data.days[1] == "true" %}checked{% endif %}>
+        <label for="tuesday">Tu</label>
+        <input type="checkbox" value="wednesday" id="wednesday" {% if data.days[2] == "true" %}checked{% endif %}>
+        <label for="wednesday">We</label>
+        <input type="checkbox" value="thursday" id="thursday" {% if data.days[3] == "true" %}checked{% endif %}>
+        <label for="thursday">Th</label>
+        <input type="checkbox" value="friday" id="friday" {% if data.days[4] == "true" %}checked{% endif %}>
+        <label for="friday">Fr</label>
+        <input type="checkbox" value="saturday" id="saturday" {% if data.days[5] == "true" %}checked{% endif %}>
+        <label for="saturday">Sa</label>
+        <input type="checkbox" value="sunday" id="sunday" {% if data.days[6] == "true" %}checked{% endif %}>
+        <label for="sunday">Su</label>
+    </div>
+    <div class="form-check ml-4 mt-2">
+        <input class="form-check-input" type="checkbox" value="" id="dayscheck"
+               {% if data.canSendAnyway %}checked{% endif %}>
+        <label class="form-check-label pointer m-0 p-0 text-secondary" for="dayscheck">
+            Send notifications even if user already made changes that day.
+        </label>
+    </div>
+    <div class="form-group">
+        <label for="reminderTextarea" class="pointer mt-3" id="reminderTextareaBtn">
+            Change email text <i class="fas fa-angle-double-down ml-1 text-primary" id="reminderTextareaArrow"></i>
+        </label>
+        <textarea class="form-control d-none" id="reminderTextarea" rows="2">{{ data.text }}</textarea>
+    </div>
+    <button class="btn btn-primary pointer mt-3" type="button" id="reminderSaveBtn">Save changes</button>
+    <span class="ml-2 d-none" id="reminderLoading"><i class="fas fa-spinner fa-spin"></i> Saving ...</span>
+</form>
+
+<div class="m-0 p-0 d-md-block d-lg-none">&nbsp;</div>

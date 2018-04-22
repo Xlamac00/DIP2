@@ -1,0 +1,23 @@
+
+{% set check = true %} {# check all banned users (aka unchecked) and set his check value #}
+{% for ban in banned %}
+    {% if ban == role.user.id %}
+        {% set check = false %}
+    {% endif %}
+{% endfor %}
+
+<input type="checkbox" id="userChecklist{{ role.user.id }}" value="{{ role.user.id }}" {% if check %}checked{% endif %}>
+{% if role.user.isAnonymous %}
+    <label for="userChecklist{{ role.user.id }}">
+        <div class="mr-1 p-0 user-portrait float-left userChecklistAnonymous"
+             title="{{ role.user.username }}: click to enable/disable">
+            <i class="fas fa-2x fa-user-circle user-image-anonymous-big position-absolute text-light"></i>
+            <div class="user-image-anonymous-bg-big" style="background-color: {{ role.user.color }}"></div>
+        </div>
+    </label>
+{% else %}
+    <label for="userChecklist{{ role.user.id }}" class="userChecklistLogged">
+        <img src="{{ role.user.imagelink }}" class="mr-1 p-0 user-portrait user-image-google-big float-left"
+             title="{{ role.user.username }}: click to enable/disable">
+    </label>
+{% endif %}

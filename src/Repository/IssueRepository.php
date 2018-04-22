@@ -7,6 +7,7 @@ use App\Entity\BoardRole;
 use App\Entity\Gauge;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
+use App\Entity\Reminder;
 use App\Entity\User;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -151,6 +152,16 @@ class IssueRepository extends AbstractSharableEntityRepository {
     $admin->setIssue($issue);
     $admin->setUser($currentUser);
     $this->manager->persist($admin);
+    $this->manager->flush();
+
+    // create new empty reminder setting
+    $reminder = new Reminder();
+    $reminder->setIssue($issue);
+    $reminder->setText('Hello!');
+    $reminder->setDays([false,false,false,false,false,false,false]);
+    $reminder->setUsers([]);
+    $reminder->setSendAnyway(false);
+    $this->manager->persist($reminder);
     $this->manager->flush();
 
     return $issue->getUrl();

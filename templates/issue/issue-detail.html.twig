@@ -80,6 +80,7 @@
                 <div class="clearfix">
                     <h2 id="issueName" class="float-left" style="max-width: {% if issue.canUserManage %}60%{% else %}75%{% endif %}">
                         <span class="overflow-text" title="{{ issue.name }}">{{ issue.name }}</span>
+                        <input type="hidden" id="issueId" value="{{ issue.pageId }}">
                     </h2>
                     <div class="float-right row">
                         {% if issue.canUserWrite %}
@@ -125,15 +126,12 @@
                                      aria-labelledby="dropdownMenuButton" >
                                     <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
                                     <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
+                                    <a class="dropdown-item pointer" id="dropdownRemindersBtn">Reminders</a>
+                                    {#<a class="dropdown-item pointer" id="">Deadlines</a>#}
                                 </div>
                             </div>
                         {% endif %}
                     </div>
-                </div>
-                <div class="mb-3 clearfix float-left d-none d-md-block">
-                    {% for user in users %}
-                        {{ include('user/user-icon.html.twig', {'user': user, 'size': 'big'}) }}
-                    {% endfor %}
                 </div>
                 <div id="gaugeGraph">
                 {{ include('graphs/graph.html.twig',
@@ -158,6 +156,9 @@
                 </div>
                 <div id="gaugeEditIssueSection" class="section" style="display: none">
                     {{ include('issue/editIssueTab.html.twig', {'issue': issue}) }}
+                </div>
+                <div id="IssueReminderSection" class="section" style="display: none">
+                    <i class="fas fa-spinner fa-spin"></i> Loading ...
                 </div>
             </div>
         </div>

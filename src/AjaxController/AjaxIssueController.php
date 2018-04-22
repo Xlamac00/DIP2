@@ -4,9 +4,13 @@ namespace App\AjaxController;
 use App\Entity\Gauge;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
+use App\Entity\IssueRole;
+use App\Entity\Reminder;
 use App\Repository\GaugeChangesRepository;
 use App\Repository\GaugeRepository;
 use App\Repository\IssueRepository;
+use App\Repository\IssueRoleRepository;
+use App\Repository\ReminderRepository;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -364,7 +368,7 @@ class AjaxIssueController extends Controller {
     } else return null;
   }
 
-  /**
+  /** Updates Issue name.
    * @Route("/ajax/issueUpdate", name="issue_ajax_issueUpdate")
    * @param Request $request - ajax Request
    * @return null|JsonResponse
@@ -380,6 +384,80 @@ class AjaxIssueController extends Controller {
       $issueRepository->updateName($name);
 
       $arrData = ['name' => $name];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /** Changes the Issue daily reminder settings.
+   * @Route("/ajax/issueChangeReminder", name="issue_ajax_changeReminder")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function issueChangeReminder(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issueId = $request->request->get('issueId');
+      $days = $request->request->get('days');
+      $remind = $request->request->get('remind');
+      $users = $request->request->get('users');
+      $text = $request->request->get('text');
+
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issue = $issueRepository->getIssueByLink($issueId, $this->getUser());
+
+      /** @var ReminderRepository $reminderRepository */
+      $reminderRepository = $this->getDoctrine()->getRepository(Reminder::class);
+      $data = $reminderRepository->getReminderByIssue($issue);
+      $data->setSendAnyway($remind === 'true');
+      $data->setText($text);
+      $data->setUsers($users);
+      $data->setDays($days);
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->persist($data);
+      $entityManager->flush();
+
+      $arrData = ['name' => $issue->getName(), 'days' => $days, 'remind' => $remind, 'text' => $text, 'users' =>
+        $users];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /** Returns Issue reminder render
+   * @Route("/ajax/issueGetReminder", name="issue_ajax_getReminder")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function issueGetReminder(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issueId = $request->request->get('issueId');
+
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issue = $issueRepository->getIssueByLink($issueId, $this->getUser());
+
+      /** @var ReminderRepository $reminderRepository */
+      $reminderRepository = $this->getDoctrine()->getRepository(Reminder::class);
+      $data = $reminderRepository->getReminderByIssue($issue);
+      if($data === null) { // DOCASNE, PRECHOD NA NOVOU VERZI, POTE SMAZAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        $reminder = new Reminder();
+        $reminder->setIssue($issue);
+        $reminder->setText('Hello!');
+        $reminder->setDays([false,false,false,false,false,false,false]);
+        $reminder->setUsers([]);
+        $reminder->setSendAnyway(false);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($reminder);
+        $entityManager->flush();
+        $data = $reminder;
+      }
+
+      /** @var IssueRoleRepository $roleRepository */
+      $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+      $roles = $roleRepository->getIssueUsers($issue->getId());
+
+      $render = $this->renderView('issue/reminderTab.html.twig',['roles' => $roles, 'data' => $data]);
+
+      $arrData = ['render' => $render];
       return new JsonResponse($arrData);
     } else return null;
   }

@@ -152,6 +152,47 @@ h1 {
 }
 
 /* **********************************************
+ * ****** CUSTOM CHECKBOX for days in week ******
+ * **********************************************/
+.days input {
+    display: none;
+}
+
+.days input + label {
+    color: #aaa;
+    cursor: pointer;
+}
+
+.days input:checked + label {
+    color: #333;
+}
+
+.days label {
+    margin: 5px 10px 5px 10px;
+}
+
+.days {
+    display: inline;
+    font-weight: bold;
+    font-size: large;
+}
+
+/* **********************************************
+ * ***** CUSTOM CHECKBOX for user portraits *****
+ * **********************************************/
+.userChecklist input {
+    display: none;
+}
+.userChecklist input +  label {
+    cursor: pointer;
+}
+.userChecklist input:not(:checked) + label .userChecklistAnonymous .user-image-anonymous-bg-big {
+    background-color: #aaa !important;
+}
+.userChecklist input:not(:checked) + .userChecklistLogged {
+    filter: grayscale(100%);
+}
+/* **********************************************
  * *************** USER PORTRAITS ***************
  * **********************************************/
 .user-portrait {

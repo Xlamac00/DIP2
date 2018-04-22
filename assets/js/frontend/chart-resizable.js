@@ -329,6 +329,28 @@ $(document).ready(function() {
         text.select();
     }
 
+    /** Displays section with reminders - download content first
+     */
+    $('#dropdownRemindersBtn').click(showReminders);
+    function showReminders() {
+        var section = document.getElementById('IssueReminderSection');
+        hideAllSections();
+        section.style.display = 'block';
+        $.ajax({
+            url:'/ajax/issueGetReminder',
+            type: "POST",
+            dataType: "json",
+            data: {"issueId": document.getElementById('issueId').value},
+            async: true,
+            success: function (data) {
+                section.innerHTML = data.render;
+                $('#reminderSaveBtn').click(ajaxSaveReminder); // set function call from btn
+                $('#reminderTextareaBtn').click(showReminderTextarea);
+                $('.gaugeCloseBtn').click(hideCurrentSection);
+            }
+        });
+    }
+
     $('#questionNo').click(hideCurrentSection);
     $('#questionYes').click(ajaxSendQuestion);
     function showGaugeDeleteDialog() {
@@ -500,6 +522,56 @@ $(document).ready(function() {
         }
         else // field name is empty
             document.getElementById('issueEditName').className = 'form-control is-invalid';
+    }
+
+    function ajaxSaveReminder() {
+        var days = [document.getElementById("monday").checked, document.getElementById("tuesday").checked,
+            document.getElementById("wednesday").checked, document.getElementById("thursday").checked,
+            document.getElementById("friday").checked, document.getElementById("saturday").checked,
+            document.getElementById("sunday").checked];
+        var remind = document.getElementById("dayscheck").checked;
+        var loading = document.getElementById("reminderLoading");
+        loading.classList.remove('d-none');
+        var users = [];
+        $('.userChecklist input').each(function () { // iterate all users and add all unchecked to the array
+            if(this.checked === false)
+                users.push(this.value);
+        });
+        $.ajax({
+            url: '/ajax/issueChangeReminder',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "issueId": document.getElementById('issueId').value,
+                "days": days,
+                "users": users,
+                "text": document.getElementById('reminderTextarea').value,
+                "remind": remind
+            },
+            async: true,
+            success: function (data) {
+                loading.classList.add('d-none');
+                document.getElementById("reminderSaveBtn").blur();
+                console.log(data);
+            }
+        });
+    }
+
+    function showReminderTextarea() {
+        var area = document.getElementById('reminderTextarea');
+        var arrow = document.getElementById('reminderTextareaArrow');
+        if(area.classList[1] === 'd-none') {
+            area.classList.remove('d-none');
+            area.classList.add('d-block');
+            arrow.classList.remove('fa-angle-double-down');
+            arrow.classList.add('fa-angle-double-up');
+        }
+        else {
+            area.classList.remove('d-block');
+            area.classList.add('d-none');
+            arrow.classList.remove('fa-angle-double-up');
+            arrow.classList.add('fa-angle-double-down');
+        }
     }
 
     $('#issueEditDelete').click(showIssueDeleteDialog);
