@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="reminder")
  */
 class Reminder {
-
   /**
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="AUTO")
@@ -29,17 +28,17 @@ class Reminder {
 
   /**
    * @ORM\ManyToOne(targetEntity="Issue")
-   * @ORM\JoinColumn(name="id_issue", referencedColumnName="id")
+   * @ORM\JoinColumn(name="id_issue", referencedColumnName="id", unique=true)
    */
   private $issue;
 
   /**
-   * @ORM\Column(type="array")
+   * @ORM\Column(type="simple_array")
    */
   private $days;
 
   /**
-   * @ORM\Column(type="array")
+   * @ORM\Column(type="simple_array", nullable=true)
    */
   private $users;
 
@@ -79,5 +78,10 @@ class Reminder {
 
   public function getDays() {
     return $this->days;
+  }
+
+  /** @return Issue */
+  public function getIssue() {
+    return $this->issue;
   }
 }

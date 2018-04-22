@@ -15,6 +15,12 @@
             <div class="user-image-anonymous-bg-big" style="background-color: {{ role.user.color }}"></div>
         </div>
     </label>
+    {% if role.user.anonymousemail == '' %}
+        <div class="position-relative d-inline-block" style="left: -10px; z-index: 2;"
+             title="User has no email defined - will only receive in-app notification">
+            <i class="fas fa-exclamation text-secondary"></i>
+        </div>
+    {% endif %}
 {% else %}
     <label for="userChecklist{{ role.user.id }}" class="userChecklistLogged">
         <img src="{{ role.user.imagelink }}" class="mr-1 p-0 user-portrait user-image-google-big float-left"

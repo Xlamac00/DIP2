@@ -158,7 +158,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
     $reminder = new Reminder();
     $reminder->setIssue($issue);
     $reminder->setText('Hello!');
-    $reminder->setDays([false,false,false,false,false,false,false]);
+    $reminder->setDays(['false','false','false','false','false','false','false']);
     $reminder->setUsers([]);
     $reminder->setSendAnyway(false);
     $this->manager->persist($reminder);

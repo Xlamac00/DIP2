@@ -30,6 +30,11 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
+    App\CronController\:
+        resource: '../src/CronController'
+        public: true
+        tags: ['controller.service_arguments']
+
     security.authentication.success_handler:
         class:  App\Security\GoogleAuthenticationSuccessHandler
         arguments:  ["@security.http_utils", {}]

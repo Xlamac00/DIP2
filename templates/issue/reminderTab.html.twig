@@ -24,24 +24,25 @@
 <form class="mt-2">
     <div class="days form-control">
         <input type="checkbox" value="monday" id="monday" {% if data.days[0] == "true" %}checked{% endif %}>
-        <label for="monday">Mo</label>
+        <label for="monday" title="Enable/disable notifications every monday morning">Mo</label>
         <input type="checkbox" value="tuesday" id="tuesday" {% if data.days[1] == "true" %}checked{% endif %}>
-        <label for="tuesday">Tu</label>
+        <label for="tuesday" title="Enable/disable notifications every tuesday morning">Tu</label>
         <input type="checkbox" value="wednesday" id="wednesday" {% if data.days[2] == "true" %}checked{% endif %}>
-        <label for="wednesday">We</label>
+        <label for="wednesday" title="Enable/disable notifications every wednesday morning">We</label>
         <input type="checkbox" value="thursday" id="thursday" {% if data.days[3] == "true" %}checked{% endif %}>
-        <label for="thursday">Th</label>
+        <label for="thursday" title="Enable/disable notifications every thursday morning">Th</label>
         <input type="checkbox" value="friday" id="friday" {% if data.days[4] == "true" %}checked{% endif %}>
-        <label for="friday">Fr</label>
+        <label for="friday" title="Enable/disable notifications every friday morning">Fr</label>
         <input type="checkbox" value="saturday" id="saturday" {% if data.days[5] == "true" %}checked{% endif %}>
-        <label for="saturday">Sa</label>
+        <label for="saturday" title="Enable/disable notifications every saturday morning">Sa</label>
         <input type="checkbox" value="sunday" id="sunday" {% if data.days[6] == "true" %}checked{% endif %}>
-        <label for="sunday">Su</label>
+        <label for="sunday" title="Enable/disable notifications every sunday morning">Su</label>
     </div>
     <div class="form-check ml-4 mt-2">
         <input class="form-check-input" type="checkbox" value="" id="dayscheck"
                {% if data.canSendAnyway %}checked{% endif %}>
-        <label class="form-check-label pointer m-0 p-0 text-secondary" for="dayscheck">
+        <label class="form-check-label pointer m-0 p-0 text-secondary" for="dayscheck"
+        title="Will send notification even if the user made any new progress from last notification.">
             Send notifications even if user already made changes that day.
         </label>
     </div>

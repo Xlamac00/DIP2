@@ -24,4 +24,18 @@ class ReminderRepository extends ServiceEntityRepository {
     }
     return $this->reminder;
   }
+
+  /** Returns all Reminders that are set (=='true') on given day
+   * @param integer $day - number from 0-6 with day in the week (0=monday)
+   * @return Reminder[]
+   */
+  public function getReminderByDay($day) {
+    $reminder = $this->findAll();
+    /** @var Reminder $data */
+    foreach ($reminder as $key => $data) { // remove all Issue that dont have set $day to true
+      if($data->getDays()[$day] === 'false')
+        unset($reminder[$key]);
+    }
+    return $reminder;
+  }
 }

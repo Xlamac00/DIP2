@@ -442,7 +442,7 @@ class AjaxIssueController extends Controller {
         $reminder = new Reminder();
         $reminder->setIssue($issue);
         $reminder->setText('Hello!');
-        $reminder->setDays([false,false,false,false,false,false,false]);
+        $reminder->setDays(['false','false','false','false','false','false','false']);
         $reminder->setUsers([]);
         $reminder->setSendAnyway(false);
         $entityManager = $this->getDoctrine()->getManager();

@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\GaugeChanges;
+use App\Entity\Issue;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -20,6 +22,28 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
     if(!isset($this->gaugeChange))
       $this->gaugeChange = $this->find($gaugeChange_id);
     return $this->gaugeChange;
+  }
+
+  /** Returns date of the newest change done by User in the Issue.
+   * @param User $user
+   * @param Issue $issue
+   * @return \DateTime
+   */
+  public function getUserNewestChange($user, $issue) {
+    $qb = $this->createQueryBuilder('c')
+      ->join('App\Entity\Gauge', 'g', 'WITH', 'c.gauge = g.id')
+      ->andWhere('c.discard = 0')
+      ->andWhere('c.user = :user')
+      ->andWhere('g.issue = :issue')
+      ->setMaxResults(1)
+      ->setParameter('user', $user->getId())
+      ->setParameter('issue', $issue->getId())
+      ->orderBy('c.time', 'DESC')
+      ->getQuery();
+    /** @var GaugeChanges[] $result */
+    $result = $qb->execute();
+    if(sizeof($result) == 0) return null;
+    return $result[0]->getRawTime();
   }
 
   public function getOldValue($gaugeId, $changeId) {

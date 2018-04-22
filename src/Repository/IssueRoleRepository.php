@@ -27,7 +27,7 @@ class IssueRoleRepository extends ServiceEntityRepository {
    * Once deleted users are not returned!
    *
    * @param string $issue - issue id (db)
-   * @return array $users - list of all users in IssueRole
+   * @return IssueRole[] $users - list of all users in IssueRole
    */
   public function getIssueUsers($issue) {
     return $this->findBy(['issue' => $issue, 'isDeleted' => 0]);

@@ -48,6 +48,7 @@ class GaugeChanges {
   private $discard;
 
   /**
+   * @var DateTime
    * @ORM\Column(type="datetime")
    */
   private $time;
@@ -89,6 +90,10 @@ class GaugeChanges {
 
   public function getTime() {
     return $this->time->format('d.m.Y \v H:i');
+  }
+
+  public function getRawTime() {
+    return $this->time;
   }
 
   public function getTimeText() {

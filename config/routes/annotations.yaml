@@ -5,3 +5,7 @@ controllers:
 ajaxcontrollers:
     resource: ../../src/AjaxController/
     type: annotation
+
+croncontrollers:
+    resource: ../../src/CronController/
+    type: annotation
