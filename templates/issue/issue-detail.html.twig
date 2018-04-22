@@ -14,9 +14,11 @@
     <script src="{{ asset('build/chart.js') }}"></script>
     {% if issue.canUserWrite %}
         <script src="{{ asset('build/chart-resizable.js') }}"></script>
+        <script src="{{ asset('build/datepickerjs.js') }}"></script>
     {% endif %}
     <script src="{{ asset('build/sharing.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
     <script>
         // Variable used in chart-resizable to get route to Ajax respond
         var path_ajax_graphChange = '{{ (path('issue_ajax_graphChange')) }}';
@@ -89,6 +91,11 @@
                                     data-toggle="tooltip" data-placement="bottom" title="Add a new task">
                                 <i class="fas fa-2x fa-plus"></i>
                             </button>
+                            <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownDeadlineNew"
+                                    value="{{ gaugeCount }}"
+                                    data-toggle="tooltip" data-placement="bottom" title="Create new deadline">
+                                <i class="fas fa-2x fa-stopwatch"></i>
+                            </button>
                         {% elseif issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
                             <button type="button" class="nobtn mx-2 startTooltip" disabled
                                     data-toggle="tooltip" data-placement="bottom" title="Must login to edit">
@@ -116,20 +123,22 @@
                                 </div>
                             </div>
                         {% endif %}
-                        {% if issue.canUserManage %}
-                            <div class="dropdown mx-2">
-                                <button type="button" class="nobtn dropdown-toggle pointer" id="gaugeEditBtn"
-                                        data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
-                                    <i class="fas fa-2x fa-cog "></i>
-                                </button>
-                                <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
-                                     aria-labelledby="dropdownMenuButton" >
-                                    <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
-                                    <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
-                                    <a class="dropdown-item pointer" id="dropdownRemindersBtn">Reminders</a>
-                                    {#<a class="dropdown-item pointer" id="">Deadlines</a>#}
+                        {% if issue.canUserWrite %}
+                            <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
+                                  data-placement="bottom" title="Settings">
+                                <div class="dropdown mx-2">
+                                    <button type="button" class="nobtn pointer" id="gaugeEditBtn"
+                                            data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                                        <i class="fas fa-2x fa-cog"></i>
+                                    </button>
+                                    <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
+                                         aria-labelledby="gaugeEditBtn" >
+                                        <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
+                                        <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
+                                        <a class="dropdown-item pointer" id="dropdownRemindersBtn">Reminders</a>
+                                    </div>
                                 </div>
-                            </div>
+                            </span>
                         {% endif %}
                     </div>
                 </div>
@@ -138,6 +147,11 @@
                     { 'gauges': issue.gauges,
                     'gauge_name': 'animatedChart',
                     'issue_id': issue.id}) }}
+                </div>
+                <div id="issueDeadlines" class="mt-4">
+                    {% for deadline in deadlines %}
+                        {{ include('issue/deadline.html.twig', {'deadline': deadline, 'issue': issue}) }}
+                    {% endfor %}
                 </div>
             </div>
             <div class="col-lg-6" id="gaugeSections">
@@ -159,6 +173,9 @@
                 </div>
                 <div id="IssueReminderSection" class="section" style="display: none">
                     <i class="fas fa-spinner fa-spin"></i> Loading ...
+                </div>
+                <div id="IssueDeadlinesSection" class="section" style="display: none">
+                    {{ include('issue/deadlinesTab.html.twig', {'issue': issue}) }}
                 </div>
             </div>
         </div>

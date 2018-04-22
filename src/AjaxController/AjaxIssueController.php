@@ -1,11 +1,13 @@
 <?php
 namespace App\AjaxController;
 
+use App\Entity\Deadline;
 use App\Entity\Gauge;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\Reminder;
+use App\Repository\DeadlineRepository;
 use App\Repository\GaugeChangesRepository;
 use App\Repository\GaugeRepository;
 use App\Repository\IssueRepository;
@@ -458,6 +460,79 @@ class AjaxIssueController extends Controller {
       $render = $this->renderView('issue/reminderTab.html.twig',['roles' => $roles, 'data' => $data]);
 
       $arrData = ['render' => $render];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /** Creates new deadline in db
+   * @Route("/ajax/issueNewDeadline", name="issue_ajax_newDeadline")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function issueNewDeadline(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issueId = $request->request->get('issueId');
+      $start = $request->request->get('start');
+      $end = $request->request->get('end');
+      $checkbox = $request->request->get('checkbox');
+      $gaugeId = $request->request->get('gauge');
+      $text = $request->request->get('text');
+
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issue = $issueRepository->getIssueByLink($issueId, $this->getUser());
+
+      $deadline = new Deadline();
+      $deadline->setIssue($issue);
+      $deadline->setEnd(date_create_from_format('d/m/Y', $end));
+      $deadline->setStart(date_create_from_format('d/m/Y', $start));
+      $deadline->setText($text);
+      if($checkbox === 'true') {
+        /** @var GaugeRepository $gaugeRepository */
+        $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
+        $gauge = $gaugeRepository->getGauge($gaugeId);
+        $deadline->setGauge($gauge);
+      }
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->persist($deadline);
+      $entityManager->flush();
+
+      $render = $this->renderView('issue/deadline.html.twig',['deadline' => $deadline]);
+
+      $arrData = ['issue' => $issueId, "render" => $render, "check" => $checkbox, "gauge" => $gaugeId];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /** Deletes deadline
+   * @Route("/ajax/issueDeleteDeadline", name="issue_ajax_deleteDeadline")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function issueDeleteDeadline(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $id = $request->request->get('value1');
+
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadline = $deadlineRepository->getDeadlineById($id);
+
+      /** @var IssueRoleRepository $issueRoleRepository */
+      $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+      $role = $issueRoleRepository->getUserRights($this->getUser(), $deadline->getIssue());
+      if($role->getRights() === Issue::ROLE_ADMIN
+        || $role->getRights() === Issue::ROLE_WRITE
+        || $role->getRights() === Issue::ROLE_ANON) {
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($deadline);
+        $entityManager->flush();
+        $done = true;
+      }
+      else {
+        $done = false;
+      }
+
+      $arrData = ['id' => $id, 'done' => $done, 'type' => 'deadlineDelete'];
       return new JsonResponse($arrData);
     } else return null;
   }

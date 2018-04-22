@@ -1,7 +1,7 @@
 
 <div class="col-md-3 p-0" id="{{ section }}{{ role.board.pageId }}">
     <div class="card">
-        <div class="card-header rounded-0 pb-5 {{ role.board.background }}">
+        <div class="card-header rounded-0 pb-3 {{ role.board.background }}">
             <button class="nobtn pointer float-right dashboardFavorite {{ section }}orite"
                     id="{{ section }}btn{{ role.board.pageId }}">
                 {% if role.favorite %}
@@ -11,7 +11,7 @@
                 {% endif %}
             </button>
         </div>
-        <div class="card-body mb-4 pb-5">
+        <div class="card-body mb-4 pb-2">
             <div class="position-absolute" style="height: 1px">
                 <div class="dashboard-userlist">
                     {% for user in role.board.activeUsers %}

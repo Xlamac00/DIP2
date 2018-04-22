@@ -68,6 +68,16 @@ h1 {
 .pointer {
     cursor: pointer;
 }
+.question {
+    cursor: help;
+}
+
+.hover-hidden {
+    display: none;
+}
+.hover:hover .hover-hidden {
+    display: block;
+}
 
 .my-primary-dark { background-color: #008ba3; }
 

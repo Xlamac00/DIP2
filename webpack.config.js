@@ -22,6 +22,8 @@ Encore
     .addEntry('typeahead', './assets/js/bootstrap3-typeahead.min.js')
     .addEntry('app-bundle', './assets/js/app.bundle.js')
     .addEntry('bootjs', './assets/js/bootstrap.bundle.min.js')
+    .addEntry('datepickerjs', './assets/js/bootstrap-datepicker.min.js')
+    .addStyleEntry('datepicker', './assets/css/bootstrap-datepicker3.css')
     .addStyleEntry('app', './assets/css/main.css')
     .addStyleEntry('bootstrap', './assets/css/bootstrap.min.css')
 

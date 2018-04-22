@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Deadline;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
+use App\Repository\DeadlineRepository;
 use App\Repository\GaugeChangesRepository;
 use App\Repository\IssueRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -29,8 +31,13 @@ class IssueController extends Controller {
     $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
     $users = $issueRepository->getAllActiveUsers($issue->getId());
 
+    /** @var DeadlineRepository $deadlineRepository */
+    $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+    $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
     return $this->render('issue/issue-detail.html.twig',
-      ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount, "users" => array_reverse($users)]);
+      ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount,
+       "users" => array_reverse($users), "deadlines" => $deadlines]);
   }
 
 }

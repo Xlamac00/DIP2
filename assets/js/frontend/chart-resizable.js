@@ -263,6 +263,16 @@ $(document).ready(function() {
         section[previous].style.display = 'block'; // display the previous one
     }
 
+    $('.deadlineDelete').click(function () {
+        hideAllSections();
+        $('.startTooltip').tooltip('hide');
+        document.getElementById('questionText').innerHTML = 'delete this deadline';
+        document.getElementById('questionCall').value = '/ajax/issueDeleteDeadline';
+        document.getElementById('questionValue1').value = this.value;
+        document.getElementById('questionValue2').value = '';
+        document.getElementById('questionSection').style.display = 'block';
+    });
+
     /** Hides all sections and remembers the last one visible.
      * The last visible section is pushed into the queue to remember the history.
      *
@@ -329,6 +339,20 @@ $(document).ready(function() {
         text.select();
     }
 
+    /** Displays section to add new deadline
+     */
+    $('#dropdownDeadlineNew').click(showNewDeadline);
+    function showNewDeadline() {
+        $('#deadlinesDatepicker .input-daterange').datepicker({
+            format: "dd/mm/yyyy",
+            weekStart: 1,
+            todayHighlight: true
+        });
+        hideAllSections();
+        document.getElementById('IssueDeadlinesSection').style.display = 'block'; // make issue edit section visible
+        this.blur();
+    }
+
     /** Displays section with reminders - download content first
      */
     $('#dropdownRemindersBtn').click(showReminders);
@@ -363,6 +387,33 @@ $(document).ready(function() {
         document.getElementById('questionSection').style.display = 'block';
     }
 
+    var settingsBtn = document.getElementById('gaugeEditBtn');
+    settingsBtn.onclick = function () {
+        $('#settingsTooltip').tooltip('dispose');
+    };
+    settingsBtn.onblur = function () {
+        $('#settingsTooltip').tooltip('enable');
+    };
+
+    var deadlineCheckbox = document.getElementById('deadlineCheckbox');
+    deadlineCheckbox.onchange = function () {
+        var tasks = document.getElementById('deadlineTasks');
+        var label = document.getElementById('deadlineCheckboxLabel');
+        if(deadlineCheckbox.checked === true) {
+            tasks.classList.remove('d-none');
+            tasks.classList.add('d-block');
+            label.classList.remove('text-secondary');
+            label.classList.add('text-dark');
+        }
+        else {
+            tasks.classList.add('d-none');
+            tasks.classList.remove('d-block');
+            label.classList.add('text-secondary');
+            label.classList.remove('text-dark');
+        }
+        deadlineCheckbox.blur();
+    };
+
     /** *****************************************************************************************************
      * ******************************************** AJAX CALLS ******************************************** *
      ***************************************************************************************************** **/
@@ -395,6 +446,60 @@ $(document).ready(function() {
         }
         else // field name is empty
             document.getElementById('gaugeAddNewName').className = 'form-control is-invalid';
+    }
+
+    $('#issueDeadlineSaveBtn').click(ajaxSaveNewDeadline);
+    function ajaxSaveNewDeadline() {
+        var start = document.getElementById('deadlineStart');
+        var end = document.getElementById('deadlineEnd');
+        if(end.value.length > 0) {
+            var endSplit = end.value.split("/");
+            var dt = new Date(parseInt(endSplit[2], 10),
+                parseInt(endSplit[1], 10) - 1,
+                parseInt(endSplit[0], 10) + 1);
+            if(dt.getTime() < Date.now()) {
+                end.classList.add('is-invalid');
+                return;
+            }
+            else {
+                end.classList.remove('is-invalid');
+            }
+        }
+        if(start.value.length > 0 && end.value.length > 0) {
+            var issue = document.getElementById('issueId').value;
+            var c = document.getElementById('deadlineCheckbox');
+            var s = document.getElementById('deadlineTasks');
+            var t = document.getElementById('deadlineTextarea');
+            $.ajax({
+                url: '/ajax/issueNewDeadline',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "issueId": issue,
+                    "start": start.value,
+                    "end": end.value,
+                    "text": t.value,
+                    "checkbox": c.checked,
+                    "gauge": s.options[s.selectedIndex].value
+                },
+                async: true,
+                success: function (data) {
+                    start.value = '';
+                    end.value = '';
+                    t.value = '';
+                    var oldHtml = document.getElementById('issueDeadlines').innerHTML;
+                    document.getElementById('issueDeadlines').innerHTML = oldHtml + data.render;
+                    start.classList.remove('is-invalid');
+                    end.classList.remove('is-invalid');
+                    hideAllSections();
+                    $("#gaugeCommentSection").css('display', 'block');
+                }
+            });
+        }
+        else {
+            start.classList.add('is-invalid');
+            end.classList.add('is-invalid');
+        }
     }
 
     $('#gaugeChangeResetBtn').click(ajaxDiscardChange); // set function call from btn
@@ -515,7 +620,6 @@ $(document).ready(function() {
                 async: true,
                 success: function (data) {
                     hideCurrentSection();
-                    document.getElementById('issueName').innerHTML = data.name;
                     document.getElementById('issueName').innerHTML = data.name;
                 }
             });
@@ -660,6 +764,18 @@ $(document).ready(function() {
                 }
                 else if(data.type === 'issueDelete') {
                     location.href = '../../'+data.return;
+                }
+                else if(data.type === 'deadlineDelete') {
+                    var remove = document.getElementById('deadline'+data.id);
+                    if(data.done === true) {
+                        var all = document.getElementById('issueDeadlines');
+                        all.removeChild(remove);
+                    }
+                    else {
+                        remove.innerHTML = "Insufficient rights";
+                    }
+                    hideAllSections(false);
+                    $("#gaugeCommentSection").css('display', 'block');
                 }
             }
         });
