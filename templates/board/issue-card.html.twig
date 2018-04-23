@@ -5,12 +5,17 @@
             style="max-width: {% if issue.activeUsers|length > 1 %}60%{% else %}75%{% endif %}">
             <a href="../../{{ issue.url }}" title="{{ issue.name }}" class="overflow-text">{{ issue.name }}</a></h5>
         <div class="dropdown float-right">
-            <button type="button" class="nobtn float-right text-dark mt-1 pointer"
-                    id="dropdownCard{{ issue.link }}"
-                    data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
-                <i class="fas fa-ellipsis-v text-dark mx-2"></i>
-            </button>
-            {% if issue.isShareEnabled or issue.canUserManage %}
+
+            {% if issue.canUserManage
+                or (issue.canUserRead
+                    and issue.isShareEnabled
+                    and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
+                or ( issue.canUserWrite and issue.isShareEnabled)%}
+                <button type="button" class="nobtn float-right text-dark mt-1 pointer"
+                        id="dropdownCard{{ issue.link }}"
+                        data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                    <i class="fas fa-ellipsis-v text-dark mx-2"></i>
+                </button>
                 <div class="dropdown-menu my-dropdown dropdown-menu-right" aria-labelledby="dropdownCard{{ issue.link }}">
                     {% if issue.isShareEnabled or issue.canUserManage %}
                         <button class="dropdown-item pointer issueShare btn-link px-3 py-1" data-id="{{ issue.pageId }}"

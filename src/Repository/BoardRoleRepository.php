@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\BoardShareHistory;
+use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\IssueShareHistory;
 use App\Entity\User;
@@ -294,10 +295,13 @@ class BoardRoleRepository extends ServiceEntityRepository {
       $this->manager->persist($role);
     }
 
+    /** @var IssueRepository $issueRepository */
+    $issueRepository = $this->manager->getRepository(Issue::class);
     /** @var IssueRoleRepository $issueRoleRepository */
     $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
     // set same rights for each Issue in this Board
-    foreach($board->getIssues() as $issue) {
+    $issues = $issueRepository->getIssuesInBoard($board->getId());
+    foreach($issues as $issue) {
       $check = $issueRoleRepository->getUserRights($user, $issue);
       if($check !== null && !$check->isDeleted()) continue; // skip issues that already have rights for this user
 

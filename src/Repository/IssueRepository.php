@@ -66,6 +66,14 @@ class IssueRepository extends AbstractSharableEntityRepository {
     $this->issue->setThisUserRights($rights);
   }
 
+  /** Returns all Issue in the Board
+   * @param $boardId - db id
+   * @return Issue[]
+   */
+  public function getIssuesInBoard($boardId) {
+    return $this->findBy(array('board' => $boardId, "deletedAt" => null));
+  }
+
   public function getNumberOfGauges($issue_id = null) {
     if($issue_id === null) $issue_id = $this->issue->getId();
     $qb = $this->createQueryBuilder('q')
@@ -132,7 +140,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
         $role = new IssueRole();
         if($user->getRights() === Board::ROLE_ADMIN) // if he was admin in board, give him admin rights
           $role->setRole(Board::ROLE_ADMIN);
-        elseif($board->isShareEnabled() && $role->isBoardHistory()) // else if the Board is sharable, give him its share rights
+        elseif($board->isShareEnabled() && $user->isBoardHistory()) // else if the Board is sharable, give him its share rights
           $role->setRole($board->getShareRights());
         else  // else give him only rights to read
           $role->setRole(Board::ROLE_READ);

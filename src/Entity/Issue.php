@@ -50,6 +50,10 @@ class Issue extends AbstractSharableEntity {
     $this->deletedAt = $deletedAt;
   }
 
+  public function isDeleted() {
+    return $this->deletedAt !== null;
+  }
+
   public function restore() {
     $this->deletedAt = null;
   }
