@@ -19,14 +19,14 @@ $(document).ready(function() {
 
     // Redraws the bar depending on the cursor position
     function chartMouseMoveEvent(evt) {
-        if (changeActive) { //the mouse was pressed over a graph bar
+        if (changeActive === true) { //the mouse was pressed over a graph bar
             var base = (getChartMetaData().data[changeBar]._model.base);
             var perc = (base - evt.offsetY) / (base / 100);
             if (perc <= 1 || perc > 98) { // redraw and stop
                 var oldPerc = (base - changeOld['y']) / (base / 100);
                 if(oldPerc < 1.5 && perc < 1.5) // old value was also low -> unintended behaviour
                     return;
-                console.log("Ending actiove mode");
+                console.log("Ending active mode");
                 perc = perc <= 1 ? 1 : 100;
                 changeActive = false;
                 ajaxUpdateGraph(perc);
@@ -42,7 +42,7 @@ $(document).ready(function() {
     // of original bar to draw the old line
     function chartMouseDownEvent(evt) {
         var bar = wasClickedOnBar(evt.offsetX, evt.offsetY);
-        if (bar !== false) {
+        if (bar !== false && commentActive === false) {
             var coords = getChartMetaData().data[bar]._model;
             changeActive = true;
             changeBar = bar;
@@ -66,13 +66,22 @@ $(document).ready(function() {
         }
     }
 
+    var using_touchscreen = false;
+    window.addEventListener('touchstart', function() {
+        using_touchscreen = true;
+        console.log("Using touchscreen!!!!");
+    });
+
     // Checks the coordinates of mouse click with dimensions of bars in graph
     function wasClickedOnBar(x, y) {
         for (var i = 0; i < getChartMetaData().data.length; i++) {
             var bar = getChartMetaData().data[i]._model;
-            if (x > (bar.x - bar.width / 2) && x < (bar.x + bar.width / 2) &&
-                y + 5 > bar.y && y - 5 < bar.base) {
-                return i;
+            if (x > (bar.x - bar.width / 2) && x < (bar.x + bar.width / 2)) { // click on graph on X coords
+                var hitBox = 5;
+                if(using_touchscreen === true && (bar.base - bar.y) < 15) // using touch screen and graph is low
+                    hitBox = 60;
+                if(y + hitBox > bar.y && y - 5 < bar.base)  // click on graph Y coords
+                    return i;
             }
         }
         return false;
@@ -488,7 +497,7 @@ $(document).ready(function() {
                     end.value = '';
                     t.value = '';
                     var oldHtml = document.getElementById('issueDeadlines').innerHTML;
-                    document.getElementById('issueDeadlines').innerHTML = oldHtml + data.render;
+                    document.getElementById('issueDeadlines').innerHTML =  data.render + oldHtml;
                     start.classList.remove('is-invalid');
                     end.classList.remove('is-invalid');
                     hideAllSections();
@@ -572,6 +581,7 @@ $(document).ready(function() {
                 hideAllSections();
                 $("#gaugeCommentSection").css('display', 'block');
                 $("#gaugeChangeCommit").css('display', 'flex');
+                document.getElementById('gaugeCommentText').focus();
             },
             error: function (XMLHttpRequest, textStatus, errorThrown ) {
                 console.log(textStatus+","+errorThrown);

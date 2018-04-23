@@ -148,7 +148,7 @@
                     'gauge_name': 'animatedChart',
                     'issue_id': issue.id}) }}
                 </div>
-                <div id="issueDeadlines" class="mt-4">
+                <div id="issueDeadlines" class="mt-md-4 mb-3">
                     {% for deadline in deadlines %}
                         {{ include('issue/deadline.html.twig', {'deadline': deadline, 'issue': issue}) }}
                     {% endfor %}

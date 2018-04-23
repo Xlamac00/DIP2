@@ -1,5 +1,5 @@
 
-<div class="mb-4 ml-3" id="deadline{{ deadline.id }}">
+<div class="mb-md-4 ml-3" id="deadline{{ deadline.id }}">
     <div class="d-flex justify-content-between pr-3 hover">
         <h5 style="color: {{ deadline.color }}">{{ deadline.name }}</h5>
         {% if issue is defined and issue.canUserWrite %}
@@ -21,8 +21,8 @@
         <p class="small m-0 p-0 mb-1">{{ deadline.text }}</p>
     {% endif %}
     <div class="row">
-        <div class="col-2">{{ deadline.start }}</div>
-        <div class="col-8">
+        <div class="col-2 d-none d-md-flex p-0 pl-md-3 m-0">{{ deadline.start }}</div>
+        <div class="col-sm-12 col-md-8">
             <div class="progress bg-light mt-1">
                 <div class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
                      style="width: {{ deadline.percentage }}%; background-color: {{ deadline.color }}">
@@ -30,6 +30,6 @@
                 {% elseif deadline.percentage > 20 %}{{ deadline.daysLeft }} days left{% endif %}</div>
             </div>
         </div>
-        <div class="col-2">{{ deadline.end }}</div>
+        <div class="col-2 d-none d-md-flex p-0 pl-md-3 m-0">{{ deadline.end }}</div>
     </div>
 </div>
