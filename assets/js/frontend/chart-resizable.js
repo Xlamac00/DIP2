@@ -7,21 +7,30 @@ $(document).ready(function() {
     var changeBar = false;
     var changeOld = [];
 
-    $('.startTooltip').tooltip();
-
-    canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt);};
-    canvas.onmousedown = function (evt) { chartMouseDownEvent(evt);};
+    canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt.offsetY);};
+    canvas.ontouchmove = function (evt) { chartTouchMoveEvent(evt);};
+    canvas.ontouchstart = function (evt) { chartTouchDownEvent(evt);};
+    canvas.onmousedown = function (evt) { chartMouseDownEvent(evt.offsetX, evt.offsetY, false);};
     canvas.onmouseup = function () { chartMouseUpEvent();};
+    canvas.ontouchend = function () { chartMouseUpEvent();};
 
     /** *****************************************************************************************************
      * ************************************* RESIZABLE CHART FUNCTIONS ************************************ *
      ***************************************************************************************************** **/
 
+    function chartTouchMoveEvent(evt) {
+        evt.preventDefault();
+        var touch = evt.touches[0] || evt.changedTouches[0];
+        var y = touch.pageY-findPosition(canvas, "top");
+        // calculate position for touch and then work as same as mouse
+        chartMouseMoveEvent(y);
+    }
+
     // Redraws the bar depending on the cursor position
-    function chartMouseMoveEvent(evt) {
+    function chartMouseMoveEvent(offsetY) {
         if (changeActive === true) { //the mouse was pressed over a graph bar
             var base = (getChartMetaData().data[changeBar]._model.base);
-            var perc = (base - evt.offsetY) / (base / 100);
+            var perc = (base - offsetY) / (base / 100);
             if (perc <= 1 || perc > 98) { // redraw and stop
                 var oldPerc = (base - changeOld['y']) / (base / 100);
                 if(oldPerc < 1.5 && perc < 1.5) // old value was also low -> unintended behaviour
@@ -37,11 +46,38 @@ $(document).ready(function() {
             }
         }
     }
+
+    function chartTouchDownEvent(evt) {
+        evt.preventDefault();
+        var touch = evt.touches[0] || evt.changedTouches[0];
+        var x = touch.pageX-findPosition(canvas, "left");
+        var y = touch.pageY-findPosition(canvas, "top");
+        // calculate position for touch and then work as same as mouse
+        chartMouseDownEvent(x, y, true);
+    }
+
+    // Calculates elements position from top of the screen
+    // @param element
+    // @param dimension - "left" or "top"
+    function findPosition(element, dimension) {
+        var node = element;
+        var curtop = 0;
+        if (node.offsetParent) {
+            do {
+                if(dimension === 'top')
+                    curtop += node.offsetTop;
+                else
+                    curtop += node.offsetLeft;
+            } while (node = node.offsetParent);
+            return curtop;
+        }
+    }
+
     // Checks if the mouse was pressed over a graph bar and if so,
     // switches the bar into active mode and saves the coordinates
     // of original bar to draw the old line
-    function chartMouseDownEvent(evt) {
-        var bar = wasClickedOnBar(evt.offsetX, evt.offsetY);
+    function chartMouseDownEvent(offsetX, offsetY, touchScreen) {
+        var bar = wasClickedOnBar(offsetX, offsetY, touchScreen);
         if (bar !== false && commentActive === false) {
             var coords = getChartMetaData().data[bar]._model;
             changeActive = true;
@@ -66,20 +102,15 @@ $(document).ready(function() {
         }
     }
 
-    var using_touchscreen = false;
-    window.addEventListener('touchstart', function() {
-        using_touchscreen = true;
-        console.log("Using touchscreen!!!!");
-    });
-
     // Checks the coordinates of mouse click with dimensions of bars in graph
-    function wasClickedOnBar(x, y) {
+    function wasClickedOnBar(x, y, touchScreen) {
         for (var i = 0; i < getChartMetaData().data.length; i++) {
             var bar = getChartMetaData().data[i]._model;
+            console.log(y+","+(bar.y)+","+(bar.base));
             if (x > (bar.x - bar.width / 2) && x < (bar.x + bar.width / 2)) { // click on graph on X coords
                 var hitBox = 5;
-                if(using_touchscreen === true && (bar.base - bar.y) < 15) // using touch screen and graph is low
-                    hitBox = 60;
+                if(touchScreen === true && (bar.base - bar.y) < 15) // using touch screen and graph is low
+                    hitBox = 50;
                 if(y + hitBox > bar.y && y - 5 < bar.base)  // click on graph Y coords
                     return i;
             }
@@ -665,8 +696,7 @@ $(document).ready(function() {
             async: true,
             success: function (data) {
                 loading.classList.add('d-none');
-                document.getElementById("reminderSaveBtn").blur();
-                console.log(data);
+                hideCurrentSection();
             }
         });
     }

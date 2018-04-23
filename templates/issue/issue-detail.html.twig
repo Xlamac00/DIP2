@@ -96,14 +96,20 @@
                                     data-toggle="tooltip" data-placement="bottom" title="Create new deadline">
                                 <i class="fas fa-2x fa-stopwatch"></i>
                             </button>
-                        {% elseif issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
-                            <button type="button" class="nobtn mx-2 startTooltip" disabled
-                                    data-toggle="tooltip" data-placement="bottom" title="Must login to edit">
-                                <i class="fas fa-2x fa-plus"></i>
-                            </button>
+                        {% elseif issue.thisuserrights.rights is constant('App\\Entity\\Issue::ROLE_WRITE')
+                             and issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
+                            <span class="startTooltip" data-toggle="tooltip"
+                                  data-placement="bottom" title="Must login to edit">
+                                <button type="button" class="nobtn mx-2" disabled>
+                                    <i class="fas fa-2x fa-plus"></i>
+                                </button>
+                            </span>
                         {% endif %}
-                        {% if issue.canUserManage or (issue.isShareEnabled and issue.thisuserrights.issuehistory is not
-                        null)%}
+                        {% if issue.canUserManage
+                            or (issue.canUserRead
+                                and issue.isShareEnabled
+                                 and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
+                            or ( issue.canUserWrite and issue.isShareEnabled)%}
                             <span class="startTooltip" data-toggle="tooltip"
                                     data-placement="bottom" title="Share with other users">
                                 <button type="button" class="nobtn mx-2 pointer"
