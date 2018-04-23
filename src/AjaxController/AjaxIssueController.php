@@ -487,7 +487,7 @@ class AjaxIssueController extends Controller {
       $deadline->setEnd(date_create_from_format('d/m/Y', $end));
       $deadline->setStart(date_create_from_format('d/m/Y', $start));
       $deadline->setText($text);
-      if($checkbox === 'true') {
+      if($checkbox === 'true' && $gaugeId !== 'null') {
         /** @var GaugeRepository $gaugeRepository */
         $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
         $gauge = $gaugeRepository->getGauge($gaugeId);

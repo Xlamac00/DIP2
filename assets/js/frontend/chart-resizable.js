@@ -7,12 +7,15 @@ $(document).ready(function() {
     var changeBar = false;
     var changeOld = [];
 
-    canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt.offsetY);};
-    canvas.ontouchmove = function (evt) { chartTouchMoveEvent(evt);};
-    canvas.ontouchstart = function (evt) { chartTouchDownEvent(evt);};
-    canvas.onmousedown = function (evt) { chartMouseDownEvent(evt.offsetX, evt.offsetY, false);};
-    canvas.onmouseup = function () { chartMouseUpEvent();};
-    canvas.ontouchend = function () { chartMouseUpEvent();};
+    function initCanvasListeners(canvas) {
+        canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt.offsetY);};
+        canvas.ontouchmove = function (evt) { chartTouchMoveEvent(evt);};
+        canvas.ontouchstart = function (evt) { chartTouchDownEvent(evt);};
+        canvas.onmousedown = function (evt) { chartMouseDownEvent(evt.offsetX, evt.offsetY, false);};
+        canvas.onmouseup = function () { chartMouseUpEvent();};
+        canvas.ontouchend = function () { chartMouseUpEvent();};
+    }
+    initCanvasListeners(canvas);
 
     /** *****************************************************************************************************
      * ************************************* RESIZABLE CHART FUNCTIONS ************************************ *
@@ -151,9 +154,7 @@ $(document).ready(function() {
 
         // Item was replaced, so all the events must be registered again
         var canvas = document.getElementById("animatedChart");
-        canvas.onmousemove = function (evt) { chartMouseMoveEvent(evt);};
-        canvas.onmousedown = function (evt) { chartMouseDownEvent(evt);};
-        canvas.onmouseup = function () { chartMouseUpEvent();};
+        initCanvasListeners(canvas);
     }
 
     /** Changes the value of the graph.
@@ -506,10 +507,11 @@ $(document).ready(function() {
                 end.classList.remove('is-invalid');
             }
         }
-        if(start.value.length > 0 && end.value.length > 0) {
+        if(start.value.length > 0 && end.value.length > 0 && start.value !== end.value) {
             var issue = document.getElementById('issueId').value;
             var c = document.getElementById('deadlineCheckbox');
             var s = document.getElementById('deadlineTasks');
+            var g = s.selectedIndex === -1 ? 'null' : s.options[s.selectedIndex];
             var t = document.getElementById('deadlineTextarea');
             $.ajax({
                 url: '/ajax/issueNewDeadline',
@@ -521,7 +523,7 @@ $(document).ready(function() {
                     "end": end.value,
                     "text": t.value,
                     "checkbox": c.checked,
-                    "gauge": s.options[s.selectedIndex].value
+                    "gauge": g.value
                 },
                 async: true,
                 success: function (data) {
