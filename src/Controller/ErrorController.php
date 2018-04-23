@@ -12,6 +12,6 @@ class ErrorController extends Controller {
    * @Route("/error/{number}", name="error")
    */
   public function index($number) {
-    return $this->render('templates/bundles/TwigBundle/Exception/error404.html.twig');
+    return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
   }
 }

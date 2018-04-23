@@ -338,6 +338,7 @@ $(document).ready(function() {
             }
             (sections[i]).style.display = 'none';
         }
+        window.scrollTo(0,0);
         return hidden;
     }
 
@@ -560,6 +561,7 @@ $(document).ready(function() {
                 updateGraphValue(true, data.newValue); // redraw graph value and stop
                 $("#gaugeChangeCommit").css('display', 'none');
                 commentActive = false;
+                window.scrollTo(0,0);
             }
         });
     }
@@ -579,6 +581,7 @@ $(document).ready(function() {
                 $('#gaugeCommentText').val('');
                 $("#gaugeChangeCommit").css('display', 'none');
                 commentActive = false;
+                window.scrollTo(0,0);
                 chart.update();
                 var oldHtml = document.getElementById('gaugeComments').innerHTML;
                 document.getElementById('gaugeComments').innerHTML = data + oldHtml;

@@ -132,7 +132,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
         $role = new IssueRole();
         if($user->getRights() === Board::ROLE_ADMIN) // if he was admin in board, give him admin rights
           $role->setRole(Board::ROLE_ADMIN);
-        elseif($board->isShareEnabled()) // else if the Board is sharable, give him its share rights
+        elseif($board->isShareEnabled() && $role->isBoardHistory()) // else if the Board is sharable, give him its share rights
           $role->setRole($board->getShareRights());
         else  // else give him only rights to read
           $role->setRole(Board::ROLE_READ);
