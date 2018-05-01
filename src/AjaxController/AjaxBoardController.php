@@ -3,6 +3,7 @@ namespace App\AjaxController;
 
 use App\Entity\Board;
 use App\Entity\BoardRole;
+use App\Entity\Notification;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -64,18 +65,29 @@ class AjaxBoardController extends Controller {
     if ($request->isXmlHttpRequest()) {
       $boardId = $request->request->get('board');
 
+      /** @var BoardRepository $boardRepository */
+      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
+      $board = $boardRepository->getBoard($boardId);
+
       $entityManager = $this->getDoctrine()->getManager();
       /** @var BoardRoleRepository $boardRoleRepository */
       $boardRoleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
       $roles = $boardRoleRepository->getBoardUsers($boardId);
       foreach($roles as $role) {
+        if($role->getUser() !== $this->getUser()) {
+          $notification = new Notification();
+          $notification->setDate();
+          $notification->setCreator($this->getUser());
+          $notification->setUser($role->getUser());
+          $notification->setUrl('');
+          $notification->setText($this->getUser()->getUsername().' deleted <br>project <b>'.$board->getName().'</b>');
+          $entityManager->persist($notification);
+        }
+
         $role->delete();
         $entityManager->persist($role);
       }
 
-      /** @var BoardRepository $boardRepository */
-      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $board = $boardRepository->getBoard($boardId);
       $entityManager->remove($board);
       $entityManager->flush();
 

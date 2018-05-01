@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\Deadline;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
+use App\Entity\Notification;
 use App\Repository\DeadlineRepository;
 use App\Repository\GaugeChangesRepository;
 use App\Repository\IssueRepository;
+use App\Repository\NotificationRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -35,9 +37,13 @@ class IssueController extends Controller {
     $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
     $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
 
+    /** @var NotificationRepository $notificationRepository */
+    $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
+    $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
+
     return $this->render('issue/issue-detail.html.twig',
       ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount,
-       "users" => array_reverse($users), "deadlines" => $deadlines]);
+       "users" => array_reverse($users), "deadlines" => $deadlines, 'notifications' => $notifications]);
   }
 
 }

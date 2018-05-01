@@ -22,7 +22,7 @@
         <nav id="topNavBar" class="navbar navbar-expand-md navbar-dark fixed-top
                     {% if board is defined %}{{ board.background }}{% else %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&alpha; 0.89</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.00</a>
                 <div class="btn-group">
                     {% if board is defined %}
                         <a href="../../{{ board.url }}">
@@ -61,6 +61,9 @@
                             {#</div>#}
                         {#</div>#}
                         {#<ul class="mx-auto"></ul>#}
+                        {% if notifications is defined and notifications['data']|length > 0 %}
+                            {{ include('navbar-notifications.html.twig', {'notifications': notifications}) }}
+                        {% endif %}
                         {{ include('navbar-user.html.twig') }}
                     </div>
                 </div>

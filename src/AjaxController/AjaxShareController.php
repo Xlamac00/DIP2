@@ -6,6 +6,7 @@ use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Entity\UserShare;
 use App\Repository\BoardRepository;
@@ -157,6 +158,15 @@ class AjaxShareController extends Controller {
           $boardRoleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
           $boardRoleRepository->giveUserRightsToBoard($user, $entity, $newRole, null);
         }
+        $notification = new Notification();
+        $notification->setDate();
+        $notification->setCreator($this->getUser());
+        $notification->setUser($user);
+        $notification->setUrl($entity->getUrl());
+        $notification->setText($this->getUser()->getUsername().' invited you <br>to <b>'.$entity->getName().'</b>');
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($notification);
+        $entityManager->flush();
       }
       elseif(strlen($email) > 2 && $entity !== null) { // only users email was included
         $share = new UserShare();

@@ -140,7 +140,9 @@
                                     <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
                                          aria-labelledby="gaugeEditBtn" >
                                         <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
-                                        <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
+                                        {% if issue.canUserManage %}
+                                            <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
+                                        {% endif %}
                                         <a class="dropdown-item pointer" id="dropdownRemindersBtn">Reminders</a>
                                     </div>
                                 </div>

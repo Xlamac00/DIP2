@@ -7,6 +7,7 @@ use App\Entity\BoardRole;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
+use App\Entity\Notification;
 use App\Entity\Reminder;
 use App\Entity\ReminderHistory;
 use App\Entity\User;
@@ -83,8 +84,16 @@ class CronReminderController extends Controller {
             $mailer->send($message);
             $send++;
           }
+
           // save notification for every user
-          //TODO
+          $notification = new Notification();
+          $notification->setDate();
+          $notification->setCreator($this->getUser());
+          $notification->setUser($user->getUser());
+          $notification->setUrl($reminder->getIssue()->getUrl());
+          $notification->setText('Don\'t forget to update <br>your progress in <b>'.$reminder->getIssue()->getName()
+          .'</b>!');
+          $entityManager->persist($notification);
 
           $history = new ReminderHistory();
           $history->setTime();

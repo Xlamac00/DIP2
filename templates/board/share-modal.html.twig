@@ -29,6 +29,8 @@
                                 <i class="fas fa-spinner fa-spin" id="modalBoardShareOptions" style="display: none"></i>
                             {% endif %}
                         </div>
+                        <p class="text-secondary">Share this project and all its issues (even any new one) with
+                            everyone with this link.</p>
                         <div id="modalBoardShareEnabledSection"
                             style="display: {% if board.isShareEnabled %} block {% else %} none {% endif %}">
                             <div class="form-group">
@@ -44,15 +46,16 @@
                                             <option value="{{ constant('ROLE_WRITE', board) }}"
                                                     {% if (board.shareRights == constant('ROLE_WRITE', board) or
                                                           board.shareRights == constant('ROLE_ANON', board)) %}selected{% endif %}>
-                                                Anyone with the link can edit</option>
+                                                Anyone with this link can EDIT project</option>
                                             <option value="{{ constant('ROLE_READ', board) }}"
                                                     {% if board.shareRights == constant('ROLE_READ', board) %}selected{% endif %}>
-                                                Anyone with the link can view</option>
+                                                Anyone with this link can VIEW project</option>
                                         </select>
                                     {% else %}
                                         <input type="text" class="form-control bg-white" disabled
                                                value="{% if board.shareRights is constant('ROLE_READ', board)
-                                               %}Anyone with the link can view{% else %}Anyone with the link can edit{% endif %}">
+                                               %}Anyone with this link can view{% else %}Anyone with this link can
+                                               edit{% endif %}">
                                     {% endif %}
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary" id="modalBoardShareCopyBtn">
@@ -90,6 +93,7 @@
                                 <h5>Invite people</h5>
                                 <i class="fas fa-spinner fa-spin" id="modalBoardShareInviteLoading" style="display: none"></i>
                             </div>
+                            <p class="text-secondary">Send email invitation to specific user.</p>
                             <div class="input-group">
                                 <input type="text" placeholder="Enter name or email address" class="form-control"
                                        data-toggle="tooltip" data-placement="top" title=""

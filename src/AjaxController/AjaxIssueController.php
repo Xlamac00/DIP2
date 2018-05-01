@@ -6,6 +6,7 @@ use App\Entity\Gauge;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
+use App\Entity\Notification;
 use App\Entity\Reminder;
 use App\Repository\DeadlineRepository;
 use App\Repository\GaugeChangesRepository;
@@ -54,6 +55,26 @@ class AjaxIssueController extends Controller {
       $issue = $issueRepository->getIssueByLink($link, $this->getUser());
       $return = $issue->getBoard()->getUrl();
       $entityManager = $this->getDoctrine()->getManager();
+
+
+      /** @var IssueRoleRepository $issueRoleRepository */
+      $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+      $roles = $issueRoleRepository->getIssueUsers($issue->getId());
+      foreach($roles as $role) {
+        if($role->getUser() !== $this->getUser()) {
+          $notification = new Notification();
+          $notification->setDate();
+          $notification->setCreator($this->getUser());
+          $notification->setUser($role->getUser());
+          $notification->setUrl('');
+          $notification->setText($this->getUser()->getUsername().' deleted <br>issue <b>'.$issue->getName().'</b>');
+          $entityManager->persist($notification);
+        }
+
+        $role->delete();
+        $entityManager->persist($role);
+      }
+
       $entityManager->remove($issue);
       $entityManager->flush();
 
@@ -484,8 +505,8 @@ class AjaxIssueController extends Controller {
 
       $deadline = new Deadline();
       $deadline->setIssue($issue);
-      $deadline->setEnd(date_create_from_format('d/m/Y', $end));
       $deadline->setStart(date_create_from_format('d/m/Y', $start));
+      $deadline->setEnd(date_create_from_format('d/m/Y', $end));
       $deadline->setText($text);
       if($checkbox === 'true' && $gaugeId !== 'null') {
         /** @var GaugeRepository $gaugeRepository */

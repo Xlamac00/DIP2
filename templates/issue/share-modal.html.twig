@@ -31,6 +31,8 @@
                                 <i class="fas fa-spinner fa-spin" id="modal{{ issue.pageId }}Options" style="display: none"></i>
                             {% endif %}
                         </div>
+                        <p class="text-secondary">Share this project and all its issues (even any new one) with
+                            everyone with this link.</p>
                         <div id="modal{{ issue.pageId }}EnabledSection"
                              style="display: {% if issue.isShareEnabled %} block {% else %} none {% endif %}">
                             <div class="form-group">
@@ -48,15 +50,16 @@
                                             <option value="{{ constant('ROLE_WRITE', issue) }}"
                                                 {% if (issue.shareRights == constant('ROLE_WRITE', issue) or
                                                 issue.shareRights == constant('ROLE_ANON', issue)) %}selected{% endif %}>
-                                                Anyone with the link can edit</option>
+                                                Anyone with this link can EDIT issue</option>
                                             <option value="{{ constant('ROLE_READ', issue) }}"
                                                 {% if issue.shareRights == constant('ROLE_READ', issue) %}selected{% endif %}>
-                                                Anyone with the link can view</option>
+                                                Anyone with this link can VIEW issue</option>
                                         </select>
                                     {% else %}
                                         <input type="text" class="form-control bg-white" disabled
                                                value="{% if issue.shareRights is constant('ROLE_READ', issue)
-                                               %}Anyone with the link can view{% else %}Anyone with the link can edit{% endif %}">
+                                               %}Anyone with this link can view{% else %}Anyone with this link can
+                                               edit{% endif %}">
                                     {% endif %}
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary"
@@ -75,7 +78,7 @@
                                     {% elseif issue.shareRights == constant('ROLE_ANON', issue) %}checked="checked" {%
                                     endif %}>
                                     <span id="modal{{ issue.pageId }}AnonymousText">
-                                        Allow anonymous users to edit this project too</span>
+                                        Allow anonymous users to edit this issue too</span>
                                 </label>
                             {% endif %}
                         </div>
@@ -93,6 +96,7 @@
                                 <i class="fas fa-spinner fa-spin" id="modal{{ issue.pageId }}InviteLoading" style="display:
                                 none"></i>
                             </div>
+                            <p class="text-secondary">Send email invitation to specific user.</p>
                             <div class="input-group">
                                 <input type="text" placeholder="Enter name or email address" class="form-control"
                                        data-toggle="tooltip" data-placement="top" title="Email with invitation was send"
@@ -121,7 +125,7 @@
                     </div>
                 {% endif %}
                 <div class="d-flex justify-content-between mt-5">
-                    <button class="btn btn-primary float-left" data-dismiss="modal" >Done</button>
+                    <button class="btn btn-primary float-left pointer" data-dismiss="modal" >Done</button>
                     {% if issue.canUserManage %}
                         <button class="nobtn float-right text-secondary pointer"
                                 id="modal{{ issue.pageId }}Individual">Manage individual users</button>

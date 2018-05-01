@@ -173,6 +173,23 @@ $(document).ready(function() {
             });
         }
     }
+    var notificationBtn = document.getElementById('dropdownMenuNotifications');
+    if(notificationBtn !== null) {
+        notificationBtn.onclick = function () {
+            var count = document.getElementById('notificationCount');
+            if(count !== null && !count.classList.contains('d-none')) {
+                console.log('sending');
+                $.ajax({
+                    url: '/ajax/updateUserNotificationCount',
+                    type: "POST",
+                    dataType: "json",
+                    data: {},
+                    async: true
+                });
+                count.classList.add('d-none');
+            }
+        }
+    }
 
     /** **************************************************************** **
      *  ************      DASHBOARD & PROJECT - USERLIST     ***********

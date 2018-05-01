@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\Bug;
+use App\Entity\Notification;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
+use App\Repository\NotificationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -80,8 +82,11 @@ class DashboardController extends Controller {
       $active = $boardRepository->getAllActiveUsers($board->getBoard(), 4);
       $board->getBoard()->setActiveUsers($active);
     }
+    /** @var NotificationRepository $notificationRepository */
+    $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
+    $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
     return $this->render('dashboard/homepage.html.twig',
-      ['boards' => $boards['boards'], 'favorite' => $boards['favorite']]);
+      ['boards' => $boards['boards'], 'favorite' => $boards['favorite'], 'notifications' => $notifications]);
 
   }
 }

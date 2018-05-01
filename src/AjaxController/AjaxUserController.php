@@ -5,9 +5,11 @@ namespace App\AjaxController;
 use App\Entity\Board;
 use App\Entity\Bug;
 use App\Entity\Issue;
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Repository\BoardRepository;
 use App\Repository\IssueRepository;
+use App\Repository\NotificationRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -101,6 +103,20 @@ class AjaxUserController extends Controller {
       $entityManager->flush();
 
       $arrData = ['text' => $text];
+      return new JsonResponse($arrData);
+    }
+  }
+
+  /**
+   * @Route("/ajax/updateUserNotificationCount", name="ajax_notification_count")
+   */
+  public function updateUserNotificationCount(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      /** @var NotificationRepository $notificationRepository */
+      $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
+      $notificationRepository->updateNotificationCount($this->getUser());
+
+      $arrData = ['done' => 'true'];
       return new JsonResponse($arrData);
     }
   }

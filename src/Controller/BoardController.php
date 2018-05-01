@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Board;
 use App\Entity\BoardRole;
+use App\Entity\Notification;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
+use App\Repository\NotificationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -22,7 +24,10 @@ class BoardController extends Controller {
       // force Board entity reload with new user rights
       $board = $boardRepository->getBoard($board->getId(), $this->getUser(), true);
     }
+    /** @var NotificationRepository $notificationRepository */
+    $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
+    $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
 
-    return $this->render('board/board-overview.html.twig', ["board" => $board]);
+    return $this->render('board/board-overview.html.twig', ["board" => $board, 'notifications' => $notifications]);
   }
 }

@@ -91,7 +91,7 @@ class Deadline {
   }
 
   public function getColor() {
-    if($this->gauge === null)
+    if($this->gauge === null || $this->gauge->getColor() === null)
       return '#666';
     else
       return $this->gauge->getColor();
