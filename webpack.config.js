@@ -28,11 +28,15 @@ Encore
     .addStyleEntry('datepicker', './assets/css/bootstrap-datepicker3.css')
     .addStyleEntry('app', './assets/css/main.css')
     .addStyleEntry('bootstrap', './assets/css/bootstrap.min.css')
+    .addStyleEntry('tips-style', './assets/css/tips.css')
 
     .addEntry('favicon', './assets/img/favicon.ico')
     .addEntry('google-login', './assets/img/signin_normal.png')
-    .addEntry('arrow-left', './assets/img/arrow_horizontal.png')
-    .addEntry('arrow-top', './assets/img/arrow_vertical.png')
+    .addEntry('arrow-left', './assets/img/arrow_left.png')
+    .addEntry('arrow-right', './assets/img/arrow_right.png')
+    .addEntry('arrow-top', './assets/img/arrow_top.png')
+    .addEntry('arrow-bottom', './assets/img/arrow_bottom.png')
+    .addEntry('arrow-top-right', './assets/img/arrow_top_right.png')
 
     .createSharedEntry('vendor', [
         './assets/js/bootstrap.bundle.min.js',

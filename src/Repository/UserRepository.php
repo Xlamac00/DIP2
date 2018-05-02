@@ -42,6 +42,13 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
   public function loadUserByGoogleId($googleId) {
     if(!isset($this->user) || $this->user->getGoogleId() != $googleId)
       $this->user = $this->findOneBy(["googleId" => $googleId]);
+    // TODO smazat - pouze prechodne obdobi!
+    /** @var TipsRepository $tipsRepository */
+    $tipsRepository = $this->manager->getRepository(Tips::class);
+    if(!$tipsRepository->tipExists('reminders', $this->user->getAnonymousLink())) {
+      $this->createAnonymousTips($this->user);
+      $this->createLoggedTips($this->user);
+    }
     if($this->user instanceof User)
       return $this->user;
     else
@@ -158,11 +165,23 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $tipNewIssue->setName('createNewIssue');
     $this->manager->persist($tipNewIssue);
 
+    $tipNewTask = new Tips();
+    $tipNewTask->setUser($user->getAnonymousLink());
+    $tipNewTask->setScreen('issue');
+    $tipNewTask->setName('createNewTask');
+    $this->manager->persist($tipNewTask);
+
     $tipEditGauge = new Tips();
     $tipEditGauge->setUser($user->getAnonymousLink());
     $tipEditGauge->setScreen('issue');
     $tipEditGauge->setName('editGauge');
     $this->manager->persist($tipEditGauge);
+
+    $tipMakeComment = new Tips();
+    $tipMakeComment->setUser($user->getAnonymousLink());
+    $tipMakeComment->setScreen('issue');
+    $tipMakeComment->setName('makeComment');
+    $this->manager->persist($tipMakeComment);
 
     $this->manager->flush();
   }
@@ -176,6 +195,30 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $tipNewBoard->setScreen('dashboard');
     $tipNewBoard->setName('createNewBoard');
     $this->manager->persist($tipNewBoard);
+
+    $tipDeadlines = new Tips();
+    $tipDeadlines->setUser($user->getAnonymousLink());
+    $tipDeadlines->setScreen('issue');
+    $tipDeadlines->setName('deadlines');
+    $this->manager->persist($tipDeadlines);
+
+//    $tipNewDeadline = new Tips();
+//    $tipNewDeadline->setUser($user->getAnonymousLink());
+//    $tipNewDeadline->setScreen('issue');
+//    $tipNewDeadline->setName('newDeadline');
+//    $this->manager->persist($tipNewDeadline);
+
+    $tipReminders = new Tips();
+    $tipReminders->setUser($user->getAnonymousLink());
+    $tipReminders->setScreen('issue');
+    $tipReminders->setName('reminders');
+    $this->manager->persist($tipReminders);
+
+    $tipSharing = new Tips();
+    $tipSharing->setUser($user->getAnonymousLink());
+    $tipSharing->setScreen('board');
+    $tipSharing->setName('sharing');
+    $this->manager->persist($tipSharing);
 
     $this->manager->flush();
   }

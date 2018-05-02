@@ -287,6 +287,32 @@ class AjaxShareController extends Controller {
   }
 
   /**
+   * @Route("/ajax/boardRemoveCurrentUser", name="ajax_board_current_remove")
+   * @param Request $request
+   * @return null|JsonResponse
+   */
+  public function boardRemoveCurrentUser(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $boardId = $request->request->get('board');
+
+      /** @var BoardRoleRepository $roleRepository */
+      $roleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
+      try {
+        /** @var User $user */
+        $user = $this->getUser();
+        $roleRepository->deleteUser($this->getUser(), $boardId, $user->getUniqueLink());
+        $success = true;
+      }
+      catch (AuthenticationException $e) {
+        $success = false;
+      }
+
+      $arrData = ['success' => $success];
+      return new JsonResponse($arrData);
+    } else return null;
+  }
+
+  /**
    * @Route("/ajax/entityGetUserlist", name="ajax_entity_userlist_get")
    * @param Request $request
    * @return null|JsonResponse

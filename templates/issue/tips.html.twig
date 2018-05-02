@@ -1,0 +1,156 @@
+{% if tips is defined and tips|length > 0 %}
+    {% set showCreateNewTaskTip = false %}
+    {% set showEditGaugeTip = false %}
+    {% set showMakeCommentTip = false %}
+    {% set showDeadlinesTip = false %}
+    {% set showNewDeadlineTip = false %}
+    {% set showRemindersTip = false %}
+    {% for tip in tips %}
+        {% if tip.name == "createNewTask" %}{% set showCreateNewTaskTip = true %}{% endif %}
+        {% if tip.name == "editGauge" %}{% set showEditGaugeTip = true %}{% endif %}
+        {% if tip.name == "makeComment" %}{% set showMakeCommentTip = true %}{% endif %}
+        {% if tip.name == "deadlines" %}{% set showDeadlinesTip = true %}{% endif %}
+        {% if tip.name == "newDeadline" %}{% set showNewDeadlineTip = true %}{% endif %}
+        {% if tip.name == "reminders" %}{% set showRemindersTip = true %}{% endif %}
+    {% endfor %}
+    {% if issue.gauges|length == 0 and issue.canUserWrite %}
+        {% if showCreateNewTaskTip == true %}
+            <input type="hidden" id="startTips" value="createNewTask">
+            <div class="tips-text-left-50 d-none mt-5" id="createNewTaskTipBig">
+                <button type="button" class="nobtn mx-2 startTooltip tipsHideForever float-right"
+                        data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
+                    Turn hints off
+                </button>
+                <p>You can always change task name, color or&nbsp;order later in settings.</p>
+                <p>You can create up to 4 tasks per each issue.</p>
+                <img src="{{ asset('build/images/arrow_right.5edbcee1.png') }}"
+                     width="150px" class="float-right">
+                <span class="float-right mt-3 mr-4 pointer text-light tips-check">
+                    <i class="fas fa-check"></i> Ok, thanks!
+                </span>
+            </div>
+            <div class="tips-text-top-50 d-none" style="top: 30%" id="createNewTaskTipSmall">
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="nobtn startTooltip tipsHideForever">
+                        Turn hints off
+                    </button>
+                </div>
+                <p>You can always change task name, color or&nbsp;order later.</p>
+                <span class="float-right mt-3 mr-4 pointer text-light tips-check">
+                    <i class="fas fa-check"></i> Ok, thanks!
+                </span>
+                <img src="{{ asset('build/images/arrow_bottom.7e2b342f.png') }}" width="150px" class="ml-5">
+            </div>
+        {% endif %}
+    {% endif %}
+    {% if showEditGaugeTip == true %}
+        <div class="tips-text-right-50 d-none" id="editGaugeTipBig">
+            <p>Pull up the graph to mark your progress.</p>
+            <img src="{{ asset('build/images/arrow_bottom.7e2b342f.png') }}" width="150px">
+            <span class="float-right mt-3 mr-4 pointer text-light tips-check">
+                <i class="fas fa-check tips-check"></i> Got it!
+            </span>
+        </div>
+        <div class="tips-text-top-50 d-none" style="top: 30%" id="editGaugeTipSmall">
+            <div class="text-center">
+                <p>Pull up the graph to mark your progress.</p>
+                <img src="{{ asset('build/images/arrow_bottom.7e2b342f.png') }}" width="150px">
+            </div>
+            <span class="float-right mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Got it!
+            </span>
+        </div>
+    {% endif %}
+    {% if showMakeCommentTip == true %}
+        <div class="tips-text-left-50 d-none mt-5" id="makeCommentTipBig">
+            <div class="d-flex justify-content-between">
+                <p>Describe your progress!</p>
+                <button type="button" class="nobtn mx-2 startTooltip tipsHideForever"
+                        data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
+                    Turn hints off
+                </button>
+            </div>
+            <p>You will not be able to change any values in the graph until you confirm or discard your update.</p>
+            <img src="{{ asset('build/images/arrow_right.5edbcee1.png') }}"
+                 width="150px" class="float-right">
+            <span class="float-right mt-3 mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Sure!
+            </span>
+        </div>
+        <div class="tips-text-top-50 d-none" style="top: 50%" id="makeCommentTipSmall">
+            <div class="d-flex justify-content-between">
+                <p>Describe your progress!</p>
+                <button type="button" class="nobtn mx-2 tipsHideForever">
+                    Turn hints off
+                </button>
+            </div>
+            <div class="text-center">
+                <img src="{{ asset('build/images/arrow_bottom.7e2b342f.png') }}" width="150px">
+            </div>
+            <span class="float-right mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Sure!
+            </span>
+        </div>
+    {% endif %}
+    {% if showDeadlinesTip == true %}
+        <div class="tips-text-left-50 d-none mt-5" id="deadlinesTipBig">
+            <div class="d-flex justify-content-between">
+                <p>Create the deadline for whole issue or for each task separately.</p>
+                <button type="button" class="nobtn mx-2 startTooltip tipsHideForever"
+                        data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
+                    Turn hints off
+                </button>
+            </div>
+            <p>You will receive notification when you have 50&nbsp;% and 25&nbsp;% of time left.</p>
+            <img src="{{ asset('build/images/arrow_right.5edbcee1.png') }}"
+                 width="150px" class="float-right">
+            <span class="float-right mt-3 mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Ok, thanks!
+            </span>
+        </div>
+        <div class="tips-text-top-50 d-none" style="top: 40%" id="deadlinesTipSmall">
+            <div class="d-flex justify-content-end">
+                <button type="button" class="nobtn mx-2 tipsHideForever">
+                    Turn hints off
+                </button>
+            </div>
+            <p>Create the deadline for whole issue or for each task separately.</p>
+            <div class="text-center">
+                <img src="{{ asset('build/images/arrow_bottom.7e2b342f.png') }}" width="150px">
+            </div>
+            <span class="float-right mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Ok, thanks!
+            </span>
+        </div>
+    {% endif %}
+    {% if showRemindersTip == true %}
+        <div class="tips-text-left-50 d-none mt-5" id="remindersTipBig">
+            <div class="d-flex justify-content-end">
+                <button type="button" class="nobtn mx-2 startTooltip tipsHideForever"
+                        data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
+                    Turn hints off
+                </button>
+            </div>
+            <p>Send regular notifications to all (or some of) the collaborators to update their progress.</p>
+            <img src="{{ asset('build/images/arrow_right.5edbcee1.png') }}"
+                 width="150px" class="float-right">
+            <span class="float-right mt-3 mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Ok, thanks!
+            </span>
+        </div>
+        <div class="tips-text-top-50 d-none" style="top: 40%" id="remindersTipSmall">
+            <div class="d-flex justify-content-end">
+                <button type="button" class="nobtn mx-2 tipsHideForever">
+                    Turn hints off
+                </button>
+            </div>
+            <p class="pl-3">Send regular notifications to all (or some of) the collaborators to update their progress.</p>
+            <div class="text-center">
+                <img src="{{ asset('build/images/arrow_bottom.7e2b342f.png') }}" width="150px">
+            </div>
+            <span class="float-right mr-4 pointer text-light tips-check">
+                <i class="fas fa-check"></i> Ok, thanks!
+            </span>
+        </div>
+    {% endif %}
+{% endif %}

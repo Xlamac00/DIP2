@@ -175,9 +175,14 @@ class BoardRoleRepository extends ServiceEntityRepository {
    * @throws AuthenticationException - not enough rights to make this change
    */
   public function deleteUser($admin, $board, $uniquelink) {
-    $role = $this->checkUsersRights($board, $admin);
-    if($role != Board::ROLE_ADMIN)
-      throw new AuthenticationException('Not enough rights to make this change');
+    if($admin instanceof User && $admin->getUniqueLink() == $uniquelink) {
+      // User has right to delete himself
+    }
+    else { // if deleting someone else, check users rights to this board
+      $role = $this->checkUsersRights($board, $admin);
+      if ($role != Board::ROLE_ADMIN)
+        throw new AuthenticationException('Not enough rights to make this change');
+    }
 
     /** @var UserRepository $userRepository */
     $userRepository = $this->manager->getRepository(User::class);

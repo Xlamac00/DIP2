@@ -1,6 +1,12 @@
 
 $(document).ready(function() {
 
+    // listener if showTip should be called from other JS file
+    document.addEventListener('toggleAllComments', function (e) {
+        e.preventDefault();
+        toggleAllComments();
+    }, false);
+
     /** Shows all comments instead of only the first 6.
      * (If there are more then 6). Displays the button to trigger this function.
      */

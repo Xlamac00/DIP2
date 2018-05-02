@@ -207,7 +207,8 @@ $(document).ready(function() {
                 hideCurrentSection();
             else if(previousSection.length === 0 // hide all additional comments
                 && document.getElementById('gaugeCommentShowAllBtn').getAttribute('data-field') === 'hide')
-                toggleAllComments();
+                var event = new CustomEvent('toggleAllComments', {cancelable: true, bubbles: true});
+                if(event !== null) document.dispatchEvent(event);
         }
         else if (e.keyCode === 13) { // Enter
             if(commentActive
@@ -359,6 +360,11 @@ $(document).ready(function() {
         hideAllSections();
         document.getElementById('IssueDeadlinesSection').style.display = 'block'; // make issue edit section visible
         this.blur();
+        var tip = document.getElementById('deadlinesTipBig');
+        if(tip !== null) { // show deadlines tip
+            var event = new CustomEvent('showTip', {detail: {element: "deadlines"}, cancelable: true, bubbles: true});
+            tip.dispatchEvent(event);
+        }
     }
 
     /** Displays section with reminders - download content first
@@ -379,6 +385,11 @@ $(document).ready(function() {
                 $('#reminderSaveBtn').click(ajaxSaveReminder); // set function call from btn
                 $('#reminderTextareaBtn').click(showReminderTextarea);
                 $('.gaugeCloseBtn').click(hideCurrentSection);
+                var tip = document.getElementById('remindersTipBig');
+                if(tip !== null) { // show deadlines tip
+                    var event = new CustomEvent('showTip', {detail: {element: "reminders"}, cancelable: true, bubbles: true});
+                    tip.dispatchEvent(event);
+                }
             }
         });
     }
@@ -449,6 +460,11 @@ $(document).ready(function() {
                     $("#gaugeCommentSection").css('display', 'block');
                     $("#gaugeAddNewName").val('');
                     hideAddNewGaugesBtn(data.gaugeCount); //potentially hide add new gauge button
+                    var tip = document.getElementById('editGaugeTipBig');
+                    if(tip !== null && data.gaugeCount === 1) { // show deadlines tip
+                        var event = new CustomEvent('showTip', {detail: {element: "editGauge"}, cancelable: true, bubbles: true});
+                        tip.dispatchEvent(event);
+                    }
                 }
             });
         }
@@ -584,6 +600,11 @@ $(document).ready(function() {
                 $("#gaugeCommentSection").css('display', 'block');
                 $("#gaugeChangeCommit").css('display', 'flex');
                 document.getElementById('gaugeCommentText').focus();
+                var tip = document.getElementById('makeCommentTipBig');
+                if(tip !== null) { // show deadlines tip
+                    var event = new CustomEvent('showTip', {detail: {element: "makeComment"}, cancelable: true, bubbles: true});
+                    tip.dispatchEvent(event);
+                }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown ) {
                 console.log(textStatus+","+errorThrown);
@@ -718,10 +739,12 @@ $(document).ready(function() {
                 replaceChart(data);
                 hideAllSections(false);
                 __showEditGaugeSection(data.tab);
-                document.getElementById('gaugeCommentSection').innerHTML = data.comments;
+                var section = document.getElementById('gaugeCommentSection');
+                section.innerHTML = data.comments;
                 $('#gaugeChangeResetBtn').click(ajaxDiscardChange); // bind actions to the buttons (again)
                 $('#gaugeChangeConfirmBtn').click(ajaxCommentChange);
-                toggleAllComments(); // hide more then x first comments
+                var event = new CustomEvent('toggleAllComments', {cancelable: true, bubbles: true});
+                if(event !== null) section.dispatchEvent(event);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown ) {
                 console.log(textStatus+","+errorThrown);
@@ -767,10 +790,12 @@ $(document).ready(function() {
                     replaceChart(data);
                     hideAllSections(false);
                     __showEditGaugeSection(data.tab);
-                    document.getElementById('gaugeCommentSection').innerHTML = data.comments;
+                    var commentSection = document.getElementById('gaugeCommentSection');
+                    commentSection.innerHTML = data.comments;
                     $('#gaugeChangeResetBtn').click(ajaxDiscardChange); // bind actions to the buttons (again)
                     $('#gaugeChangeConfirmBtn').click(ajaxCommentChange);
-                    toggleAllComments();
+                    var event = new CustomEvent('toggleAllComments', {cancelable: true, bubbles: true});
+                    commentSection.dispatchEvent(event);
                     hideAddNewGaugesBtn(data.gaugeCount); //potentially show add new gauge button
                 }
                 else if(data.type === 'issueDelete') {

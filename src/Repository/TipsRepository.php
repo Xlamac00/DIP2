@@ -17,19 +17,22 @@ class TipsRepository extends ServiceEntityRepository {
   }
 
   public function getNewTipsForPage($pageName, $userLink) {
-    $tips = $this->findBy(array('screen' => $pageName, 'shown' => NULL, 'user_link' => $userLink));
-//    $tips = $this->findBy(array('screen' => $pageName, 'user_link' => $userLink));
-    $this->hideTips($tips);
-    return $tips;
+    return $this->findBy(array('screen' => $pageName, 'shown' => NULL, 'user_link' => $userLink));
+//    return $this->findBy(array('screen' => $pageName, 'user_link' => $userLink));
+  }
+
+  public function tipExists($tip, $userLink) {
+    $tip = $this->findOneBy(array('user_link' => $userLink, 'name' => $tip));
+    return $tip !== null;
   }
 
   /**
-   * @param Tips[] $tips
+   * @param Tips $tip
+   * @param string $userLink - unique user_link (same for anonymous and logged)
    */
-  private function hideTips($tips) {
-    foreach ($tips as $tip) {
-      $tip->setShown();
-    }
+  public function hideOneTip($tip, $userLink) {
+    $tip = $this->findOneBy(array('user_link' => $userLink, 'name' => $tip));
+    $tip->setShown();
     $this->manager->flush();
   }
 

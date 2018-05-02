@@ -91,46 +91,72 @@ $(document).ready(function() {
         document.getElementById('modalEntityDeleteType').value = type;
         document.getElementById('modalEntityDeleteBtn').innerHTML = 'Delete ' + type;
     });
-    document.getElementById('modalEntityDeleteBtn').onclick = function () {
-        var type = document.getElementById('modalEntityDeleteType').value;
-        var link = document.getElementById('modalIssueDeleteId').value;
-        var loading = document.getElementById('modalIssueDeleteLoading');
-        if(link.length > 0) {
+    var deleteEntity = document.getElementById('modalEntityDeleteBtn');
+    if(deleteEntity !== null) {
+        deleteEntity.onclick = function () {
+            var type = document.getElementById('modalEntityDeleteType').value;
+            var link = document.getElementById('modalIssueDeleteId').value;
+            var loading = document.getElementById('modalIssueDeleteLoading');
+            if(link.length > 0) {
+                loading.className = 'd-block';
+                if(type === 'project') {
+                    $.ajax({
+                        url: '/ajax/boardDelete',
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "board": link
+                        },
+                        async: true,
+                        success: function (data) {
+                            console.log(data);
+                            location.href = '../../dashboard';
+                        }
+                    });
+                }
+                else if(type === 'issue') {
+                    $.ajax({
+                        url: '/ajax/issueDelete',
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "value1": link
+                        },
+                        async: true,
+                        success: function (data) {
+                            document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-none';
+                            document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-block';
+                            $('#modalEntityDelete').modal('hide');
+                            loading.className = "d-none";
+                        }
+                    });
+                }
+            }
+        };
+    }
+    var leaveBoard = document.getElementById('modalLeaveBoardBtn');
+    if(leaveBoard !== null) {
+        leaveBoard.onclick = function () {
+            var board = document.getElementById('boardId');
+            var loading = document.getElementById('modalLeaveBoardLoading');
             loading.className = 'd-block';
-            if(type === 'project') {
-                $.ajax({
-                    url: '/ajax/boardDelete',
-                    type: "POST",
-                    dataType: "json",
-                    data: {
-                        "board": link
-                    },
-                    async: true,
-                    success: function (data) {
-                        console.log(data);
-                        location.href = '../../dashboard';
-                    }
-                });
-            }
-            else if(type === 'issue') {
-                $.ajax({
-                    url: '/ajax/issueDelete',
-                    type: "POST",
-                    dataType: "json",
-                    data: {
-                        "value1": link
-                    },
-                    async: true,
-                    success: function (data) {
-                        document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-none';
-                        document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-block';
-                        $('#modalEntityDelete').modal('hide');
-                        loading.className = "d-none";
-                    }
-                });
-            }
-        }
-    };
+            console.log('click');
+            $.ajax({
+                url: '/ajax/boardRemoveCurrentUser',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "board": board.value
+                },
+                async: true,
+                success: function (data) {
+                    console.log(data);
+                    loading.className = '';
+                    location.href = '../../dashboard';
+                }
+            });
+        };
+    }
     $('.issueCardRestore').click(function () {
         if(this.name.length > 0) {
             var loading = document.getElementById('issueCard'+this.name+'RestoreLoading');

@@ -188,5 +188,8 @@
                 </div>
             </div>
         </div>
+        {% if tips is defined and tips|length > 0 %}
+            {{ include('issue/tips.html.twig', {'tips': tips}) }}
+        {% endif %}
     </main>
 {% endblock %}

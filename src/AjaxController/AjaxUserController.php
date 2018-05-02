@@ -139,4 +139,21 @@ class AjaxUserController extends Controller {
     }
   }
 
+  /**
+   * @Route("/ajax/userHideOneTip", name="ajax_user_tip_hide")
+   */
+  public function userHideOneTip(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $text = $request->request->get('tip');
+
+      /** @var TipsRepository $tipsRepository */
+      $tipsRepository = $this->getDoctrine()->getRepository(Tips::class);
+      /** @var User $user */
+      $user = $this->getUser();
+      $tipsRepository->hideOneTip($text, $user->getAnonymousLink());
+
+      $arrData = ['done' => 'true', 'element' => $text, 'user' => $user->getAnonymousLink()];
+      return new JsonResponse($arrData);
+    }
+  }
 }

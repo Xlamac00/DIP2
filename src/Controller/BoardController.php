@@ -5,9 +5,12 @@ namespace App\Controller;
 use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\Notification;
+use App\Entity\Tips;
+use App\Entity\User;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
 use App\Repository\NotificationRepository;
+use App\Repository\TipsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -28,6 +31,13 @@ class BoardController extends Controller {
     $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
     $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
 
-    return $this->render('board/board-overview.html.twig', ["board" => $board, 'notifications' => $notifications]);
+    /** @var TipsRepository $tipsRepository */
+    $tipsRepository = $this->getDoctrine()->getRepository(Tips::class);
+    /** @var User $user */
+    $user = $this->getUser();
+    $tips = $tipsRepository->getNewTipsForPage('board', $user->getAnonymousLink());
+
+    return $this->render('board/board-overview.html.twig',
+      ["board" => $board, 'notifications' => $notifications, "tips" => $tips]);
   }
 }
