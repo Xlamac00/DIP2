@@ -504,6 +504,7 @@ class AjaxIssueController extends Controller {
       $issue = $issueRepository->getIssueByLink($issueId, $this->getUser());
 
       $deadline = new Deadline();
+      $deadline->setFresh();
       $deadline->setIssue($issue);
       $deadline->setStart(date_create_from_format('d/m/Y', $start));
       $deadline->setEnd(date_create_from_format('d/m/Y', $end));

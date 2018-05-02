@@ -55,7 +55,7 @@ class OwnAuthUserProvider extends OAuthUserProvider {
       // check Google user's rights in comparison with his old anonymous rights
       // and give Google user all anonymous's rights as well
       $anonUser = $this->repository->loadUserByUsername($user->getAnonymousLink());
-      if(!$anonUser->isAnonymous()) die('not anonymous!!');
+//      if(!$anonUser->isAnonymous()) die('not anonymous!!');
       $boards = $this->boardRoleRepository->getUserBoards($anonUser);
       /** @var BoardRole $board */
       foreach($boards as $board) {
@@ -73,7 +73,8 @@ class OwnAuthUserProvider extends OAuthUserProvider {
             $issueRights = $this->issueRoleRepository->getUserRights($user, $issue); // Google users rights
             if($issueRights === null) {
               $anonRights = $this->issueRoleRepository->getUserRights($anonUser, $issue);
-              if($anonRights->isActive() && !$anonRights->isDeleted() && $anonRights->isShareEnabled()) {
+              if($anonRights != null && $anonRights->isActive()
+                && !$anonRights->isDeleted() && $anonRights->isShareEnabled()) {
                 $right = new IssueRole();
                 $right->setUser($user);
                 $right->setRole($anonRights->getRights());

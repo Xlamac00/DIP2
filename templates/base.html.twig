@@ -61,7 +61,7 @@
                             {#</div>#}
                         {#</div>#}
                         {#<ul class="mx-auto"></ul>#}
-                        {% if notifications is defined and notifications['data']|length > 0 %}
+                        {% if notifications is defined %}
                             {{ include('navbar-notifications.html.twig', {'notifications': notifications}) }}
                         {% endif %}
                         {{ include('navbar-user.html.twig') }}
@@ -72,21 +72,23 @@
     </header>
 {% endblock %}
 
-<div class="container">
+<div class="container" id="mainContainer">
     <div class="row">
         {% block body %}{% endblock %}
     </div>
+    <div id="tips-overlay"></div>
     {{ include('board/new-modal.html.twig') }}
 </div>
 <div class="fixed-bottom" >
     <div class="btn-group dropup rounded m-1">
-     <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="bugReportBtn"
-             class="btn btn-secondary pointer dropdown-toggle"> Report bug</button>
-    <div class="dropdown-menu p-2">
-        <label for="bugReportText">This is alpha version of this application. Any feedback will be really
-            appreciated.</label>
-        <textarea id="bugReportText"></textarea>
-        <button class="btn" id="bugReportSend">Send</button>
+         <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="bugReportBtn"
+                 class="btn btn-secondary pointer dropdown-toggle"> Report bug</button>
+        <div class="dropdown-menu p-2">
+            <label for="bugReportText">This is alpha version of this application. Any feedback will be really
+                appreciated.</label>
+            <textarea id="bugReportText"></textarea>
+            <button class="btn" id="bugReportSend">Send</button>
+        </div>
     </div>
 </div>
 

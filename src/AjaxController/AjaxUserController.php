@@ -6,10 +6,12 @@ use App\Entity\Board;
 use App\Entity\Bug;
 use App\Entity\Issue;
 use App\Entity\Notification;
+use App\Entity\Tips;
 use App\Entity\User;
 use App\Repository\BoardRepository;
 use App\Repository\IssueRepository;
 use App\Repository\NotificationRepository;
+use App\Repository\TipsRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -115,6 +117,22 @@ class AjaxUserController extends Controller {
       /** @var NotificationRepository $notificationRepository */
       $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
       $notificationRepository->updateNotificationCount($this->getUser());
+
+      $arrData = ['done' => 'true'];
+      return new JsonResponse($arrData);
+    }
+  }
+
+  /**
+   * @Route("/ajax/userHideAllTips", name="ajax_user_tips_hide")
+   */
+  public function userHideAllTips(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      /** @var TipsRepository $tipsRepository */
+      $tipsRepository = $this->getDoctrine()->getRepository(Tips::class);
+      /** @var User $user */
+      $user = $this->getUser();
+      $tipsRepository->hideAllTips($user->getAnonymousLink());
 
       $arrData = ['done' => 'true'];
       return new JsonResponse($arrData);

@@ -31,8 +31,7 @@
                                 <i class="fas fa-spinner fa-spin" id="modal{{ issue.pageId }}Options" style="display: none"></i>
                             {% endif %}
                         </div>
-                        <p class="text-secondary">Share this project and all its issues (even any new one) with
-                            everyone with this link.</p>
+                        <p class="text-secondary">Share this issue with everyone with this link.</p>
                         <div id="modal{{ issue.pageId }}EnabledSection"
                              style="display: {% if issue.isShareEnabled %} block {% else %} none {% endif %}">
                             <div class="form-group">
@@ -58,8 +57,7 @@
                                     {% else %}
                                         <input type="text" class="form-control bg-white" disabled
                                                value="{% if issue.shareRights is constant('ROLE_READ', issue)
-                                               %}Anyone with this link can view{% else %}Anyone with this link can
-                                               edit{% endif %}">
+                                               %}Anyone with this link can view{% else %}Anyone with this link can edit{% endif %}">
                                     {% endif %}
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary"

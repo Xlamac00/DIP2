@@ -16,39 +16,8 @@ h1 {
     padding-bottom: 9px;
     margin-bottom: 20px;
     border-bottom: 1px solid #eee;
+    font-variant: small-caps;
 }
-
-/*
- * Sidebar
- */
-
-/*.sidebar {*/
-    /*position: fixed;*/
-    /*top: 51px;*/
-    /*bottom: 0;*/
-    /*left: 0;*/
-    /*z-index: 1000;*/
-    /*padding: 20px 0;*/
-    /*overflow-x: hidden;*/
-    /*overflow-y: auto; !* Scrollable contents if viewport is shorter than content. *!*/
-    /*border-right: 1px solid #eee;*/
-/*}*/
-
-/*.sidebar .nav {*/
-    /*margin-bottom: 20px;*/
-/*}*/
-
-/*.sidebar .nav-item {*/
-    /*width: 100%;*/
-/*}*/
-
-/*.sidebar .nav-item + .nav-item {*/
-    /*margin-left: 0;*/
-/*}*/
-
-/*.sidebar .nav-link {*/
-    /*border-radius: 0;*/
-/*}*/
 
 /*
  * Dashboard
@@ -243,6 +212,46 @@ h1 {
 }
 .user-image-google-big {
     width: 40px;
+}
+
+/* **********************************************
+ * *************** USER HELP ***************
+ * **********************************************/
+#tips-overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+}
+
+.tips-text{
+    font-size: 25px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    background-color: rgba(0,0,0,0);
+    z-index: 3;
+    width: 33%;
+    position: relative;
+    top: 0;
+}
+.tips-text-small{
+    font-size: 25px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    background-color: rgba(0,0,0,0);
+    z-index: 3;
+    width: 100%;
+    position: relative;
+    left: 50%;
 }
 
 /* **********************************************

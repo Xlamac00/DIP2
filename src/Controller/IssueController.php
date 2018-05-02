@@ -6,10 +6,13 @@ use App\Entity\Deadline;
 use App\Entity\GaugeChanges;
 use App\Entity\Issue;
 use App\Entity\Notification;
+use App\Entity\Tips;
+use App\Entity\User;
 use App\Repository\DeadlineRepository;
 use App\Repository\GaugeChangesRepository;
 use App\Repository\IssueRepository;
 use App\Repository\NotificationRepository;
+use App\Repository\TipsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -41,9 +44,16 @@ class IssueController extends Controller {
     $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
     $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
 
+    /** @var TipsRepository $tipsRepository */
+    $tipsRepository = $this->getDoctrine()->getRepository(Tips::class);
+    /** @var User $user */
+    $user = $this->getUser();
+    $tips = $tipsRepository->getNewTipsForPage('issue', $user->getAnonymousLink());
+
     return $this->render('issue/issue-detail.html.twig',
       ["issue" => $issue, "changes" => $changes, "gaugeCount" => $gaugeCount,
-       "users" => array_reverse($users), "deadlines" => $deadlines, 'notifications' => $notifications]);
+       "users" => array_reverse($users), "deadlines" => $deadlines,
+       'notifications' => $notifications, "tips" => $tips]);
   }
 
 }

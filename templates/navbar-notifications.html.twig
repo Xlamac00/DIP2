@@ -1,9 +1,8 @@
 
 <div class="dropdown float-right">
-
-    <button class="nobtn float-right pointer m-0 p-0 " data-toggle="dropdown" aria-haspopup="false"
+    <button class="nobtn float-right pointer m-0 p-0" data-toggle="dropdown" aria-haspopup="false"
             type="button" aria-expanded="true" id="dropdownMenuNotifications">
-        <span class=" mr-3">
+        <span class="mr-3">
             <i class="fas fa-bell text-light fa-2x mt-2"></i>
             {% if notifications['count'] > 0 %}
                 <span class="fa-layers-counter fa-3x mr-1" id="notificationCount"
@@ -15,18 +14,25 @@
           style="right: 10px; left: auto;">
         <div class="text-secondary text-center">Notifications:</div>
         <div class="dropdown-divider"></div>
-        {% if notifications|length > 0 %}
+        {% if notifications['data']|length > 0 %}
             {% for note in notifications['data']  %}
                 <div class="dropdown-item">
                     <div class="row">
                         <div class="col-10 pr-5">
-                            <a href="{{ note.link }}" class="{% if note.isShown %}text-secondary{% else %}text-dark{% endif %}"
-                               title="{% if note.isShown %}Displayed {{ note.shown }}{% else %}Created {{ note.date }}{% endif
-                               %}">
-                                {{ note.text | raw }}</a>
+                            {% if note.link|length > 0 %}
+                                <a href="{{ note.link }}" class="{% if note.isShown %}text-secondary{% else %}text-dark{% endif %}"
+                               title="{% if note.isShown %}Displayed {{ note.shown }}{% else %}Created {{ note.date }}{% endif %}">
+                                {{ note.text | raw }}
+                                </a>
+                            {% else %}
+                                <span class="{% if note.isShown %}text-secondary{% else %}text-dark{% endif %}">
+                                    {{ note.text | raw }}
+                                </span>
+                            {% endif %}
                         </div>
                         <div class="col-2">
-                            <span class="text-secondary" title="{{ note.date }}">{{ note.dateText | raw }}</span>
+                            <small class="text-secondary " title="{{ note.date }}">
+                                {{ note.dateText | raw }}</small>
                         </div>
                     </div>
                 </div>

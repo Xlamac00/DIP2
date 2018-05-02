@@ -30,7 +30,7 @@ class NotificationRepository extends ServiceEntityRepository {
         ->where('n.user = :user')
         ->andWhere('n.shown > :yesterday OR n.shown IS NULL')
         ->setParameter('user', $user->getId())
-        ->setParameter('yesterday', new \DateTime('-1 days'), \Doctrine\DBAL\Types\Type::DATETIME)
+        ->setParameter('yesterday', new \DateTime('-2 days'), \Doctrine\DBAL\Types\Type::DATETIME)
         ->orderBy('n.shown', "ASC")
         ->getQuery();
       $this->notification['data'] = $qb->execute();

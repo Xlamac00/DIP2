@@ -54,8 +54,7 @@
                                     {% else %}
                                         <input type="text" class="form-control bg-white" disabled
                                                value="{% if board.shareRights is constant('ROLE_READ', board)
-                                               %}Anyone with this link can view{% else %}Anyone with this link can
-                                               edit{% endif %}">
+                                               %}Anyone with this link can view{% else %}Anyone with this link can edit{% endif %}">
                                     {% endif %}
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary" id="modalBoardShareCopyBtn">

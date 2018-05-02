@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Tips;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -141,7 +142,42 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $this->manager->persist($user);
     $this->manager->flush();
     $this->user = $user;
+
+    $this->createAnonymousTips($user);
+
     return $user;
+  }
+
+  /** Initiates tips for given user - only the ones for anonymous users
+   * @param User $user
+   */
+  public function createAnonymousTips($user) {
+    $tipNewIssue = new Tips();
+    $tipNewIssue->setUser($user->getAnonymousLink());
+    $tipNewIssue->setScreen('board');
+    $tipNewIssue->setName('createNewIssue');
+    $this->manager->persist($tipNewIssue);
+
+    $tipEditGauge = new Tips();
+    $tipEditGauge->setUser($user->getAnonymousLink());
+    $tipEditGauge->setScreen('issue');
+    $tipEditGauge->setName('editGauge');
+    $this->manager->persist($tipEditGauge);
+
+    $this->manager->flush();
+  }
+
+  /** Initiates tips for given user - the rest
+   * @param User $user
+   */
+  public function createLoggedTips($user) {
+    $tipNewBoard = new Tips();
+    $tipNewBoard->setUser($user->getAnonymousLink());
+    $tipNewBoard->setScreen('dashboard');
+    $tipNewBoard->setName('createNewBoard');
+    $this->manager->persist($tipNewBoard);
+
+    $this->manager->flush();
   }
 
   /** Creates user account from Google Account data.
@@ -164,6 +200,9 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $this->manager->persist($user);
     $this->manager->flush();
     $this->user = $user;
+
+    $this->createLoggedTips($user);
+
     return $user;
   }
 

@@ -16,6 +16,7 @@
         <script src="{{ asset('build/chart-resizable.js') }}"></script>
         <script src="{{ asset('build/datepickerjs.js') }}"></script>
     {% endif %}
+    <script src="{{ asset('build/issue.js') }}"></script>
     <script src="{{ asset('build/sharing.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
@@ -80,7 +81,7 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="clearfix">
-                    <h2 id="issueName" class="float-left" style="max-width: {% if issue.canUserManage %}60%{% else %}75%{% endif %}">
+                    <h2 id="issueName" class="float-left text-smallcaps" style="max-width: {% if issue.canUserManage %}60%{% else %}75%{% endif %}">
                         <span class="overflow-text" title="{{ issue.name }}">{{ issue.name }}</span>
                         <input type="hidden" id="issueId" value="{{ issue.pageId }}">
                     </h2>

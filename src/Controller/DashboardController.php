@@ -6,9 +6,12 @@ use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\Bug;
 use App\Entity\Notification;
+use App\Entity\Tips;
+use App\Entity\User;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
 use App\Repository\NotificationRepository;
+use App\Repository\TipsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -22,11 +25,11 @@ class DashboardController extends Controller {
     $boardRole = $this->getDoctrine()->getRepository(BoardRole::class);
     /** @var BoardRole[][] $boards */
     $boards = $boardRole->getUserBoardsAndFavorite($this->getUser());
-    if(sizeof($boards) == 0) { // user has nothing yet
+    if(sizeof($boards['boards']) == 0) { // user has nothing yet
       return $this->showDefaultHomepage();
     }
-    elseif(sizeof($boards) == 1 or sizeof($boards['favorite']) == 1) {
-      if(sizeof($boards) == 1)
+    elseif(sizeof($boards['boards']) == 1 or sizeof($boards['favorite']) == 1) {
+      if(sizeof($boards['boards']) == 1)
         return $this->showSingleBoard($boards['boards'][0]);
       else
         return $this->showSingleBoard($boards['favorite'][0]);
@@ -53,19 +56,28 @@ class DashboardController extends Controller {
     $boardRole = $this->getDoctrine()->getRepository(BoardRole::class);
     /** @var BoardRole[][] $boards */
     $boards = $boardRole->getUserBoardsAndFavorite($this->getUser());
-    if(sizeof($boards) == 0) { // user has nothing yet
+    if(sizeof($boards['boards']) == 0) { // user has nothing yet
       return $this->showDefaultHomepage();
     }
-    elseif(sizeof($boards) == 1) {
-      return $this->showSingleBoard($boards['boards'][0]);
-    }
+//    elseif(sizeof($boards['boards']) == 1) {
+//      return $this->showSingleBoard($boards['boards'][0]);
+//    }
     else { // user has more than one board
       return $this->showMoreBoards($boards);
     }
   }
 
   private function showDefaultHomepage() {
-    return $this->render('dashboard/homepage.html.twig');
+    /** @var TipsRepository $tipsRepository */
+    $tipsRepository = $this->getDoctrine()->getRepository(Tips::class);
+    /** @var User $user */
+    $user = $this->getUser();
+    $tips = $tipsRepository->getNewTipsForPage('dashboard', $user->getAnonymousLink());
+    /** @var NotificationRepository $notificationRepository */
+    $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
+    $notifications = $notificationRepository->getUnreadNotifications($user);
+    return $this->render('dashboard/homepage.html.twig',
+      ['boards' => '', 'favorite' => [], 'tips' => $tips, 'notifications' => $notifications]);
   }
 
   /** @param BoardRole $board */
@@ -75,7 +87,7 @@ class DashboardController extends Controller {
   }
 
   /** @param BoardRole[][] $boards */
-  private function showMoreBoards($boards) {
+  private function  showMoreBoards($boards) {
     /** @var BoardRepository $boardRepository */
     $boardRepository = $this->getDoctrine()->getRepository(Board::class);
     foreach($boards['boards'] as $board) { // get all users that contributed to all boards

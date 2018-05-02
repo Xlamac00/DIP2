@@ -1,5 +1,15 @@
 
 $(document).ready(function() {
+    $('.startTooltip').tooltip();
+
+    /** **************************************************************** **
+     *  ******************        TIPS AND HELP        *****************
+     ** **************************************************************** **/
+    function hideHelp() {
+        console.log('hide');
+        document.getElementById('help-overlay').style.display = 'none';
+        $('.help-text').style.display = 'none';
+    }
 
     /** **************************************************************** **
      *  ****************        NAVBAR - USERNAME        ***************

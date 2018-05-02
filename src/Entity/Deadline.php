@@ -49,6 +49,9 @@ class Deadline {
    */
   private $gauge;
 
+  // Indivates if the deadline was freshly created - workaround, somehow the display is different after refresh
+  private $fresh;
+
   /** @param DateTime $start */
   public function setStart($start) {
     $this->start = $start;
@@ -72,6 +75,10 @@ class Deadline {
   /** @param Gauge $gauge */
   public function setGauge($gauge) {
     $this->gauge = $gauge;
+  }
+
+  public function setFresh() {
+    $this->fresh = true;
   }
 
   public function getId() {
@@ -105,12 +112,13 @@ class Deadline {
   }
 
   public function getDaysLeft() {
-    return ((new DateTime())->diff($this->end))->format('%a');
+    // workaround with fresh date - dont know the reason
+    return ((new DateTime("now".($this->fresh === true ? '' : '- 1 day')))->diff($this->end))->format('%a');
   }
 
   public function getPercentage() {
     $total = $this->start->diff($this->end)->format('%a');
-    $now = (new DateTime())->diff($this->end)->format('%a');
+    $now = (new DateTime("now".($this->fresh === true ? '' : '- 1 day')))->diff($this->end)->format('%a');
     if($total == 0) return 100;
     return 100-(($now*100)/$total);
   }

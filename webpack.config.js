@@ -16,7 +16,9 @@ Encore
     .addEntry('fonts-all', './assets/js/fontawesome.min.js')
     .addEntry('fonts-solid', './assets/js/fa-solid.min.js')
     .addEntry('fonts-regular', './assets/js/fa-regular.min.js')
+    .addEntry('tips', './assets/js/frontend/tips.js')
     .addEntry('board', './assets/js/frontend/board.js')
+    .addEntry('issue', './assets/js/frontend/issue.js')
     .addEntry('dashboard', './assets/js/frontend/dashboard.js')
     .addEntry('sharing', './assets/js/frontend/entity-sharing.js')
     .addEntry('typeahead', './assets/js/bootstrap3-typeahead.min.js')
@@ -29,6 +31,8 @@ Encore
 
     .addEntry('favicon', './assets/img/favicon.ico')
     .addEntry('google-login', './assets/img/signin_normal.png')
+    .addEntry('arrow-left', './assets/img/arrow_horizontal.png')
+    .addEntry('arrow-top', './assets/img/arrow_vertical.png')
 
     .createSharedEntry('vendor', [
         './assets/js/bootstrap.bundle.min.js',

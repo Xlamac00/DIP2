@@ -1,9 +1,16 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}
+    Project manager
+{% endblock %}
+
 {% block stylesheets %}
     {{  parent() }}
     <script src="{{ asset('build/dashboard.js') }}"></script>
     <script src="{{ asset('build/fonts-regular.js') }}"></script>
+    {% if tips is defined and  tips|length > 0 %}
+        <script src="{{ asset('build/tips.js') }}"></script>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -144,6 +151,37 @@
                     </div>
                 </div>
                 <div class="m-0 p-0 d-md-none">&nbsp;</div>
+
+                {% if tips is defined and tips|length > 0 %}
+                    <input type="hidden" id="tipsNames" value="{% for tip in tips %}{{ tip.name }},{% endfor %}">
+                    <div class="tips-text d-none mt-5" style="left: 20%" id="createNewBoardTipBig">
+                        <div class="d-flex justify-content-between">
+                            <div> Start by creating new project </div>
+                            <button type="button" class="nobtn mx-2 startTooltip pointer tipsHideForever"
+                                    data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
+                                <i class="fas fa-1x fa-times text-light"></i>
+                            </button>
+                        </div>
+                        <img src="{{ asset('build/images/arrow_horizontal.18ba1cd2.png') }}" width="150px" class="mt-3">
+                        <button class="nobtn help-check float-right mr-2 mt-5 pointer text-light"
+                                id="createNewBoardBtnBig">
+                            <i class="fas fa-check"></i> Ok, thanks!
+                        </button>
+                    </div>
+                    <div class="tips-text-small d-none" style="top: 80px" id="createNewBoardTipSmall">
+                        <div class="d-flex justify-content-between">
+                            <img src="{{ asset('build/images/arrow_vertical.fc5ac9dd.png') }}" width="150px" class="ml-5">
+                            <button type="button" class="nobtn startTooltip pointer text-light tipsHideForever">
+                                <small>Hide future tips</small>
+                            </button>
+                        </div>
+                        <div class="mt-4"> Start by creating new project</div>
+                        <div class="help-check float-right mr-2 mt-2 pointer nobtn text-light"
+                             id="createNewBoardBtnSmall">
+                            <i class="fas fa-check"></i> Ok, thanks!
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     </main>
