@@ -1,0 +1,26 @@
+
+<select class="form-control mb-3" id="deadlineTasks">
+    {% set exists = false %}
+    {% for deadline in deadlines %}
+        {% if deadline.gaugeId == 'issue' %}{% set exists = true %}{% endif %}
+    {% endfor %}
+    <option value="issue">Issue: {{ issue.name }}  {% if exists == false %}(create new){% endif %}</option>
+    {% for task in issue.gauges %}
+        {% set exists = false %}
+        {% for deadline in deadlines %}
+            {% if deadline.gaugeId == task.id %}{% set exists = true %}{% endif %}
+        {% endfor %}
+        <option value="{{ task.id }}">Task: {{ task.name }} {% if exists == false %}(create new){% endif %}</option>
+    {% endfor %}
+</select>
+
+
+<div class="d-none" id="deadlinesData">
+    {% for deadline in deadlines %}
+        <div id="deadline{{ deadline.gaugeId }}">
+            <input type="hidden" value="{{ deadline.startPicker }}">
+            <input type="hidden" value="{{ deadline.endPicker }}">
+            <input type="hidden" value="{{ deadline.text }}">
+        </div>
+    {% endfor %}
+</div>

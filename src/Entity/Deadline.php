@@ -45,12 +45,9 @@ class Deadline {
   /**
    * @var Gauge $gauge
    * @ORM\ManyToOne(targetEntity="Gauge")
-   * @ORM\JoinColumn(name="id_gauge", referencedColumnName="id", nullable=true)
+   * @ORM\JoinColumn(name="id_gauge", referencedColumnName="id", nullable=true, onDelete="CASCADE")
    */
   private $gauge;
-
-  // Indivates if the deadline was freshly created - workaround, somehow the display is different after refresh
-  private $fresh;
 
   /** @param DateTime $start */
   public function setStart($start) {
@@ -77,10 +74,6 @@ class Deadline {
     $this->gauge = $gauge;
   }
 
-  public function setFresh() {
-    $this->fresh = true;
-  }
-
   public function getId() {
     return $this->id;
   }
@@ -93,8 +86,16 @@ class Deadline {
     return $this->start->format('d. m.');
   }
 
+  public function getStartPicker() {
+    return $this->start->format('d/m/Y');
+  }
+
   public function getEnd() {
     return $this->end->format('d. m.');
+  }
+
+  public function getEndPicker() {
+    return $this->end->format('d/m/Y');
   }
 
   public function getColor() {
@@ -111,14 +112,19 @@ class Deadline {
       return $this->gauge->getName();
   }
 
+  public function getGaugeId() {
+    if($this->gauge !== null)
+      return $this->gauge->getId();
+    else return 'issue';
+  }
+
   public function getDaysLeft() {
-    // workaround with fresh date - dont know the reason
-    return ((new DateTime("now".($this->fresh === true ? '' : '- 1 day')))->diff($this->end))->format('%a');
+    return ((new DateTime("now - 1 day"))->diff($this->end))->format('%a');
   }
 
   public function getPercentage() {
     $total = $this->start->diff($this->end)->format('%a');
-    $now = (new DateTime("now".($this->fresh === true ? '' : '- 1 day')))->diff($this->end)->format('%a');
+    $now = (new DateTime("now - 1 day"))->diff($this->end)->format('%a');
     if($total == 0) return 100;
     return 100-(($now*100)/$total);
   }

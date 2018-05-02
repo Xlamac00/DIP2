@@ -247,6 +247,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
         $oldValue = $gauge->getPreviousValue($changeId);
         return
           ['color' => $data->getColor(),
+            'name' => $data->getName(),
            'oldValue' => round($oldValue),
            'newValue' => round($newValue)];
       }

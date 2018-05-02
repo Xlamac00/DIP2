@@ -1,0 +1,8 @@
+
+{% for deadline in deadlines %}
+    {% if issue is defined %}
+        {{ include('issue/deadline.html.twig', {'deadline': deadline, 'issue': issue}) }}
+    {% else %}
+        {{ include('issue/deadline.html.twig', {'deadline': deadline}) }}
+    {% endif %}
+{% endfor %}

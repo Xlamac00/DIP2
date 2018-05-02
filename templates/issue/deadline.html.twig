@@ -2,7 +2,7 @@
 <div class="mb-md-4 ml-3" id="deadline{{ deadline.id }}">
     <div class="d-flex justify-content-between pr-3 hover">
         <h5 style="color: {{ deadline.color }}">{{ deadline.name }}</h5>
-        {% if issue is defined and issue.canUserWrite %}
+        {% if (issue is defined and issue.canUserWrite) or not issue is defined %}
             <div class="hover-hidden">
                 {#<button type="button" class="nobtn startTooltip pointer deadlineEdit"#}
                         {#value="{{ deadline.id }}"#}

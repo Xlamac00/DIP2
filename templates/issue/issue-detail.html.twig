@@ -21,15 +21,6 @@
     <script src="{{ asset('build/typeahead.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
     <script>
-        // Variable used in chart-resizable to get route to Ajax respond
-        var path_ajax_graphChange = '{{ (path('issue_ajax_graphChange')) }}';
-        var path_ajax_graphDiscard = '{{ (path('issue_ajax_graphDiscard')) }}';
-        var path_ajax_graphComment = '{{ (path('issue_ajax_graphComment')) }}';
-        var path_ajax_newGauge = '{{ (path('issue_ajax_newGauge')) }}';
-        var path_ajax_gaugesInfo = '{{ (path('issue_ajax_gaugesInfo')) }}';
-        var path_ajax_oneGaugeInfo = '{{ (path('issue_ajax_oneGaugeInfo')) }}';
-        var path_ajax_gaugeUpdate = '{{ (path('issue_ajax_gaugeUpdate')) }}';
-        var path_ajax_issueUpdate = '{{ (path('issue_ajax_issueUpdate')) }}';
         var options = {
             scales: {
                 yAxes: [{
@@ -94,7 +85,7 @@
                             </button>
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownDeadlineNew"
                                     value="{{ gaugeCount }}"
-                                    data-toggle="tooltip" data-placement="bottom" title="Create new deadline">
+                                    data-toggle="tooltip" data-placement="bottom" title="Manage deadlines">
                                 <i class="fas fa-2x fa-stopwatch"></i>
                             </button>
                         {% elseif issue.thisuserrights.rights is constant('App\\Entity\\Issue::ROLE_WRITE')
@@ -158,9 +149,7 @@
                     'issue_id': issue.id}) }}
                 </div>
                 <div id="issueDeadlines" class="mt-md-4 mb-3">
-                    {% for deadline in deadlines %}
-                        {{ include('issue/deadline.html.twig', {'deadline': deadline, 'issue': issue}) }}
-                    {% endfor %}
+                    {{ include('issue/deadlineList.html.twig', {'deadlines': deadlines, 'issue': issue}) }}
                 </div>
             </div>
             <div class="col-lg-6" id="gaugeSections">
@@ -184,7 +173,7 @@
                     <i class="fas fa-spinner fa-spin"></i> Loading ...
                 </div>
                 <div id="IssueDeadlinesSection" class="section" style="display: none">
-                    {{ include('issue/deadlinesTab.html.twig', {'issue': issue}) }}
+                    {{ include('issue/deadlinesTab.html.twig', {'issue': issue, 'deadlines': deadlines}) }}
                 </div>
             </div>
         </div>

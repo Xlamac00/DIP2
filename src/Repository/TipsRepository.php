@@ -37,6 +37,12 @@ class TipsRepository extends ServiceEntityRepository {
   }
 
   public function hideAllTips($userLink) {
-
+    /** @var Tips[] $tips */
+    $tips = $this->findBy(array('user_link' => $userLink, 'shown' => NULL));
+    foreach($tips as $tip) {
+      if($tip->getName() !== "editGauge")
+        $tip->setShown();
+    }
+    $this->manager->flush();
   }
 }

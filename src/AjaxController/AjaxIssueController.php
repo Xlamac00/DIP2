@@ -220,6 +220,13 @@ class AjaxIssueController extends Controller {
 
       $issue = $issueRepository->getIssue($issueId, $this->getUser());
       $gaugeCount = $issueRepository->getNumberOfGauges();
+
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
@@ -228,6 +235,8 @@ class AjaxIssueController extends Controller {
         ['labels' => $labels,
          'colors' => $colors,
          'values' => $values,
+         'deadlines' => $list,
+         'select' => $select,
          'gaugeCount' => $gaugeCount];
       return new JsonResponse($arrData);
     } else return null;
@@ -258,6 +267,12 @@ class AjaxIssueController extends Controller {
       $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
       $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
 
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
@@ -268,6 +283,8 @@ class AjaxIssueController extends Controller {
         ['labels' => $labels,
          'colors' => $colors,
          'values' => $values,
+         'deadlines' => $list,
+         'select' => $select,
          'comments' => $comments,
          'tab' => $tab];
       return new JsonResponse($arrData);
@@ -340,6 +357,12 @@ class AjaxIssueController extends Controller {
       $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
       $gaugeCount = $issueRepository->getNumberOfGauges();
 
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
@@ -352,6 +375,8 @@ class AjaxIssueController extends Controller {
          'colors' => $colors,
          'values' => $values,
          'comments' => $comments,
+         'deadlines' => $list,
+         'select' => $select,
          'gaugeCount' => $gaugeCount,
          'tab' => $tab];
       return new JsonResponse($arrData);
@@ -495,7 +520,6 @@ class AjaxIssueController extends Controller {
       $issueId = $request->request->get('issueId');
       $start = $request->request->get('start');
       $end = $request->request->get('end');
-      $checkbox = $request->request->get('checkbox');
       $gaugeId = $request->request->get('gauge');
       $text = $request->request->get('text');
 
@@ -503,27 +527,76 @@ class AjaxIssueController extends Controller {
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssueByLink($issueId, $this->getUser());
 
-      $deadline = new Deadline();
-      $deadline->setFresh();
-      $deadline->setIssue($issue);
-      $deadline->setStart(date_create_from_format('d/m/Y', $start));
-      $deadline->setEnd(date_create_from_format('d/m/Y', $end));
-      $deadline->setText($text);
-      if($checkbox === 'true' && $gaugeId !== 'null') {
-        /** @var GaugeRepository $gaugeRepository */
-        $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
-        $gauge = $gaugeRepository->getGauge($gaugeId);
-        $deadline->setGauge($gauge);
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadline = $deadlineRepository->getDeadlineByIssue($issue->getId(), $gaugeId === 'issue' ? null : $gaugeId);
+
+      if($deadline === null) { // create new deadline
+        $deadline = new Deadline();
+        $deadline->setIssue($issue);
+        $deadline->setStart(date_create_from_format('d/m/Y', $start));
+        $deadline->setEnd(date_create_from_format('d/m/Y', $end));
+        $deadline->setText($text);
+        if($gaugeId !== 'issue') {
+          /** @var GaugeRepository $gaugeRepository */
+          $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
+          $gauge = $gaugeRepository->getGauge($gaugeId);
+          $deadline->setGauge($gauge);
+        }
       }
+      else {
+        $deadline->setText($text);
+        $deadline->setStart(date_create_from_format('d/m/Y', $start));
+        $deadline->setEnd(date_create_from_format('d/m/Y', $end));
+      }
+
       $entityManager = $this->getDoctrine()->getManager();
       $entityManager->persist($deadline);
       $entityManager->flush();
 
-      $render = $this->renderView('issue/deadline.html.twig',['deadline' => $deadline]);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
 
-      $arrData = ['issue' => $issueId, "render" => $render, "check" => $checkbox, "gauge" => $gaugeId];
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+
+      $arrData = ['issue' => $issueId, "list" => $list, "select" => $select, "gauge" => $gaugeId];
       return new JsonResponse($arrData);
     } else return null;
+  }
+
+  /** Deletes deadline
+   * @Route("/teee", name="teee")
+   */
+  public function teee() {
+      $id = 98;
+
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadline = $deadlineRepository->getDeadlineById($id);
+      $issue = $deadline->getIssue();
+
+      /** @var IssueRoleRepository $issueRoleRepository */
+      $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+      $role = $issueRoleRepository->getUserRights($this->getUser(), $deadline->getIssue());
+      if($role->getRights() === Issue::ROLE_ADMIN
+        || $role->getRights() === Issue::ROLE_WRITE
+        || $role->getRights() === Issue::ROLE_ANON) {
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($deadline);
+//        $entityManager->flush();
+        $done = true;
+      }
+      else {
+        $done = false;
+      }
+
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+
+      $arrData = ['id' => $id, 'done' => $done, 'type' => 'deadlineDelete', "list" => $list, "select" => $select];
+      return new JsonResponse($arrData);
   }
 
   /** Deletes deadline
@@ -538,6 +611,7 @@ class AjaxIssueController extends Controller {
       /** @var DeadlineRepository $deadlineRepository */
       $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
       $deadline = $deadlineRepository->getDeadlineById($id);
+      $issue = $deadline->getIssue();
 
       /** @var IssueRoleRepository $issueRoleRepository */
       $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
@@ -554,7 +628,12 @@ class AjaxIssueController extends Controller {
         $done = false;
       }
 
-      $arrData = ['id' => $id, 'done' => $done, 'type' => 'deadlineDelete'];
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+
+      $arrData = ['id' => $id, 'done' => $done, 'type' => 'deadlineDelete', "list" => $list, "select" => $select];
       return new JsonResponse($arrData);
     } else return null;
   }

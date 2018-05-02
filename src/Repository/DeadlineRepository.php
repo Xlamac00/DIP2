@@ -30,12 +30,24 @@ class DeadlineRepository extends ServiceEntityRepository {
     return $deadline;
   }
 
+  /**
+   * @param $issue_id
+   * @param $gauge_id
+   *
+   * @return Deadline
+   */
+  public function getDeadlineByIssue($issue_id, $gauge_id) {
+    /** @var Deadline $dl */
+    $dl = $this->findOneBy(array('issue' => $issue_id, 'gauge' => $gauge_id));
+    return $dl;
+  }
+
   /** Returns all active deadlines for given Issue.
    * @param Issue $issue
    * @return Deadline[]
    */
   public function getDeadlinesForIssue($issue) {
-    if(!isset($this->deadline)) {
+//    if(!isset($this->deadline)) {
       $qb = $this->createQueryBuilder('d')
         ->where('d.issue = :issue')
         ->andWhere('d.end > :yesterday')
@@ -43,8 +55,8 @@ class DeadlineRepository extends ServiceEntityRepository {
         ->setParameter('yesterday', new \DateTime('-2 days'), \Doctrine\DBAL\Types\Type::DATETIME)
         ->orderBy('d.end', 'ASC')
         ->getQuery();
-      $this->deadline = $qb->execute();
-    }
-    return $this->deadline;
+      return $qb->execute();
+//    }
+//    return $this->deadline;
   }
 }

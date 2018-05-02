@@ -1,36 +1,28 @@
 
 <div class="d-flex justify-content-between">
-    <h3 class="text-smallcaps">Create new deadline:</h3>
+    <h3 class="text-smallcaps">Manage deadlines:</h3>
     <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-{#<h6>Time frame</h6>#}
+
+<h6>Link deadline to:</h6>
+<div id="deadlinesSelect">
+    {{ include('issue/deadlinesSelect.html.twig', {'deadlines': deadlines, 'issue': issue}) }}
+</div>
 <div id="deadlinesDatepicker">
     <div class="input-daterange input-group" id="datepicker">
         <input type="text" class="input-sm form-control bg-white"
-               name="start" placeholder="Start date" id="deadlineStart" readonly/>
+               name="start" placeholder="Start date" id="deadlineStart" />
         <span class="input-group-addon px-3">to</span>
         <input type="text" class="input-sm form-control bg-white"
-               name="end" placeholder="End date" id="deadlineEnd" readonly/>
+               name="end" placeholder="End date" id="deadlineEnd" />
     </div>
 </div>
 
 <div class="form-group mt-2">
-    <label for="deadlineTextarea" class="text-secondary">Deadline description</label>
-    <textarea class="form-control" id="deadlineTextarea" rows="1"></textarea>
+    <textarea class="form-control" id="deadlineTextarea" rows="1" placeholder="Deadline description"></textarea>
 </div>
-<div class="row mt-2 pl-3">
-    <input type="checkbox" id="deadlineCheckbox" class="pointer">
-    <label for="deadlineCheckbox" class="text-secondary mt-2 ml-2 pointer" id="deadlineCheckboxLabel">
-        Link to specific task
-    </label>
-</div>
-<select class="form-control d-none" id="deadlineTasks">
-    {% for task in issue.gauges %}
-        <option value="{{ task.id }}">{{ task.name }}</option>
-    {% endfor %}
-</select>
 
 <button class="btn btn-success mx-auto pointer mt-3 d-block" style="width: 130px;"
         id="issueDeadlineSaveBtn">Save deadline</button>

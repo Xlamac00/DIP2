@@ -208,7 +208,7 @@ $(document).ready(function() {
             else if(previousSection.length === 0 // hide all additional comments
                 && document.getElementById('gaugeCommentShowAllBtn').getAttribute('data-field') === 'hide')
                 var event = new CustomEvent('toggleAllComments', {cancelable: true, bubbles: true});
-                if(event !== null) document.dispatchEvent(event);
+                if(typeof event === 'object') document.dispatchEvent(event);
         }
         else if (e.keyCode === 13) { // Enter
             if(commentActive
@@ -271,15 +271,51 @@ $(document).ready(function() {
         section[previous].style.display = 'block'; // display the previous one
     }
 
-    $('.deadlineDelete').click(function () {
+    function deadlineDelete(e) {
         hideAllSections();
         $('.startTooltip').tooltip('hide');
+        console.log(e.currentTarget);
         document.getElementById('questionText').innerHTML = 'delete this deadline';
         document.getElementById('questionCall').value = '/ajax/issueDeleteDeadline';
-        document.getElementById('questionValue1').value = this.value;
+        document.getElementById('questionValue1').value = e.currentTarget.value;
         document.getElementById('questionValue2').value = '';
         document.getElementById('questionSection').style.display = 'block';
-    });
+    }
+
+    function updateDeadlineSelect() {
+        var deadlineSelect = document.getElementById('deadlineTasks');
+        var option = deadlineSelect.options[deadlineSelect.selectedIndex].value;
+        var data = $('#deadlinesData #deadline'+option);
+        if(typeof data.children().get(0) !== 'undefined') {
+            document.getElementById('deadlineStart').value =
+                (typeof data.children().get(0) !== 'undefined') ? data.children().get(0).value : '';
+            document.getElementById('deadlineEnd').value =
+                (typeof data.children().get(1) !== 'undefined') ? data.children().get(1).value : '';
+            document.getElementById('deadlineTextarea').innerHTML =
+                (typeof data.children().get(2) !== 'undefined') ? data.children().get(2).value : '';
+        }
+        else {
+            document.getElementById('deadlineStart').value = '';
+            document.getElementById('deadlineEnd').value = '';
+            document.getElementById('deadlineTextarea').innerHTML = '';
+        }
+    }
+
+    function replaceDeadlineItems(list, select) {
+        var oldText = document.getElementById('issueDeadlines');
+        oldText.innerHTML =  list;
+        var els = oldText.getElementsByClassName('deadlineDelete');
+        [].forEach.call(els, function (el) { // bind delete button with ajax action
+            el.onclick = function (e) {
+                deadlineDelete(e);
+            };
+        });
+        document.getElementById('deadlinesSelect').innerHTML = select;
+        var deadlineSelect = document.getElementById('deadlineTasks');
+        if(deadlineSelect !== null)
+            deadlineSelect.onchange = function () {updateDeadlineSelect()};
+    }
+    replaceDeadlineItems(document.getElementById('issueDeadlines').innerHTML, document.getElementById('deadlinesSelect').innerHTML);
 
     /** Hides all sections and remembers the last one visible.
      * The last visible section is pushed into the queue to remember the history.
@@ -358,6 +394,7 @@ $(document).ready(function() {
             todayHighlight: true
         });
         hideAllSections();
+        updateDeadlineSelect();
         document.getElementById('IssueDeadlinesSection').style.display = 'block'; // make issue edit section visible
         this.blur();
         var tip = document.getElementById('deadlinesTipBig');
@@ -414,25 +451,6 @@ $(document).ready(function() {
         $('#settingsTooltip').tooltip('enable');
     };
 
-    var deadlineCheckbox = document.getElementById('deadlineCheckbox');
-    deadlineCheckbox.onchange = function () {
-        var tasks = document.getElementById('deadlineTasks');
-        var label = document.getElementById('deadlineCheckboxLabel');
-        if(deadlineCheckbox.checked === true) {
-            tasks.classList.remove('d-none');
-            tasks.classList.add('d-block');
-            label.classList.remove('text-secondary');
-            label.classList.add('text-dark');
-        }
-        else {
-            tasks.classList.add('d-none');
-            tasks.classList.remove('d-block');
-            label.classList.add('text-secondary');
-            label.classList.remove('text-dark');
-        }
-        deadlineCheckbox.blur();
-    };
-
     /** *****************************************************************************************************
      * ******************************************** AJAX CALLS ******************************************** *
      ***************************************************************************************************** **/
@@ -444,7 +462,7 @@ $(document).ready(function() {
         if(name.length > 0) {
             document.getElementById('gaugeAddNewName').className = 'form-control';
             $.ajax({
-                url:path_ajax_newGauge,
+                url: "/ajax/issueNewGauge",
                 type: "POST",
                 dataType: "json",
                 data: {
@@ -460,6 +478,7 @@ $(document).ready(function() {
                     $("#gaugeCommentSection").css('display', 'block');
                     $("#gaugeAddNewName").val('');
                     hideAddNewGaugesBtn(data.gaugeCount); //potentially hide add new gauge button
+                    replaceDeadlineItems(data.deadlines, data.select);
                     var tip = document.getElementById('editGaugeTipBig');
                     if(tip !== null && data.gaugeCount === 1) { // show deadlines tip
                         var event = new CustomEvent('showTip', {detail: {element: "editGauge"}, cancelable: true, bubbles: true});
@@ -491,9 +510,8 @@ $(document).ready(function() {
         }
         if(start.value.length > 0 && end.value.length > 0 && start.value !== end.value) {
             var issue = document.getElementById('issueId').value;
-            var c = document.getElementById('deadlineCheckbox');
             var s = document.getElementById('deadlineTasks');
-            var g = s.selectedIndex === -1 ? 'null' : s.options[s.selectedIndex];
+            var g = s.options[s.selectedIndex];
             var t = document.getElementById('deadlineTextarea');
             $.ajax({
                 url: '/ajax/issueNewDeadline',
@@ -504,7 +522,6 @@ $(document).ready(function() {
                     "start": start.value,
                     "end": end.value,
                     "text": t.value,
-                    "checkbox": c.checked,
                     "gauge": g.value
                 },
                 async: true,
@@ -512,8 +529,7 @@ $(document).ready(function() {
                     start.value = '';
                     end.value = '';
                     t.value = '';
-                    var oldHtml = document.getElementById('issueDeadlines').innerHTML;
-                    document.getElementById('issueDeadlines').innerHTML =  data.render + oldHtml;
+                    replaceDeadlineItems(data.list, data.select);
                     start.classList.remove('is-invalid');
                     end.classList.remove('is-invalid');
                     hideAllSections();
@@ -533,7 +549,7 @@ $(document).ready(function() {
      */
     function ajaxDiscardChange() {
         $.ajax({
-            url: path_ajax_graphDiscard,
+            url: "/ajax/issueGraphDiscard",
             type: "POST",
             dataType: "json",
             data: {
@@ -553,7 +569,7 @@ $(document).ready(function() {
     $('#gaugeChangeConfirmBtn').click(ajaxCommentChange); // set function call from btn
     function ajaxCommentChange() {
         $.ajax({
-            url: path_ajax_graphComment,
+            url: "/ajax/issueGraphComment",
             type: "POST",
             dataType: "json",
             data: {
@@ -581,7 +597,7 @@ $(document).ready(function() {
      */
     function ajaxUpdateGraph(newValue) {
         $.ajax({
-            url: path_ajax_graphChange,
+            url: "/ajax/issueGraphChange",
             type: "POST",
             dataType: "json",
             data: {
@@ -595,7 +611,8 @@ $(document).ready(function() {
                 commentActive = true;
                 updateGraphValue(true, data.newValue); // redraw graph value and stop
                 $("#gaugeCommentHeadline").css('color', data.color);
-                document.getElementById('gaugeCommentHeadline').innerHTML = data.oldValue + "% -> " + data.newValue + "%";
+                document.getElementById('gaugeCommentHeadline').innerHTML =
+                    data.name + ": " + data.oldValue + " <i class=\"fas fa-angle-right\"></i> <b>" + data.newValue + "</b> %";
                 hideAllSections();
                 $("#gaugeCommentSection").css('display', 'block');
                 $("#gaugeChangeCommit").css('display', 'flex');
@@ -614,7 +631,7 @@ $(document).ready(function() {
 
     function ajaxGetGaugesInfo() {
         $.ajax({
-            url: path_ajax_gaugesInfo,
+            url: "/ajax/issueGetGauges",
             type: "POST",
             dataType: "json",
             data: {
@@ -643,7 +660,7 @@ $(document).ready(function() {
         var name = $('#gaugeEditIssueSection #issueEditName').val();
         if(name.length > 0) {
             $.ajax({
-                url: path_ajax_issueUpdate,
+                url: "/ajax/issueUpdate",
                 type: "POST",
                 dataType: "json",
                 data: {
@@ -725,7 +742,7 @@ $(document).ready(function() {
         var id = $("#gaugeEditOneSection #gaugeUpdateId").val();
         var name = document.getElementById('gaugeAddNewName'+id).value;
         $.ajax({
-            url: path_ajax_gaugeUpdate,
+            url: "/ajax/issueUpdateGauge",
             type: "POST",
             dataType: "json",
             data: {
@@ -743,6 +760,7 @@ $(document).ready(function() {
                 section.innerHTML = data.comments;
                 $('#gaugeChangeResetBtn').click(ajaxDiscardChange); // bind actions to the buttons (again)
                 $('#gaugeChangeConfirmBtn').click(ajaxCommentChange);
+                replaceDeadlineItems(data.deadlines, data.select);
                 var event = new CustomEvent('toggleAllComments', {cancelable: true, bubbles: true});
                 if(event !== null) section.dispatchEvent(event);
             },
@@ -754,7 +772,7 @@ $(document).ready(function() {
 
     function ajaxGetOneGaugeInfo() {
         $.ajax({
-            url: path_ajax_oneGaugeInfo,
+            url: "/ajax/issueOneGauge",
             type: "POST",
             dataType: "json",
             data: {
@@ -790,6 +808,7 @@ $(document).ready(function() {
                     replaceChart(data);
                     hideAllSections(false);
                     __showEditGaugeSection(data.tab);
+                    replaceDeadlineItems(data.deadlines, data.select);
                     var commentSection = document.getElementById('gaugeCommentSection');
                     commentSection.innerHTML = data.comments;
                     $('#gaugeChangeResetBtn').click(ajaxDiscardChange); // bind actions to the buttons (again)
@@ -802,14 +821,7 @@ $(document).ready(function() {
                     location.href = '../../'+data.return;
                 }
                 else if(data.type === 'deadlineDelete') {
-                    var remove = document.getElementById('deadline'+data.id);
-                    if(data.done === true) {
-                        var all = document.getElementById('issueDeadlines');
-                        all.removeChild(remove);
-                    }
-                    else {
-                        remove.innerHTML = "Insufficient rights";
-                    }
+                    replaceDeadlineItems(data.list, data.select);
                     hideAllSections(false);
                     $("#gaugeCommentSection").css('display', 'block');
                 }
@@ -864,7 +876,6 @@ $(document).ready(function() {
                     },
                     async: true,
                     success: function (data) {
-                        console.log("data recieved");
                         replaceChart(data);
                         __showEditGaugeSection(data.tab);
                     }
