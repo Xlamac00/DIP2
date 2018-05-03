@@ -5,28 +5,105 @@
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-<br>
 
-<table class="table sortable">
-    <tbody>
-        {% for gauge in gauges %}
-            <tr draggable="true" rel="{{ gauge.id }}">
-                <td>
-                    <h5 style="color: {{ gauge.color }}; cursor: move" title="Drag task to change its position">{{ gauge.name }}</h5>
-                </td>
-                <td align="right">
-                    <button type="button" class="nobtn gaugeEdit pointer editTooltip" name="{{ gauge.id }}"
-                            data-toggle="tooltip" data-placement="top" title="Edit {{ gauge.name }}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </td>
-                <td class="align-right">
-                    <button type="button" class="nobtn gaugeDelete pointer editTooltip" name="{{ gauge.id }}"
-                            data-toggle="tooltip" data-placement="top" title="Delete {{ gauge.name }}">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="sortable">
+    {% for gauge in gauges %}
+        <div class="form-control mx-1 mb-2" draggable="true" rel="{{ gauge.id }}">
+            <div class="row h-100">
+                <div class="col-1 move h-100  align-middle" title="Drag task to change its position" >
+                    <i class="fas fa-2x fa-bars text-secondary align-middle"></i>
+                </div>
+                <div class="col-11">
+                    <div class="form-group row m-0 p-0">
+                        <label class="col-2 col-form-label">Name</label>
+                        <div class="col-10">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="gaugeEditName d-inline-flex mt-2 mb-2">
+                                        <h5 style="color: {{ gauge.color }};">{{ gauge.name }}</h5>
+                                        <i class="fas fa-edit text-secondary mt-1 ml-3 pointer"></i>
+                                    </div>
+                                    <div class="gaugeEditText m-0 p-0 mb-2 d-none" id="g{{ gauge.id }}">
+                                        <input type="text" value="{{ gauge.name }}" class="gaugeEditInput">
+                                        <i class="fas fa-2x fa-check-square text-success pt-2 pointer"></i>
+                                    </div>
+                                </div>
+                                <button type="button" class="nobtn gaugeDelete pointer editTooltip" name="{{ gauge.id }}"
+                                data-toggle="tooltip" data-placement="top" title="Delete {{ gauge.name }}">
+                                    <i class="fas fa-trash-alt text-secondary"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row m-0 p-0">
+                        <label class="col-2 col-form-label">Color</label>
+                        <div class="col-10" id="gaugeEditColorSection">
+                            <label class="radio-container gaugeEditColor d-block">
+                                <span class="checkmark color{{ gauge.colorName }}"></span>
+                            </label>
+                            <form class="gaugeEditColors d-none" id="c{{ gauge.id }}">
+                                {% set color =  gauge.color %}
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="900c3f" {{ color == '#900c3f' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark color900c3f"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="c70039" {{ color == '#c70039' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark colorc70039"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="ff5733" {{ color == '#ff5733' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark colorff5733"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="ff8d1a" {{ color == '#ff8d1a' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark colorff8d1a"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="ffc300" {{ color == '#ffc300' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark colorffc300"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="eddd53" {{ color == '#eddd53' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark coloreddd53"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="add45c" {{ color == '#add45c' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark coloradd45c"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="57c785" {{ color == '#57c785' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark color57c785"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="00baad" {{ color == '#00baad' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark color00baad"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="2a7b9b" {{ color == '#2a7b9b' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark color2a7b9b"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="3d3d6b" {{ color == '#3d3d6b' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark color3d3d6b"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="radio" value="511849" {{ color == '#511849' ? 'checked="checked"' : '' }}>
+                                    <span class="checkmark color511849"></span>
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    {#<div class="form-group row  m-0 p-0">#}
+                        {#<label for="staticEmail" class="col-2 col-form-label">Owner</label>#}
+                        {#<div class="col-10">#}
+                            {#<label class="radio-container">#}
+                                {#<span class="checkmark color{{ gauge.colorName }}"></span>#}
+                            {#</label>#}
+                        {#</div>#}
+                    {#</div>#}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

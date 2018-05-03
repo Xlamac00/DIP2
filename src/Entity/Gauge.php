@@ -21,108 +21,112 @@ class Gauge {
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
      */
-    private $id;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Issue", inversedBy="gauges")
-     * @ORM\JoinColumn(name="id_issue", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     */
-    private $issue;
-
-    public function getIssue() {
-      return $this->issue;
-    }
-
-    public function setIssue($issue_id) {
-      $this->issue = $issue_id;
-    }
+  private $id;
 
   /**
-   * @ORM\OneToMany(targetEntity="GaugeChanges", mappedBy="gauge")
+   * @ORM\ManyToOne(targetEntity="Issue", inversedBy="gauges")
+   * @ORM\JoinColumn(name="id_issue", referencedColumnName="id", nullable=true, onDelete="SET NULL")
    */
-    private $changes;
+  private $issue;
 
-  /**
-   * @return Collection|GaugeChanges[]
-   */
-  public function getChanges()  {
-    return $this->changes;
+  public function getIssue() {
+    return $this->issue;
   }
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $name;
+  public function setIssue($issue_id) {
+    $this->issue = $issue_id;
+  }
 
-    //  /** @var  string - short version of the name */
-    //  private $short_name;
+/**
+ * @ORM\OneToMany(targetEntity="GaugeChanges", mappedBy="gauge")
+ */
+  private $changes;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $color;
+/**
+ * @return Collection|GaugeChanges[]
+ */
+public function getChanges()  {
+  return $this->changes;
+}
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $value;
+  /**
+   * @ORM\Column(type="string", length=100)
+   */
+  private $name;
 
-  /** Order by which the gauges are shown in the issue
+  //  /** @var  string - short version of the name */
+  //  private $short_name;
+
+  /**
+   * @ORM\Column(type="string", length=100)
+   */
+  private $color;
+
+  /**
    * @ORM\Column(type="integer")
    */
-    private $position;
+  private $value;
 
-    public function getPosition() {
-      return $this->position;
-    }
+/** Order by which the gauges are shown in the issue
+ * @ORM\Column(type="integer")
+ */
+  private $position;
 
-    public function setPosition($position) {
-      $this->position = $position;
-    }
+  public function getPosition() {
+    return $this->position;
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getColor() {
-      return $this->color;
-    }
+  public function setPosition($position) {
+    $this->position = $position;
+  }
 
-    public function setColor($color) {
-      $this->color = ($color[0] == '#' ? '':'#').$color;
-    }
+  /**
+   * @return mixed
+   */
+  public function getColor() {
+    return $this->color;
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getValue() {
-      return $this->value;
-    }
+  public function getColorName() {
+    return substr($this->color, 1);
+  }
 
-    public function setValue($value) {
-      $this->value = $value;
-    }
+  public function setColor($color) {
+    $this->color = ($color[0] == '#' ? '':'#').$color;
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getName() {
-      return $this->name;
-    }
+  /**
+   * @return mixed
+   */
+  public function getValue() {
+    return $this->value;
+  }
 
-    public function setName($name) {
-      $this->name = $name;
-    }
+  public function setValue($value) {
+    $this->value = $value;
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getId() {
-      return $this->id;
-    }
+  /**
+   * @return mixed
+   */
+  public function getName() {
+    return $this->name;
+  }
 
-    public function toString() {
-      return "Gauge: <br><br>".
-              "Id: ".$this->id."<br>".
-              "Name: ".$this->name;
-    }
+  public function setName($name) {
+    $this->name = $name;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getId() {
+    return $this->id;
+  }
+
+  public function toString() {
+    return "Gauge: <br><br>".
+            "Id: ".$this->id."<br>".
+            "Name: ".$this->name;
+  }
 }

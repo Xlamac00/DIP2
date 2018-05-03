@@ -253,11 +253,15 @@ class AjaxIssueController extends Controller {
       $gauge_id = $request->request->get('gaugeId');
       $name = $request->request->get('name');
       $color = $request->request->get('color');
+      sleep(1);
 
       /** @var GaugeRepository $gaugeRepository */
       $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
       $gaugeRepository->getGauge($gauge_id);
-      $gaugeRepository->changeGaugeData($name, $color); // update the gauge
+      if(strlen($name) > 0)
+        $gaugeRepository->changeGaugeName($name); // update the gauge
+      if(strlen($color) > 0)
+        $gaugeRepository->changeGaugeColor($color); // update the gauge
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
@@ -562,41 +566,6 @@ class AjaxIssueController extends Controller {
       $arrData = ['issue' => $issueId, "list" => $list, "select" => $select, "gauge" => $gaugeId];
       return new JsonResponse($arrData);
     } else return null;
-  }
-
-  /** Deletes deadline
-   * @Route("/teee", name="teee")
-   */
-  public function teee() {
-      $id = 98;
-
-      /** @var DeadlineRepository $deadlineRepository */
-      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
-      $deadline = $deadlineRepository->getDeadlineById($id);
-      $issue = $deadline->getIssue();
-
-      /** @var IssueRoleRepository $issueRoleRepository */
-      $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
-      $role = $issueRoleRepository->getUserRights($this->getUser(), $deadline->getIssue());
-      if($role->getRights() === Issue::ROLE_ADMIN
-        || $role->getRights() === Issue::ROLE_WRITE
-        || $role->getRights() === Issue::ROLE_ANON) {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($deadline);
-//        $entityManager->flush();
-        $done = true;
-      }
-      else {
-        $done = false;
-      }
-
-      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
-
-      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
-      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
-
-      $arrData = ['id' => $id, 'done' => $done, 'type' => 'deadlineDelete', "list" => $list, "select" => $select];
-      return new JsonResponse($arrData);
   }
 
   /** Deletes deadline

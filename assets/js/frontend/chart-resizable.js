@@ -211,13 +211,22 @@ $(document).ready(function() {
                 if(typeof event === 'object') document.dispatchEvent(event);
         }
         else if (e.keyCode === 13) { // Enter
-            if(commentActive
+            if (commentActive
                 && (!$('#gaugeCommentText').is(':focus') || (e.ctrlKey && $('#gaugeCommentText').is(':focus')))) // user is not writing
                 ajaxCommentChange();      // save the gauge change to DB
-            else if(document.getElementById('gaugeNewSection').style.display === 'block') // dialog to add new gauge
+            else if (document.getElementById('gaugeNewSection').style.display === 'block') // dialog to add new gauge
                 ajaxSaveNewGauge();
-            else if(document.getElementById('gaugeEditOneSection').style.display === 'block') // dialog to add new gauge
-                ajaxUpdateGauge();
+            else if (document.getElementById('gaugeEditGaugeSection').style.display === 'block') {
+                if ($('.gaugeEditInput').is(':focus')) {// dialog to edit gauge name
+                    var input = $('.gaugeEditText :focus');
+                    updateGaugeName(input.parent().parent().get(0), input.parent().get(0).id.substr(1), '');
+                }
+            }
+            else if (document.getElementById('IssueDeadlinesSection').style.display === 'block') { // creating new
+                // deadline
+                if(e.ctrlKey && $('#deadlineTextarea').is(':focus'))
+                    ajaxSaveNewDeadline();
+            }
             else if(document.getElementById('questionSection').style.display === 'block') // question dialog
                 ajaxSendQuestion();
             else if(document.getElementById('gaugeEditIssueSection').style.display === 'block') // issue update dialog
@@ -272,6 +281,7 @@ $(document).ready(function() {
     }
 
     function deadlineDelete(e) {
+        console.log('delte');
         hideAllSections();
         $('.startTooltip').tooltip('hide');
         console.log(e.currentTarget);
@@ -285,6 +295,7 @@ $(document).ready(function() {
     function updateDeadlineSelect() {
         var deadlineSelect = document.getElementById('deadlineTasks');
         var option = deadlineSelect.options[deadlineSelect.selectedIndex].value;
+        var trash = document.getElementById('deadlineTrash');
         var data = $('#deadlinesData #deadline'+option);
         if(typeof data.children().get(0) !== 'undefined') {
             document.getElementById('deadlineStart').value =
@@ -293,11 +304,16 @@ $(document).ready(function() {
                 (typeof data.children().get(1) !== 'undefined') ? data.children().get(1).value : '';
             document.getElementById('deadlineTextarea').innerHTML =
                 (typeof data.children().get(2) !== 'undefined') ? data.children().get(2).value : '';
+            trash.classList.remove('d-none');
+            trash.value = data.children().get(3).value;
+            trash.onclick = function (e) {deadlineDelete(e);};
         }
         else {
             document.getElementById('deadlineStart').value = '';
             document.getElementById('deadlineEnd').value = '';
             document.getElementById('deadlineTextarea').innerHTML = '';
+            trash.classList.add('d-none');
+            trash.onclick = null;
         }
     }
 
@@ -650,9 +666,65 @@ $(document).ready(function() {
         section.innerHTML = template;
         $('#editGaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
         $('.editTooltip').tooltip();
-        $('.gaugeEdit').click(ajaxGetOneGaugeInfo); // bind action to open gauge edit dialog
         $('.gaugeDelete').click(showGaugeDeleteDialog); // bind action to open gauge edit dialog
+
+        var oldName = null;
+        // click on gauge name - show edit input, hide colorful name
+        $('.gaugeEditName').click(function () {
+            var name = this.parentNode.getElementsByClassName('gaugeEditName')[0];
+            var editable = this.parentNode.getElementsByClassName('gaugeEditText')[0];
+            editable.classList.remove('d-none');
+            editable.getElementsByTagName('input')[0].select();
+            name.classList.remove('d-inline-flex');
+            name.classList.add('d-none');
+            oldName = name.getElementsByTagName('h5')[0].innerHTML;
+        });
+        // focus outside gauge name edit - if the name is changed, save it on server
+        $('.gaugeEditText').focusout(function () {
+            updateGaugeName(this.parentNode, this.id.substr(1), oldName);
+        });
+        var oldColor = null;
+        // click on gauge color - hide its color, show all available colors
+        $('.gaugeEditColor').click(function () {
+            var color = this.parentNode.getElementsByClassName('gaugeEditColor')[0];
+            var colors = this.parentNode.getElementsByClassName('gaugeEditColors')[0];
+            color.classList.remove('d-block');
+            color.classList.add('d-none');
+            colors.classList.remove('d-none');
+            oldColor = $('#'+colors.id+" input:checked").get(0).value;
+        });
+        // click on gauge new color - if it was changed, save it on server
+        $("#gaugeEditColorSection input[name='radio']").click(function() {
+            var newColor = this.value;
+            var gaugeId = this.parentNode.parentNode.id.substr(1);
+            if(oldColor !== newColor) {
+                this.parentNode.parentNode.innerHTML = '<i class="fas fa-2x fa-spinner fa-spin"></i>';
+                ajaxUpdateGauge(gaugeId,null,newColor);
+            }
+            else {
+                var color = this.parentNode.parentNode.parentNode.getElementsByClassName('gaugeEditColor')[0];
+                color.classList.add('d-block');
+                color.classList.remove('d-none');
+                this.parentNode.parentNode.classList.add('d-none');
+            }
+        });
         initDraggableEntityRows();
+    }
+
+    function updateGaugeName(parent, gaugeId, oldName) {
+        var name = parent.getElementsByClassName('gaugeEditName')[0];
+        var editable = parent.getElementsByClassName('gaugeEditText')[0];
+        var newName = editable.getElementsByTagName('input')[0].value;
+        if(newName !== oldName) {
+            parent.innerHTML = '<i class="fas fa-2x fa-spinner fa-spin"></i>';
+            ajaxUpdateGauge(gaugeId,newName,null);
+        }
+        else {
+            editable.classList.add('d-none');
+            name.classList.add('d-inline-flex');
+            name.classList.remove('d-none');
+        }
+
     }
 
     $('#issueEditSaveBtn').click(ajaxUpdateIssue); // set function call from btn
@@ -738,18 +810,16 @@ $(document).ready(function() {
         document.getElementById('questionSection').style.display = 'block';
     }
 
-    function ajaxUpdateGauge() {
-        var id = $("#gaugeEditOneSection #gaugeUpdateId").val();
-        var name = document.getElementById('gaugeAddNewName'+id).value;
+    function ajaxUpdateGauge(gaugeId, newName, newColor) {
         $.ajax({
             url: "/ajax/issueUpdateGauge",
             type: "POST",
             dataType: "json",
             data: {
                 "issueId": chart.config.issueId,
-                "gaugeId": id,
-                "name": name,
-                "color": $('input[name=radio]:checked', '#gaugeEditOneSection #gaugeAddNewForm').val()
+                "gaugeId": gaugeId,
+                "name": newName,
+                "color": newColor
             },
             async: true,
             success: function (data) {
@@ -770,28 +840,28 @@ $(document).ready(function() {
         });
     }
 
-    function ajaxGetOneGaugeInfo() {
-        $.ajax({
-            url: "/ajax/issueOneGauge",
-            type: "POST",
-            dataType: "json",
-            data: {
-                "gaugeId": this.name
-            },
-            async: true,
-            success: function (data) {
-                hideAllSections();
-                var section = document.getElementById('gaugeEditOneSection');
-                section.style.display = 'block'; // make gauge edit section visible
-                section.innerHTML = data.render;
-                $('.gaugeEdit').blur();
-                $('.gaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
-                $('#gaugeEditOneSection #gaugeAddNewSaveBtn').click(ajaxUpdateGauge); //bind action to close btn
-                var text = document.getElementById('gaugeAddNewName'+data.id);
-                text.focus();
-            }
-        });
-    }
+    // function ajaxGetOneGaugeInfo() {
+    //     $.ajax({
+    //         url: "/ajax/issueOneGauge",
+    //         type: "POST",
+    //         dataType: "json",
+    //         data: {
+    //             "gaugeId": this.name
+    //         },
+    //         async: true,
+    //         success: function (data) {
+    //             hideAllSections();
+    //             var section = document.getElementById('gaugeEditOneSection');
+    //             section.style.display = 'block'; // make gauge edit section visible
+    //             section.innerHTML = data.render;
+    //             $('.gaugeEdit').blur();
+    //             $('.gaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
+    //             $('#gaugeEditOneSection #gaugeAddNewSaveBtn').click(ajaxUpdateGauge); //bind action to close btn
+    //             var text = document.getElementById('gaugeAddNewName'+data.id);
+    //             text.focus();
+    //         }
+    //     });
+    // }
 
     function ajaxSendQuestion() {
         $.ajax({
@@ -840,6 +910,7 @@ $(document).ready(function() {
         var entityId; // the id (key) of the entity
 
         function handleDragStart(e) {
+            try {
             dragSrcEl = this;
             entityId = $(this).attr('rel');
             dragSrcEl.style.opacity = '0.6';
@@ -847,6 +918,13 @@ $(document).ready(function() {
             startPosition = Array.prototype.indexOf.call(parent.children, dragSrcEl);
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', this.innerHTML);
+            }
+            catch(err) {
+                e.preventDefault();
+                dragSrcEl.style.opacity = '1';
+                dragSrcEl = null;
+                entityId = null;
+            }
         }
 
         function handleDragOver(e) {
@@ -886,7 +964,7 @@ $(document).ready(function() {
         function handleDragEnd() {
             this.style.opacity = '1';  // this / e.target is the source node.
         }
-        var rows = document.querySelectorAll('table.sortable > tbody tr');
+        var rows = document.querySelectorAll('div.sortable > div');
         [].forEach.call(rows, function(row) {
             row.addEventListener('dragstart', handleDragStart, false);
             row.addEventListener('dragover', handleDragOver, false);

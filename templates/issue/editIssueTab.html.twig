@@ -14,13 +14,19 @@
 
 {% if issue.canUserManage %}
     <div class="mt-5">
-        <h3>Danger zone:</h3>
         <div class="d-flex justify-content-between">
             <div>
-                <b class="float-left">Delete issue</b><br>
-                Permanently deletes this one issue.
+                <div class="row">
+                    <div class="col-2">
+                        <i class="fas fa-2x fa-exclamation-triangle text-warning mt-2"></i>
+                    </div>
+                    <div class="col-10">
+                        <b class="float-left">Delete issue</b><br>
+                        Permanently deletes this one issue.
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-outline-danger mt-3 pointer float-right" id="issueEditDelete">Delete issue</button>
+            <button class="btn btn-outline-danger pointer float-right" id="issueEditDelete">Delete issue</button>
         </div>
         <input type="hidden" id="issueDeleteId" value="{{ issue.pageId }}">
     </div>

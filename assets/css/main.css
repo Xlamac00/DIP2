@@ -40,6 +40,9 @@ h1 {
 .question {
     cursor: help;
 }
+.move {
+    cursor: move;
+}
 
 .hover-hidden {
     display: none;
