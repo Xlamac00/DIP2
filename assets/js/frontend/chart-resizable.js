@@ -146,6 +146,7 @@ $(document).ready(function() {
         chart.destroy();
         $('#animatedChart').replaceWith('<canvas id="animatedChart" height="1" width="2"></canvas>');
         var ctx = $('#animatedChart').get(0).getContext("2d");
+        console.log(data);
         chart = new Chart(ctx, {
             type: 'bar',
             issueId: chart.config.issueId,
@@ -154,6 +155,7 @@ $(document).ready(function() {
                 datasets: [{ data: data.values.slice(0, -1).replace(/'/g,'').split(','),
                     backgroundColor: data.colors.slice(0, -1).replace(/'/g,'').split(','),
                     borderColor: data.colors.slice(0, -1).replace(/'/g,'').split(','),
+                    label: data.names.slice(0, -1).replace(/'/g,'').split(','),
                     borderWidth: 1  }]
             },
             options: options
@@ -339,10 +341,12 @@ $(document).ready(function() {
                 deadlineDelete(e);
             };
         });
-        document.getElementById('deadlinesSelect').innerHTML = select;
-        var deadlineSelect = document.getElementById('deadlineTasks');
-        if(deadlineSelect !== null)
-            deadlineSelect.onchange = function () {updateDeadlineSelect()};
+        if(select !== null) {
+            document.getElementById('deadlinesSelect').innerHTML = select;
+            var deadlineSelect = document.getElementById('deadlineTasks');
+            if(deadlineSelect !== null)
+                deadlineSelect.onchange = function () {updateDeadlineSelect()};
+        }
     }
     replaceDeadlineItems(document.getElementById('issueDeadlines').innerHTML, document.getElementById('deadlinesSelect').innerHTML);
 
@@ -784,7 +788,8 @@ $(document).ready(function() {
                 },
                 async: true,
                 success: function (data) {
-                    console.log(data);
+                    replaceChart(data);
+                    replaceDeadlineItems(data.list,null);
                     input.classList.remove('border-secondary');
                     input.classList.add('border-muted');
                     input.value = data.user;

@@ -242,12 +242,14 @@ class AjaxIssueController extends Controller {
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $names = $this->renderView('graphs/graph-names.html.twig',['gauges' => $issue->getGauges()]);
 
       $arrData =
         ['labels' => $labels,
          'colors' => $colors,
          'values' => $values,
          'deadlines' => $list,
+         'names' => $names,
          'select' => $select,
          'gaugeCount' => $gaugeCount];
       return new JsonResponse($arrData);
@@ -298,6 +300,7 @@ class AjaxIssueController extends Controller {
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $names = $this->renderView('graphs/graph-names.html.twig',['gauges' => $issue->getGauges()]);
       $tab = $this->renderView('issue/editGaugeTab.html.twig',
         ['gauges' => $issue->getGauges(), 'gaugeEdit' => $gaugeEdit, 'canWrite' => $issue->canUserWrite()]);
       $comments = $this->renderView('issue/commentsTab.html.twig',['changes' => $changes]);
@@ -307,6 +310,7 @@ class AjaxIssueController extends Controller {
          'colors' => $colors,
          'values' => $values,
          'deadlines' => $list,
+         'names' => $names,
          'select' => $select,
          'comments' => $comments,
          'tab' => $tab];
@@ -361,66 +365,6 @@ class AjaxIssueController extends Controller {
   }
 
   /**
-   * @Route("/tesd", name="tesd")
-   * @param Request $request - ajax Request
-   * @return null|JsonResponse
-   */
-  public function tesd(Request $request) {
-      $gauge_id = '31';
-      $issue_id = '29';
-
-      /** @var GaugeRepository $gaugeRepository */
-      $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
-      $gauge = $gaugeRepository->getGauge($gauge_id);
-
-      $entityManager = $this->getDoctrine()->getManager();
-      $entityManager->remove($gauge);
-      $entityManager->flush();
-
-      /** @var IssueRepository $issueRepository */
-      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
-      $issueRepository->updateGaugesIndex();
-
-      if($issue->getThisUserRights()->getRights() == Issue::ROLE_GAUGE) {
-        /** @var GaugeRepository $gaugeRepository */
-        $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
-        $gaugeEdit = $gaugeRepository->getBoundGauges($issue, $this->getUser());
-      }
-      else $gaugeEdit = array_fill(0, 4, 1);
-
-      /** @var GaugeChangesRepository $gaugeChangesRepository */
-      $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
-      $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
-      $gaugeCount = $issueRepository->getNumberOfGauges();
-
-      /** @var DeadlineRepository $deadlineRepository */
-      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
-      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
-
-      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
-      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
-      $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
-      $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
-      $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
-      $tab = $this->renderView('issue/editGaugeTab.html.twig',
-        ['gauges' => $issue->getGauges(), 'gaugeEdit' => $gaugeEdit, 'canWrite' => $issue->canUserWrite()]);
-      $comments = $this->renderView('issue/commentsTab.html.twig',['changes' => $changes]);
-
-      $arrData =
-        ['type' => 'gaugeDelete',
-         'labels' => $labels,
-         'colors' => $colors,
-         'values' => $values,
-         'comments' => $comments,
-         'deadlines' => $list,
-         'select' => $select,
-         'gaugeCount' => $gaugeCount,
-         'tab' => $tab];
-      return new JsonResponse($arrData);
-  }
-
-  /**
    * @Route("/ajax/issueGaugeDelete", name="issue_ajax_gaugeDelete")
    * @param Request $request - ajax Request
    * @return null|JsonResponse
@@ -464,6 +408,7 @@ class AjaxIssueController extends Controller {
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $names = $this->renderView('graphs/graph-names.html.twig',['gauges' => $issue->getGauges()]);
       $tab = $this->renderView('issue/editGaugeTab.html.twig',
         ['gauges' => $issue->getGauges(), 'gaugeEdit' => $gaugeEdit, 'canWrite' => $issue->canUserWrite()]);
       $comments = $this->renderView('issue/commentsTab.html.twig',['changes' => $changes]);
@@ -475,6 +420,7 @@ class AjaxIssueController extends Controller {
          'values' => $values,
          'comments' => $comments,
          'deadlines' => $list,
+         'names' => $names,
          'select' => $select,
          'gaugeCount' => $gaugeCount,
          'tab' => $tab];
@@ -511,6 +457,7 @@ class AjaxIssueController extends Controller {
       $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
       $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
       $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $names = $this->renderView('graphs/graph-names.html.twig',['gauges' => $issue->getGauges()]);
       $tab = $this->renderView('issue/editGaugeTab.html.twig',
         ['gauges' => $issue->getGauges(), 'gaugeEdit' => $gaugeEdit, 'canWrite' => $issue->canUserWrite()]);
 
@@ -518,6 +465,7 @@ class AjaxIssueController extends Controller {
         ['labels' => $labels,
          'colors' => $colors,
          'values' => $values,
+         'names' => $names,
          'tab' => $tab];
       return new JsonResponse($arrData);
     } else return null;
@@ -841,7 +789,7 @@ class AjaxIssueController extends Controller {
       }
       else {
         if($gauge !== null) {
-          $name = $gauge->getBindUserName();
+          $name = $gauge->getBindUserMail();
         }
         else $name = '';
       }
@@ -855,7 +803,16 @@ class AjaxIssueController extends Controller {
           $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
           $issueRoleRepository->giveUserRightsToIssue($user, $issue, Issue::ROLE_READ, null, null);
 
-          $this->inviteUserByEmail($user->getEmail(), $issue->getUrl(), $issue, $this->getUser(), $mailer);
+          $notification = new Notification();
+          $notification->setDate();
+          $notification->setCreator($this->getUser());
+          $notification->setUser($user);
+          $notification->setUrl($issue->getUrl());
+          $notification->setText($this->getUser()->getUsername().' bound you <br>to task <b>'.$gauge->getName().'</b>');
+          $entityManager = $this->getDoctrine()->getManager();
+          $entityManager->persist($notification);
+          $entityManager->flush();
+//          $this->inviteUserByEmail($user->getEmail(), $issue->getUrl(), $issue, $this->getUser(), $mailer);
         }
       }
       elseif(strlen($email) > 2 && $issue !== null && $gauge !== null) { // only users email was included
@@ -868,12 +825,30 @@ class AjaxIssueController extends Controller {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($share);
         $entityManager->flush();
-        $name = $email;
+        $name = $email." invited";
 
         $this->inviteUserByEmail($email, $share->getUrl(), $issue, $this->getUser(), $mailer);
       }
 
-      $arrData = ['issue' => $issueId, 'gauge' => $gaugeId, 'user' => $name];
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
+      $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
+      $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $names = $this->renderView('graphs/graph-names.html.twig',['gauges' => $issue->getGauges()]);
+
+      $arrData =
+        ['labels' => $labels,
+         'colors' => $colors,
+         'values' => $values,
+         'list' => $list,
+         'names' => $names,
+         'issue' => $issueId,
+         'gauge' => $gaugeId,
+         'user' => $name];
       return new JsonResponse($arrData);
     } else return null;
   }

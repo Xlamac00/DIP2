@@ -72,6 +72,11 @@ class IssueRoleRepository extends ServiceEntityRepository {
       $issue = $issueRepository->getIssueByLink($pageId, $user);
       if($issue == null) throw new AuthenticationException('No issue found');
     }
+    /** @var BoardRoleRepository $boardRoleRepository */
+    $boardRoleRepository = $this->manager->getRepository(BoardRole::class);
+    $boardRights = $boardRoleRepository->getUserRights($user, $issue->getBoard());
+    if($boardRights == null || !$boardRights->isShareEnabled() || !$boardRights->isActive() || $boardRights->isDeleted())
+      throw new AuthenticationException('No rights found');
 
     $rights = $this->getUserRights($user, $issue);
 

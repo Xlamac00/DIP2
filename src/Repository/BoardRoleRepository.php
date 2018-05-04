@@ -47,12 +47,18 @@ class BoardRoleRepository extends ServiceEntityRepository {
    */
   public function getUserBoardsAndFavorite($user) {
     $roles = $this->getUserBoards($user);
+    $boards = array();
     $favorite = array();
-    foreach ($roles as $role) { // filter only favorite boards
-      if ($role->isFavorite())
-        $favorite[] = $role;
+    // get users right to board
+    foreach($roles as $role) {
+      if($role->getRights() !== null && $role->getRights() !== Board::ROLE_VOID
+        && $role->isActive() === true && !$role->isDeleted()) {
+        $boards[] = $role;
+        if ($role->isFavorite())
+          $favorite[] = $role;
+      }
     }
-    return ['boards' => $roles, 'favorite' => $favorite];
+    return ['boards' => $boards, 'favorite' => $favorite];
   }
 
   /** Returns the rights the User have on this Board.

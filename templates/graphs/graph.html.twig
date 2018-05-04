@@ -9,8 +9,8 @@
         data: {
             labels: [
                 {% for gauge in gauges %}
-                '{{ gauge.name }}',
-                {#'{{ gauge.bindUserName }}',#}
+                {#'{{ gauge.name }}',#}
+                '{{ gauge.bindUserName }}',
                 {% endfor %}
             ],
             datasets: [{
@@ -29,11 +29,11 @@
                     '{{ gauge.color }}',
                     {% endfor %}
                 ],
-                {#name: [#}
-                    {#{% for gauge in gauges %}#}
-                    {#'{{ gauge.name }}',#}
-                    {#{% endfor %}#}
-                {#],#}
+                label: [
+                    {% for gauge in gauges %}
+                    '{{ gauge.name }}',
+                    {% endfor %}
+                ],
                 borderWidth: 1
             }]
         },
