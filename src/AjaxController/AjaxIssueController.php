@@ -361,6 +361,66 @@ class AjaxIssueController extends Controller {
   }
 
   /**
+   * @Route("/tesd", name="tesd")
+   * @param Request $request - ajax Request
+   * @return null|JsonResponse
+   */
+  public function tesd(Request $request) {
+      $gauge_id = '31';
+      $issue_id = '29';
+
+      /** @var GaugeRepository $gaugeRepository */
+      $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
+      $gauge = $gaugeRepository->getGauge($gauge_id);
+
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->remove($gauge);
+      $entityManager->flush();
+
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
+      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
+      $issueRepository->updateGaugesIndex();
+
+      if($issue->getThisUserRights()->getRights() == Issue::ROLE_GAUGE) {
+        /** @var GaugeRepository $gaugeRepository */
+        $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
+        $gaugeEdit = $gaugeRepository->getBoundGauges($issue, $this->getUser());
+      }
+      else $gaugeEdit = array_fill(0, 4, 1);
+
+      /** @var GaugeChangesRepository $gaugeChangesRepository */
+      $gaugeChangesRepository = $this->getDoctrine()->getRepository(GaugeChanges::class);
+      $changes = $gaugeChangesRepository->getAllChangesForIssue($issue->getId());
+      $gaugeCount = $issueRepository->getNumberOfGauges();
+
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $select = $this->renderView('issue/deadlinesSelect.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
+      $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
+      $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $tab = $this->renderView('issue/editGaugeTab.html.twig',
+        ['gauges' => $issue->getGauges(), 'gaugeEdit' => $gaugeEdit, 'canWrite' => $issue->canUserWrite()]);
+      $comments = $this->renderView('issue/commentsTab.html.twig',['changes' => $changes]);
+
+      $arrData =
+        ['type' => 'gaugeDelete',
+         'labels' => $labels,
+         'colors' => $colors,
+         'values' => $values,
+         'comments' => $comments,
+         'deadlines' => $list,
+         'select' => $select,
+         'gaugeCount' => $gaugeCount,
+         'tab' => $tab];
+      return new JsonResponse($arrData);
+  }
+
+  /**
    * @Route("/ajax/issueGaugeDelete", name="issue_ajax_gaugeDelete")
    * @param Request $request - ajax Request
    * @return null|JsonResponse

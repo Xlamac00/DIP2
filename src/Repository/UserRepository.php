@@ -60,8 +60,9 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
   public function findUserByNameAndEmail($partOfName, $partOfEmail) {
     $qb = $this->createQueryBuilder('u')
       ->andWhere('u.isActive = 1')
-      ->andWhere('u.email IS NOT NULL')
-      ->andWhere('u.email LIKE :mail AND u.username LIKE :name')
+      ->andWhere('u.email IS NOT NULL or u.anonymousEmail IS NOT NULL')
+      ->andWhere('u.email LIKE :mail or u.anonymousEmail LIKE :mail')
+      ->andWhere('u.username LIKE :name')
       ->setParameter('name', '%'.$partOfName.'%')
       ->setParameter('mail', $partOfEmail.'%')
       ->getQuery();
@@ -130,15 +131,18 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
   public function findUsersBySubstring($substring) {
     $qb = $this->createQueryBuilder('u')
       ->andWhere('u.isActive = 1')
-      ->andWhere('u.email IS NOT NULL')
-      ->andWhere('u.email LIKE :string OR u.username LIKE :string')
+      ->andWhere('u.email IS NOT NULL OR u.anonymousEmail  IS NOT NULL')
+      ->andWhere('u.email LIKE :string OR u.username LIKE :string OR u.anonymousEmail LIKE :string')
       ->setParameter('string', '%'.$substring.'%')
       ->getQuery();
     $users = $qb->execute();
     $result = array();
     /** @var User $user */
     foreach($users as $user) {
-      $mail = explode('@', $user->getEmail());
+      if($user->getEmail() === null)
+        $mail = explode('@', $user->getAnonymousEmail());
+      else
+        $mail = explode('@', $user->getEmail());
       $email = $mail[0]."@ ... ";
       $result[] = strtolower($user->getUsername())." (".$email.")";
     }

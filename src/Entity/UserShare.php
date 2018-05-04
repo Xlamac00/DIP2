@@ -35,7 +35,7 @@ class UserShare  extends AbstractBasicRoleEntity {
 
   /**
    * @ORM\ManyToOne(targetEntity="Gauge")
-   * @ORM\JoinColumn(name="id_gauge", referencedColumnName="id", nullable=true)
+   * @ORM\JoinColumn(name="id_gauge", referencedColumnName="id", nullable=true, onDelete="SET NULL")
    */
   private $gauge;
 

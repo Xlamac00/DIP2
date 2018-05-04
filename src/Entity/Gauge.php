@@ -31,7 +31,7 @@ class Gauge {
 
   /**
    * @var User $userEdit
-   * @ORM\ManyToOne(targetEntity="User", cascade={"remove"})
+   * @ORM\ManyToOne(targetEntity="User")
    * @ORM\JoinColumn(name="id_user", referencedColumnName="id")
    */
   private $userEdit;
@@ -56,6 +56,16 @@ class Gauge {
   public function getBindUserName() {
     if($this->userEdit instanceof  User)
       return $this->userEdit->getUsername();
+    else return '';
+  }
+
+  public function getBindUserMail() {
+    if($this->userEdit instanceof  User) {
+      if($this->userEdit->isAnonymous() && $this->userEdit->getAnonymousEmail() !== null)
+        return explode('@', $this->userEdit->getAnonymousEmail())[0]."@...";
+      else
+        return $this->userEdit->getUsername();
+    }
     else return '';
   }
 
