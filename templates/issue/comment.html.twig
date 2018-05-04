@@ -1,9 +1,9 @@
 
 <div class="media mb-3">
-    <span title="{{ change.user.username }}" class="ml-1 mr-3">
+    <span title="{{ change.user.username }}" class="ml-1 mr-3 mt-2">
         {{ include('user/user-icon.html.twig', {'user': change.user, 'size': 'big'}) }}
     </span>
-    <div class="media-body mb-3">
+    <div class="media-body">
         <div class="d-flex justify-content-between">
             <span style="color: {{ change.gauge.color }}">{{ change.gauge.name }}: {{ change.oldValue }}
                 <i class="fas fa-angle-right"></i> <b>{{ change.value }}</b> %</span>

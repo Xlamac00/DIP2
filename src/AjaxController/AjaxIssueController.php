@@ -808,7 +808,7 @@ class AjaxIssueController extends Controller {
           $notification->setCreator($this->getUser());
           $notification->setUser($user);
           $notification->setUrl($issue->getUrl());
-          $notification->setText($this->getUser()->getUsername().' bound you <br>to task <b>'.$gauge->getName().'</b>');
+          $notification->setText($this->getUser()->getUsername().' gave you <br>task <b>'.$gauge->getName().'</b>');
           $entityManager = $this->getDoctrine()->getManager();
           $entityManager->persist($notification);
           $entityManager->flush();

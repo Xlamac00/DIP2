@@ -58,6 +58,7 @@ h1 {
 }
 
 .my-primary-dark { background-color: #008ba3; }
+.color-user { color: #ebebeb; }
 
 .bg-ad1457 { background-color: #ad1457; }
 .bg-008ba3 { background-color: #008ba3; }
@@ -192,7 +193,7 @@ h1 {
     display: inline-block;
     z-index: 1;
     width: 30px;
-    height: 30px;
+    height: 32px;
     position: relative;
     top: 2px;
     left: 3px;

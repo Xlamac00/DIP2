@@ -18,7 +18,7 @@
     </div>
 {% elseif user.isAnonymous %}
     <div class="mr-1 p-0 user-portrait float-left" title="{{ user.username }}">
-        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }} text-light position-absolute"></i>
+        <i class="fas fa-2x fa-user-circle user-image-anonymous-{{ size }} position-absolute color-user"></i>
         <div class="user-image-anonymous-bg-{{ size }} m-0 mr-1 p-0" style="background-color: {{ user.color }}"></div>
     </div>
 {% else %}
