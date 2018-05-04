@@ -191,17 +191,21 @@ h1 {
 .user-image-anonymous-bg-small {
     display: inline-block;
     z-index: 1;
-    width: 32px;
-    height: 32px;
-    margin: 2px;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    top: 2px;
+    left: 3px;
     border-radius: 999em;
 }
 .user-image-anonymous-bg-big {
     display: inline-block;
     z-index: 1;
-    width: 37px;
-    height: 37px;
-    margin: 2px;
+    width: 36px;
+    height: 34px;
+    position: relative;
+    top: 5px;
+    left: 2px;
     border-radius: 999em;
 }
 .user-image-anonymous-small {
