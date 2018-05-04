@@ -12,14 +12,16 @@
 {% block stylesheets %}
     {{  parent() }}
     <script src="{{ asset('build/chart.js') }}"></script>
-    {% if issue.canUserWrite %}
+    {% if issue.canUserEditGauge %}
         <script src="{{ asset('build/chart-resizable.js') }}"></script>
+        <script src="{{ asset('build/typeahead.js') }}"></script>
+    {% endif %}
+    {% if issue.canUserManage %}
         <script src="{{ asset('build/datepickerjs.js') }}"></script>
+        <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
     {% endif %}
     <script src="{{ asset('build/issue.js') }}"></script>
     <script src="{{ asset('build/sharing.js') }}"></script>
-    <script src="{{ asset('build/typeahead.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
     <script>
         var options = {
             scales: {
@@ -37,11 +39,20 @@
                 }]
             },
             hover: {
-                {% if issue.canUserWrite %}
+                {% if issue.canUserEditGauge %}
                     onHover: function(e, el) {
                         var chart = document.getElementById("animatedChart");
-                        if(typeof el[0] === 'object')
-                            chart.style.cursor = "ns-resize";
+                        if(typeof el[0] === 'object') {
+                            {% if issue.canUserWrite %}
+                                chart.style.cursor = "ns-resize";
+                            {% else %} // if user has right only to some of the gauges
+                              // get element with all rights and check users rights to this gauge
+                              if(document.getElementById('gaugeRights').childNodes[el[0]._index].dataset.rights === '1')
+                                  chart.style.cursor = "ns-resize";
+                              else
+                                  chart.style.cursor = "not-allowed";
+                            {% endif %}
+                        }
                         else
                             chart.style.cursor = "default";
                     }
@@ -83,11 +94,6 @@
                                     data-toggle="tooltip" data-placement="bottom" title="Add a new task">
                                 <i class="fas fa-2x fa-plus"></i>
                             </button>
-                            <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownDeadlineNew"
-                                    value="{{ gaugeCount }}"
-                                    data-toggle="tooltip" data-placement="bottom" title="Manage deadlines">
-                                <i class="fas fa-2x fa-stopwatch"></i>
-                            </button>
                         {% elseif issue.thisuserrights.rights is constant('App\\Entity\\Issue::ROLE_WRITE')
                              and issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
                             <span class="startTooltip" data-toggle="tooltip"
@@ -96,6 +102,13 @@
                                     <i class="fas fa-2x fa-plus"></i>
                                 </button>
                             </span>
+                        {% endif %}
+                        {% if issue.canUserManage %}
+                            <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownDeadlineNew"
+                                    value="{{ gaugeCount }}"
+                                    data-toggle="tooltip" data-placement="bottom" title="Manage deadlines">
+                                <i class="fas fa-2x fa-stopwatch"></i>
+                            </button>
                         {% endif %}
                         {% if issue.canUserManage
                             or (issue.canUserRead
@@ -121,7 +134,7 @@
                                 </div>
                             </div>
                         {% endif %}
-                        {% if issue.canUserWrite %}
+                        {% if issue.canUserManage %}
                             <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
                                   data-placement="bottom" title="Settings">
                                 <div class="dropdown mx-2">
@@ -132,13 +145,16 @@
                                     <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
                                          aria-labelledby="gaugeEditBtn" >
                                         <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
-                                        {% if issue.canUserManage %}
-                                            <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
-                                        {% endif %}
+                                        <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
                                         <a class="dropdown-item pointer" id="dropdownRemindersBtn">Reminders</a>
                                     </div>
                                 </div>
                             </span>
+                        {% elseif issue.canUserEditGauge %}
+                            <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownGaugeBtn"
+                                    data-toggle="tooltip" data-placement="bottom" title="Edit tasks">
+                                <i class="fas fa-2x fa-edit"></i>
+                            </button>
                         {% endif %}
                     </div>
                 </div>
@@ -181,4 +197,5 @@
             {{ include('issue/tips.html.twig', {'tips': tips}) }}
         {% endif %}
     </main>
+    <div id="gaugeRights">{% for gauge in gaugeEdit %}<span data-rights="{{ gauge }}"></span>{% endfor %}</div>
 {% endblock %}

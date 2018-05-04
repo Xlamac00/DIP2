@@ -200,7 +200,7 @@ class AjaxShareController extends Controller {
         ->setTo($email)
         ->setBody(
           '<h2>Hello,</h2> '.$owner->getUsername().' ( '.$owner->getEmail().' )'
-          .' wants to share an Project with you.'
+          .' wants to share a project with you. Click on the link to start!'
           .'<p><h3>'.$entity->getName().'</h3>'
           .'<a href="https://xlamac00-dip.herokuapp.com/'.$shareLink.'" target="_blank">'.$shareLink.'</a></p>', // Its not an error!
           'text/html'

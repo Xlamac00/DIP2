@@ -17,6 +17,12 @@ $(document).ready(function() {
     }
     initCanvasListeners(canvas);
 
+    // gets rights to edit individual Gauges
+    var gaugeRights = [];
+    document.getElementById('gaugeRights').childNodes.forEach(function(item){
+        gaugeRights.push(item.dataset.rights === '1');
+    });
+
     /** *****************************************************************************************************
      * ************************************* RESIZABLE CHART FUNCTIONS ************************************ *
      ***************************************************************************************************** **/
@@ -81,7 +87,8 @@ $(document).ready(function() {
     // of original bar to draw the old line
     function chartMouseDownEvent(offsetX, offsetY, touchScreen) {
         var bar = wasClickedOnBar(offsetX, offsetY, touchScreen);
-        if (bar !== false && commentActive === false) {
+        // check if user has rights to edit this gauge
+        if (bar !== false && commentActive === false && gaugeRights[bar] === true) {
             var coords = getChartMetaData().data[bar]._model;
             changeActive = true;
             changeBar = bar;
@@ -221,6 +228,10 @@ $(document).ready(function() {
                     var input = $('.gaugeEditText :focus');
                     updateGaugeName(input.parent().parent().get(0), input.parent().get(0).id.substr(1), '');
                 }
+                else if ($('.gaugeEditOwnerInput').is(':focus')) {// dialog to add gauge editor
+                    var focused = $(':focus');
+                    ajaxInviteUserToGauge(focused[0].id.substr(1), focused[0].value);
+                }
             }
             else if (document.getElementById('IssueDeadlinesSection').style.display === 'block') { // creating new
                 // deadline
@@ -247,7 +258,9 @@ $(document).ready(function() {
       */
     function hideAddNewGaugesBtn(count) {
         if(typeof count === 'undefined') { //get count of gauges set by the controller
-            count =  document.getElementById('gaugeAddNewBtn').value;
+            var button = document.getElementById('gaugeAddNewBtn');
+            if(button === null) return;
+            count = button.value;
         }
         if(count <= 0) { // there are no gauges, show create new dialog
             hideAllSections(false);
@@ -388,6 +401,7 @@ $(document).ready(function() {
     function showEditGauge() {
         hideAllSections();
         ajaxGetGaugesInfo();
+        $('#dropdownGaugeBtn').blur();
     }
 
     /** Displays section with issue edit options
@@ -460,12 +474,14 @@ $(document).ready(function() {
     }
 
     var settingsBtn = document.getElementById('gaugeEditBtn');
-    settingsBtn.onclick = function () {
-        $('#settingsTooltip').tooltip('dispose');
-    };
-    settingsBtn.onblur = function () {
-        $('#settingsTooltip').tooltip('enable');
-    };
+    if(settingsBtn !== null) {
+        settingsBtn.onclick = function () {
+            $('#settingsTooltip').tooltip('dispose');
+        };
+        settingsBtn.onblur = function () {
+            $('#settingsTooltip').tooltip('enable');
+        };
+    }
 
     /** *****************************************************************************************************
      * ******************************************** AJAX CALLS ******************************************** *
@@ -708,7 +724,89 @@ $(document).ready(function() {
                 this.parentNode.parentNode.classList.add('d-none');
             }
         });
+        $('.gaugeEditOwnerInput').focusin(function () {
+            this.classList.add('border-secondary');
+            this.classList.remove('border-muted');
+            this.parentNode.getElementsByClassName('text-success')[0].classList.add('d-inline-flex');
+        });
+        $('.gaugeEditOwnerInput').focusout(function () {
+            ajaxInviteUserToGauge(this.id.substr(1), this.value);
+        });
+        $('.gaugeEditOwnerInput').typeahead({
+            // data source - ajax query to user names
+            source: function (query, process) {
+                $.ajax({
+                    url: '/ajax/autocompleteUsername',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "input": query
+                    },
+                    async: true,
+                    success: function (data) {
+                        // document.getElementById(name+"InviteBtn").style.display = 'block';
+                        return process(data.result);
+                    }
+                });
+            },
+            // default template
+            menu: '<ul class="typeahead dropdown-menu" role="listbox"></ul>',
+            item: '<li><a class="dropdown-item" href="#" role="option"></a></li>',
+            headerHtml: '<li class="dropdown-header"></li>',
+            headerDivider: '<li class="divider" role="separator"></li>',
+            itemContentSelector:'a',
+            minLength: 2, // min length to trigger the suggestion list
+            scrollHeight: 0, // number of pixels the scrollable parent container scrolled down
+            autoSelect: true,// auto selects the first item
+            afterSelect: $.noop,  // callbacks
+            afterEmptySelect: $.noop,
+            addItem: false, // adds an item to the end of the list
+            delay: 0  // delay between lookups
+        });
         initDraggableEntityRows();
+    }
+
+    var oldUser = null;
+    function ajaxInviteUserToGauge(gaugeId, userName) {
+        var input = document.getElementById("u"+gaugeId);
+        if(userName !== oldUser || userName.length === 0) {
+            var loading = document.getElementById("gaugeEditLoading"+gaugeId);
+            loading.className = 'd-inline-flex';
+            input.parentNode.getElementsByClassName('text-success')[0].classList.remove('d-inline-flex');
+            $.ajax({
+                url: "/ajax/issueInviteGauge",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "issueId": document.getElementById('issueId').value,
+                    "gaugeId": gaugeId,
+                    "userName": userName
+                },
+                async: true,
+                success: function (data) {
+                    console.log(data);
+                    input.classList.remove('border-secondary');
+                    input.classList.add('border-muted');
+                    input.value = data.user;
+                    oldUser = data.user;
+                    input.blur();
+                    loading.className = 'd-none';
+                    // if(loading !== null) loading.parentNode.removeChild(loading);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown ) {
+                    console.log(textStatus+","+errorThrown);
+                    input.classList.remove('border-secondary');
+                    input.classList.add('border-muted');
+                    input.blur();
+                    loading.className = 'd-none';
+                }
+            });
+        }
+        else {
+            input.parentNode.getElementsByClassName('text-success')[0].classList.remove('d-inline-flex');
+            input.classList.remove('border-secondary');
+            input.classList.add('border-muted');
+        }
     }
 
     function updateGaugeName(parent, gaugeId, oldName) {
@@ -839,29 +937,6 @@ $(document).ready(function() {
             }
         });
     }
-
-    // function ajaxGetOneGaugeInfo() {
-    //     $.ajax({
-    //         url: "/ajax/issueOneGauge",
-    //         type: "POST",
-    //         dataType: "json",
-    //         data: {
-    //             "gaugeId": this.name
-    //         },
-    //         async: true,
-    //         success: function (data) {
-    //             hideAllSections();
-    //             var section = document.getElementById('gaugeEditOneSection');
-    //             section.style.display = 'block'; // make gauge edit section visible
-    //             section.innerHTML = data.render;
-    //             $('.gaugeEdit').blur();
-    //             $('.gaugeCloseBtn').click(hideCurrentSection); //bind action to close btn
-    //             $('#gaugeEditOneSection #gaugeAddNewSaveBtn').click(ajaxUpdateGauge); //bind action to close btn
-    //             var text = document.getElementById('gaugeAddNewName'+data.id);
-    //             text.focus();
-    //         }
-    //     });
-    // }
 
     function ajaxSendQuestion() {
         $.ajax({

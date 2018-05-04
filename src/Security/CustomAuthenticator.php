@@ -45,7 +45,7 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
    */
   public function getCredentials(Request $request) {
     $uri = $request->server->get('REQUEST_URI');
-    preg_match('/\/[i,b,u]\/[0-9A-z]{8}\//', $uri, $matches); // get page id from url
+    preg_match('/\/[i,b,u,g]\/[0-9A-z]{8}\//', $uri, $matches); // get page id from url
     return array(
       'clientId' => $request->cookies->get('clientId'),
       'googleId' => $request->cookies->get('googleId'),
@@ -98,6 +98,11 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
       $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
+    else if($credentials['pageType'] === 'g') { // shared link for specific user for only one gauge
+      $role = $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user,true);
+      $user->setPagePermission($credentials['pageId'], $role);
+      return true;
+    }
     else
       return true;
   }
@@ -126,7 +131,7 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   }
 
   public function start(Request $request, AuthenticationException $authException = null) {
-    die('chyba aut');
+//    die('chyba aut');
     new RedirectResponse('/custom-authenticator-error');
   }
 

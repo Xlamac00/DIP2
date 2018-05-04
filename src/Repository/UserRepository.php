@@ -42,13 +42,6 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
   public function loadUserByGoogleId($googleId) {
     if(!isset($this->user) || $this->user->getGoogleId() != $googleId)
       $this->user = $this->findOneBy(["googleId" => $googleId]);
-    // TODO smazat - pouze prechodne obdobi!
-    /** @var TipsRepository $tipsRepository */
-    $tipsRepository = $this->manager->getRepository(Tips::class);
-    if(!$tipsRepository->tipExists('reminders', $this->user->getAnonymousLink())) {
-      $this->createAnonymousTips($this->user);
-      $this->createLoggedTips($this->user);
-    }
     if($this->user instanceof User)
       return $this->user;
     else
@@ -85,6 +78,17 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
   public function findUserByEmail($email) {
     /** @var User $user */
     $user = $this->findOneBy(["email" => $email]);
+    return $user;
+  }
+
+  /** Returns user which has exactly same name as $username.
+   *
+   * @param string $username
+   * @return User - with exactly same name, no more, no less
+   */
+  public function findUserByName($username) {
+    /** @var User $user */
+    $user = $this->findOneBy(["name" => $username]);
     return $user;
   }
 

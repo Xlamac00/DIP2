@@ -12,6 +12,7 @@ abstract class AbstractSharableEntity extends AbstractLinkableEntity {
   const ROLE_ANON = 'ROLE_ISSUE_ANONWRITE';
   const ROLE_ADMIN = 'ROLE_ISSUE_ADMIN';
   const ROLE_VOID = 'ROLE_ISSUE_NOTHING';
+  const ROLE_GAUGE = 'ROLE_ISSUE_GAUGE';
 
   public function __construct() {
     $this->shareEnabled = true;
@@ -93,7 +94,17 @@ abstract class AbstractSharableEntity extends AbstractLinkableEntity {
       $this->userRights->isShareEnabled() &&
       !$this->userRights->isDeleted() &&
       in_array($this->userRights->getRights(),
-         [Board::ROLE_ADMIN, Board::ROLE_WRITE, Board::ROLE_ANON, Board::ROLE_READ]);
+         [Board::ROLE_ADMIN, Board::ROLE_WRITE, Board::ROLE_ANON, Board::ROLE_READ, Board::ROLE_GAUGE]);
+  }
+
+  public function canUserEditGauge() {
+    if($this->canUserManage() === true) return true; // if he can manage, he can read as well
+    return
+      $this->userRights->isActive() &&
+      $this->userRights->isShareEnabled() &&
+      !$this->userRights->isDeleted() &&
+      in_array($this->userRights->getRights(),
+        [Board::ROLE_ADMIN, Board::ROLE_WRITE, Board::ROLE_ANON, Board::ROLE_GAUGE]);
   }
 
   public function canUserWrite() {

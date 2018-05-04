@@ -29,6 +29,13 @@ class Gauge {
    */
   private $issue;
 
+  /**
+   * @var User $userEdit
+   * @ORM\ManyToOne(targetEntity="User", cascade={"remove"})
+   * @ORM\JoinColumn(name="id_user", referencedColumnName="id")
+   */
+  private $userEdit;
+
   public function getIssue() {
     return $this->issue;
   }
@@ -37,28 +44,40 @@ class Gauge {
     $this->issue = $issue_id;
   }
 
-/**
- * @ORM\OneToMany(targetEntity="GaugeChanges", mappedBy="gauge")
- */
+  /** @param User $user */
+  public function bindUserToGauge($user) {
+    $this->userEdit = $user;
+  }
+
+  public function hasBindUser() {
+    return $this->userEdit !== null;
+  }
+
+  public function getBindUserName() {
+    if($this->userEdit instanceof  User)
+      return $this->userEdit->getUsername();
+    else return '';
+  }
+
+  /**
+   * @ORM\OneToMany(targetEntity="GaugeChanges", mappedBy="gauge")
+   */
   private $changes;
 
-/**
- * @return Collection|GaugeChanges[]
- */
-public function getChanges()  {
-  return $this->changes;
-}
+  /**
+   * @return Collection|GaugeChanges[]
+   */
+  public function getChanges()  {
+    return $this->changes;
+  }
 
   /**
    * @ORM\Column(type="string", length=100)
    */
   private $name;
 
-  //  /** @var  string - short version of the name */
-  //  private $short_name;
-
   /**
-   * @ORM\Column(type="string", length=100)
+   * @ORM\Column(type="string", length=16)
    */
   private $color;
 

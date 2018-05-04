@@ -37,6 +37,11 @@ Encore
     .addEntry('arrow-top', './assets/img/arrow_top.png')
     .addEntry('arrow-bottom', './assets/img/arrow_bottom.png')
     .addEntry('arrow-top-right', './assets/img/arrow_top_right.png')
+    .addEntry('slide1a', './assets/img/slide_1a.jpeg')
+    .addEntry('slide1b', './assets/img/slide_1b.gif')
+    .addEntry('slide2a', './assets/img/slide_2a.jpeg')
+    .addEntry('slide2b', './assets/img/slide_2b.gif')
+    .addEntry('slide3', './assets/img/slide_3.jpeg')
 
     .createSharedEntry('vendor', [
         './assets/js/bootstrap.bundle.min.js',

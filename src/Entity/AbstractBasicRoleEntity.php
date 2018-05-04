@@ -57,6 +57,9 @@ abstract class AbstractBasicRoleEntity {
       case 'read':
       case AbstractSharableEntity::ROLE_READ:
         $role = AbstractSharableEntity::ROLE_READ; break;
+      case 'gauge':
+      case AbstractSharableEntity::ROLE_GAUGE:
+        $role = AbstractSharableEntity::ROLE_GAUGE; break;
       case 'void':
       case AbstractSharableEntity::ROLE_VOID:
       default:

@@ -20,6 +20,10 @@
                             (role.rights is constant('App\\Entity\\Board::ROLE_WRITE') and role.user.isAnonymous == 1))
                             and (role.isBoardHistory != 1 or role.isShareEnabled == 1) %}selected{% endif %}>
                         Can view</option>
+                    {% if role.rights is constant('App\\Entity\\Board::ROLE_GAUGE') %}
+                        <option value="{{ constant('App\\Entity\\Board::ROLE_GAUGE') }}" selected>
+                            Limited editing</option>
+                    {% endif %}
                     <option value="{{ constant('App\\Entity\\Board::ROLE_VOID') }}"
                             {% if role.isActive != 1 or (role.isShareEnabled != 1 and role.isBoardHistory == 1)
                             %}selected{%

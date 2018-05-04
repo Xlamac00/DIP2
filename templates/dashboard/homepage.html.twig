@@ -14,51 +14,46 @@
     <main role="main" class="col-xl-12">
         <h1 class="text-center d-none d-sm-block mt-3">Manage your tasks easily!</h1>
         {% if is_granted('ROLE_ANONYMOUS') and boards|length == 0 %}
-            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <div id="carouselExampleIndicators" data-ride="carousel"
+                 class="carousel slide border border-secondary rounded bg-white mt-5">
                 <ol class="carousel-indicators">
                     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                 </ol>
-                <div class="carousel-inner">
+                <div class="carousel-inner text-center">
                     <div class="carousel-item active">
-                        <div class="d-block w-100 bg-dark" style="height: 300px">
+                        <div class="w-100">
+                            <img src="{{ asset('build/images/slide_1a.b13fd862.jpeg') }}" height="300px">
+                            <img src="{{ asset('build/images/slide_1b.2144ad2b.gif') }}"  height="300px">
                         </div>
                     </div>
                     <div class="carousel-item">
-                        <div class="d-block w-100 bg-secondary" style="height: 300px">
+                        <div class="w-100">
+                            <img src="{{ asset('build/images/slide_2b.6da492d9.gif') }}"  height="300px">
+                            <img src="{{ asset('build/images/slide_2a.0ac2d0ff.jpeg') }}" height="300px">
                         </div>
                     </div>
                     <div class="carousel-item">
-                        <div class="d-block w-100 bg-light" style="height: 300px">
-                        </div>
+                        <img src="{{ asset('build/images/slide_3.7f4cd889.jpeg') }}" height="300px" >
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
+                    <i class="fas fa-2x fa-chevron-left text-dark"></i>
                 </a>
                 <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
+                    <i class="fas fa-2x fa-chevron-right text-dark"></i>
                 </a>
             </div>
-            <div class="text-center row mt-4">
-                <div class="col-sm-6">
+            <div class="text-center  mt-4">
+                <div class="mt-5">
                     <h2 class="text-secondary">Sign in for free</h2>
                     <p>To create your own projects</p>
                     <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google'}) }}">
                         <img src="{{ asset('build/images/signin_normal.696c081a.png') }}">
                     </a>
                 </div>
-                <div class="col-sm-6" style="white-space: nowrap;">
-                    <div class="border border-right-0 border-top-0 border-bottom-0 border-secondary float-left
-                    d-none d-sm-block position-relative" style="left: -13px; ">
-                        <div class="jumbotron bg-white m-0 px-0">
-                            <h4 class="position-relative rounded-circle p-2 bg-white"
-                                style="right: 50%">Or</h4>
-                        </div>
-                    </div>
+                <div class="d-md-none" style="white-space: nowrap;">
                     <div class="border border-left-0 border-right-0 border-bottom-0 border-secondary
                     d-sm-none mt-5">
                         <div class="bg-white">

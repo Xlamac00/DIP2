@@ -38,13 +38,14 @@ class IssueRepository extends AbstractSharableEntityRepository {
    *
    * @param string $link
    * @param User   $user
+   * @param boolean $loadDetails
    * @return Issue
    */
-  public function getIssueByLink($link, $user) {
+  public function getIssueByLink($link, $user, $loadDetails = true) {
     if(!isset($this->issue)) {
       $this->issue = $this->findOneBy(["linkId" => $link]);
       if($this->issue === null) return null;
-      $this->loadIssue($user);
+      if($loadDetails === true) $this->loadIssue($user);
     }
     return $this->issue;
   }
@@ -59,10 +60,13 @@ class IssueRepository extends AbstractSharableEntityRepository {
     return $issue->getId();
   }
 
+  /**
+   * @param User $user
+   */
   private function loadIssue($user) {
     /** @var IssueRoleRepository $issueRoleRepository */
     $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
-    $rights = $issueRoleRepository->getUserRights($user, $this->issue);
+    $rights = $issueRoleRepository->getUsersRights($this->issue, $user);
     $this->issue->setThisUserRights($rights);
   }
 

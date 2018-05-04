@@ -13,7 +13,7 @@ class UserShare  extends AbstractBasicRoleEntity {
   /**
    * @ORM\Column(type="string", length=64)
    */
-  private $shareLink;
+  protected $shareLink;
 
   /**
    * @ORM\Column(type="datetime")
@@ -31,12 +31,28 @@ class UserShare  extends AbstractBasicRoleEntity {
   private $entity;
 
   /** @var  AbstractSharableEntity */
-  private $entityObject;
+  protected $entityObject;
+
+  /**
+   * @ORM\ManyToOne(targetEntity="Gauge")
+   * @ORM\JoinColumn(name="id_gauge", referencedColumnName="id", nullable=true)
+   */
+  private $gauge;
 
   public function setEmail($email) {
     $this->email = $email;
     $this->time = new \DateTime("now");
     $this->shareLink = md5($this->time->format('U').$this->email);
+    $this->gauge = null;
+  }
+
+  /** @param Gauge $gauge */
+  public function setGauge($gauge) {
+    $this->gauge = $gauge;
+  }
+
+  public function getGauge() {
+    return $this->gauge;
   }
 
   /**
@@ -52,7 +68,8 @@ class UserShare  extends AbstractBasicRoleEntity {
   }
 
   public function getUrl() {
-    return 'u/'.$this->entityObject->getPageId().'/'.$this->entityObject->getLink().'?'.$this->shareLink;
+    $start = $this->gauge === null ? 'u' : 'g';
+    return $start.'/'.$this->entityObject->getPageId().'/'.$this->entityObject->getLink().'?'.$this->shareLink;
   }
 
 }

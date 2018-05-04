@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\AbstractSharableEntity;
 use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\BoardShareHistory;
+use App\Entity\GaugeRole;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\IssueShareHistory;
@@ -46,14 +48,10 @@ class IssueRoleRepository extends ServiceEntityRepository {
     return $role;
   }
 
-  public function checkUsersRights($pageId, $userId, $googleId = null) {
+  /** @return IssueRole */
+  public function getUsersRights($pageId, $userId, $googleId = null) {
     if($userId instanceof User) {
       $user = $userId;
-//      if($userId->isAnonymous())
-//        $googleId = null;
-//      else
-//        $googleId = $userId->getGoogleId();
-//      $userId = $userId->getUniqueLink();
     }
     else {
       /** @var UserRepository $userRepository */
@@ -65,36 +63,36 @@ class IssueRoleRepository extends ServiceEntityRepository {
     }
     if($user == null) throw new AuthenticationException('No user found');
 
-    /** @var IssueRepository $issueRepository */
-    $issueRepository = $this->manager->getRepository(Issue::class);
-    $issue = $issueRepository->getIssueByLink($pageId, $user);
-    if($issue == null) throw new AuthenticationException('No issue found');
+    if($pageId instanceof Issue) {
+      $issue = $pageId;
+    }
+    else {
+      /** @var IssueRepository $issueRepository */
+      $issueRepository = $this->manager->getRepository(Issue::class);
+      $issue = $issueRepository->getIssueByLink($pageId, $user);
+      if($issue == null) throw new AuthenticationException('No issue found');
+    }
 
     $rights = $this->getUserRights($user, $issue);
-    if($rights == null || !$rights->isShareEnabled()) throw new AuthenticationException('No rights found');
-    return $rights->getRights();
-//    $qb = $this->createQueryBuilder('r')
-//      ->select('DISTINCT r.role')
-//      ->join('App\Entity\User', 'u')
-//      ->andWhere('r.user = u.id')
-//      ->join('App\Entity\Issue', 'i')
-//      ->andWhere('i.id = :pageId')
-//      ->andWhere('r.issue = i.id')
-//      ->setParameter('pageId', $pageId);
-//    // get user whether he is logged by google id or is anonymous
-//    if($googleId !== null && strlen($googleId) > 10)
-//      $q = $qb->andWhere('u.googleId = :userId')
-//              ->setParameter('userId', $googleId);
-//    else
-//      $q = $qb->andWhere('u.link = :userId')
-//        ->andWhere('u.googleId is null')
-//        ->setParameter('userId', $userId);
-//
-//    $result = $q->getQuery()->execute();
-//    die(sizeof($result)."A");
-//    if(sizeof($result) <= 0)
-//      throw new AuthenticationException('No rights found');
-//    return $result[0]['role'];
+
+    if($rights == null || !$rights->isShareEnabled() || !$rights->isActive() || $rights->isDeleted())
+      throw new AuthenticationException('No rights found');
+
+    // If user has only right to read, check if he can at least change one gauge
+    if($rights->getRights() === Issue::ROLE_READ) {
+      foreach($issue->getGauges() as $gauge) {
+        if($gauge->hasBindUser() && $gauge->getBindUserName() == $user->getUsername()) {
+          $rights->setRole(Issue::ROLE_GAUGE);
+          return $rights;
+        }
+      }
+    }
+
+    return $rights;
+  }
+
+  public function checkUsersRights($pageId, $userId, $googleId = null) {
+     return $this->getUsersRights($pageId, $userId, $googleId)->getRights();
   }
 
   /** Changes individuals user rights to this Issue.
@@ -123,6 +121,8 @@ class IssueRoleRepository extends ServiceEntityRepository {
       else
         $role = Board::ROLE_WRITE;
     }
+    elseif($newRights == Board::ROLE_GAUGE)
+      $role = Board::ROLE_READ;
     elseif($newRights == Board::ROLE_READ)
       $role = Board::ROLE_READ;
     elseif($newRights == Board::ROLE_VOID)

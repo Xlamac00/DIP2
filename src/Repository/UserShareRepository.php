@@ -1,12 +1,14 @@
 <?php
 
-
 namespace App\Repository;
+
 use App\Entity\Board;
 use App\Entity\BoardRole;
+use App\Entity\Gauge;
 use App\Entity\Issue;
 use App\Entity\IssueRole;
 use App\Entity\User;
+use App\Entity\UserGaugeShare;
 use App\Entity\UserShare;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -27,14 +29,16 @@ class UserShareRepository extends ServiceEntityRepository {
    * @param string $shareLink - 32 char long share link
    * @param string $pageId - 8 char long entity page id
    * @param UserInterface $user - current user viewing the page
+   * @param boolean $gauge - if the link is only for board/issue, or if its for specific gauge too
    *
    * @return string $shareRights
    */
-  public function checkShareLinkRights($shareLink, $pageId, $user) {
+  public function checkShareLinkRights($shareLink, $pageId, $user, $gauge = null) {
     /** @var UserShare $userShare */
     $userShare = $this->findOneBy(["entity" => $pageId, "shareLink" => $shareLink]);
-    if($userShare === null) // has not found anything
+    if($userShare === null) { // has not found anything
       throw new AuthenticationException('Invalid user link');
+    }
     if(!($user instanceof User))
       throw new AuthenticationException('Invalid user');
     if($user->getAnonymousEmail() === null) { // If the user is anonymous, pair his account with email which was shared
@@ -45,11 +49,19 @@ class UserShareRepository extends ServiceEntityRepository {
 
     /** @var IssueRepository $issueRepository */
     $issueRepository = $this->manager->getRepository(Issue::class);
-    $issue = $issueRepository->getIssueByLink($pageId, $user);
+    $issue = $issueRepository->getIssueByLink($pageId, $user, false);
     if($issue !== null) { // Its Issue - give user rights to view this issue
       /** @var IssueRoleRepository $issueRoleRepository */
       $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
       $issueRoleRepository->giveUserRightsToIssue($user, $issue, $userShare->getRights(), null, null);
+
+      if($gauge === true) { // the rights are for specific gauge, give user rights to edit it
+        /** @var GaugeRepository $gaugeRepository */
+        $gaugeRepository = $this->manager->getRepository(Gauge::class);
+        $g = $userShare->getGauge();
+        if($g !== null)
+          $gaugeRepository->bindUserWithGauge($g, $user);
+      }
     }
     else {
       /** @var BoardRepository $boardRepository */

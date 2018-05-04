@@ -16,6 +16,13 @@
                         <i class="fas fa-trash-alt text-secondary"></i>
                     </button>
                 </div>
+                <h5 class="hover-shown">
+                    {{ deadline.gaugeOwner }}
+                </h5>
+            {% else %}
+                <div class="float-right">
+                    <h5>{{ deadline.gaugeOwner }}</h5>
+                </div>
             {% endif %}
         </div>
         {% if deadline.text|length > 0 %}

@@ -118,6 +118,12 @@ class Deadline {
     else return 'issue';
   }
 
+  public function getGaugeOwner() {
+    if($this->gauge !== null)
+      return $this->gauge->getBindUserName();
+    else return '';
+  }
+
   public function getDaysLeft() {
     return ((new DateTime("now - 1 day"))->diff($this->end))->format('%a');
   }
