@@ -155,6 +155,7 @@ $(document).ready(function() {
     // One modal window to delete any Issue - on open insert issue name and id
     $('#modalEntityDuplicate').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
+        $('#modalDuplicateName').focus();
         if(button !== null) {
             var id = button.data('id');
             var color = button.data('color').substr(1);
@@ -167,7 +168,6 @@ $(document).ready(function() {
             weekStart: 1,
             todayHighlight: true
         });
-        document.getElementById('modalDuplicateName').focus();
     });
     var duplicateBoard = document.getElementById('modalDuplicateBtn');
     if(duplicateBoard !== null) {

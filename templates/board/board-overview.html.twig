@@ -10,10 +10,8 @@
     <script src="{{ asset('build/sharing.js') }}"></script>
     <script src="{{ asset('build/board.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
-    {% if board.canUserManage %}
-        <script src="{{ asset('build/datepickerjs.js') }}"></script>
-        <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
-    {% endif %}
+    <script src="{{ asset('build/datepickerjs.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
     <script>
         var options = {
             scales: {
@@ -112,6 +110,11 @@
                         {% else %}
                             <button class="btn-link dropdown-item pointer" data-target="#modalLeaveBoard"
                                     data-toggle="modal">Leave project</button>
+                            {% if not(is_granted('ROLE_ANONYMOUS')) %}
+                                <button class="btn-link dropdown-item pointer" data-target="#modalEntityDuplicate"
+                                        data-id="{{ board.id }}" data-color="{{ board.color }}"
+                                        data-toggle="modal">Duplicate project</button>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -155,6 +158,33 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="modal fade" id="modalLeaveBoard" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header {{ board.background }}">
+                                <h5 class="modal-title text-light">Leave {{ board.name }}</h5>
+                                <button type="button" class="close pointer" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Do you really want to leave this project?</p>
+                                <p class="text-secondary">You will loose the right to see/edit this project and all its
+                                    issues .</p>
+                                <p id="modalLeaveBoardLoading" class="d-none">
+                                    <i class="fas fa-spinner fa-spin"></i> Sending ...</p>
+                            </div>
+                            <div class="modal-footer d-flex justify-content-start">
+                                <button type="button" class="btn btn-warning pointer text-light"
+                                        id="modalLeaveBoardBtn">Leave</button>
+                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if not(is_granted('ROLE_ANONYMOUS')) %}
                 <div class="modal fade" id="modalEntityDuplicate" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -184,31 +214,6 @@
                                 <input type="hidden" id="modalDuplicateId" value="">
                                 <button type="button" class="btn btn-success pointer"
                                         id="modalDuplicateBtn">Duplicate</button>
-                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="modal fade" id="modalLeaveBoard" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header {{ board.background }}">
-                                <h5 class="modal-title text-light">Leave {{ board.name }}</h5>
-                                <button type="button" class="close pointer" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Do you really want to leave this project?</p>
-                                <p class="text-secondary">You will loose the right to see/edit this project and all its
-                                    issues .</p>
-                                <p id="modalLeaveBoardLoading" class="d-none">
-                                    <i class="fas fa-spinner fa-spin"></i> Sending ...</p>
-                            </div>
-                            <div class="modal-footer d-flex justify-content-start">
-                                <button type="button" class="btn btn-warning pointer text-light"
-                                        id="modalLeaveBoardBtn">Leave</button>
                                 <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
                             </div>
                         </div>

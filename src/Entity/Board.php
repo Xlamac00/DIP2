@@ -18,6 +18,7 @@ class Board extends AbstractSharableEntity {
     parent::__construct();
     $this->issues = new ArrayCollection();
     $this->favorite = false;
+    $this->archivedAt = null;
   }
 
   /**
@@ -86,6 +87,7 @@ class Board extends AbstractSharableEntity {
   }
 
   /**
+   * @var \DateTime
    * @ORM\Column(type="datetime", nullable=true)
    */
   private $deletedAt;
@@ -99,6 +101,7 @@ class Board extends AbstractSharableEntity {
   }
 
   /**
+   * @var \DateTime
    * @ORM\Column(type="datetime", nullable=true)
    */
   private $archivedAt;

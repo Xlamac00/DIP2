@@ -110,11 +110,12 @@
                                 <i class="fas fa-2x fa-stopwatch"></i>
                             </button>
                         {% endif %}
-                        {% if issue.canUserManage
+                        {% if not issue.board.isArchived
+                            (issue.canUserManage
                             or (issue.canUserRead
                                 and issue.isShareEnabled
                                  and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
-                            or ( issue.canUserWrite and issue.isShareEnabled)%}
+                            or ( issue.canUserWrite and issue.isShareEnabled)) %}
                             <span class="startTooltip" data-toggle="tooltip"
                                     data-placement="bottom" title="Share with other users">
                                 <button type="button" class="nobtn mx-2 pointer"

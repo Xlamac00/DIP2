@@ -49,6 +49,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
     $roles = $this->getUserBoards($user);
     $boards = array();
     $favorite = array();
+    $archived = array();
     // get users right to board
     foreach($roles as $role) {
       if($role->getRights() !== null && $role->getRights() !== Board::ROLE_VOID

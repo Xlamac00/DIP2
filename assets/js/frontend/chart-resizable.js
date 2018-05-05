@@ -89,6 +89,7 @@ $(document).ready(function() {
         var bar = wasClickedOnBar(offsetX, offsetY, touchScreen);
         // check if user has rights to edit this gauge
         if (bar !== false && commentActive === false && gaugeRights[bar] === true) {
+            console.log('mouse down');
             var coords = getChartMetaData().data[bar]._model;
             changeActive = true;
             changeBar = bar;
@@ -99,6 +100,7 @@ $(document).ready(function() {
             };
         }
         else {
+            console.log('mouser down false'+commentActive+";"+gaugeRights[bar]);
             changeActive = false;
             changeBar = false;
         }
@@ -116,15 +118,15 @@ $(document).ready(function() {
     function wasClickedOnBar(x, y, touchScreen) {
         for (var i = 0; i < getChartMetaData().data.length; i++) {
             var bar = getChartMetaData().data[i]._model;
-            console.log(y+","+(bar.y)+","+(bar.base));
             if (x > (bar.x - bar.width / 2) && x < (bar.x + bar.width / 2)) { // click on graph on X coords
                 var hitBox = 5;
                 if(touchScreen === true && (bar.base - bar.y) < 15) // using touch screen and graph is low
                     hitBox = 50;
-                if(y + hitBox > bar.y && y - 5 < bar.base)  // click on graph Y coords
+                if(y + hitBox > bar.y && y - 5 < bar.base) // click on graph Y coords
                     return i;
             }
         }
+        console.log('was not clicked on bar');
         return false;
     }
 
@@ -146,7 +148,6 @@ $(document).ready(function() {
         chart.destroy();
         $('#animatedChart').replaceWith('<canvas id="animatedChart" height="1" width="2"></canvas>');
         var ctx = $('#animatedChart').get(0).getContext("2d");
-        console.log(data);
         chart = new Chart(ctx, {
             type: 'bar',
             issueId: chart.config.issueId,
@@ -160,6 +161,13 @@ $(document).ready(function() {
             },
             options: options
         });
+        if(typeof data.gaugeRights !== 'undefined') {
+            gaugeRights = [];
+            data.gaugeRights.forEach(function (item) {
+                gaugeRights.push(item === 1);
+            });
+            console.log(gaugeRights);
+        }
 
         // Item was replaced, so all the events must be registered again
         var canvas = document.getElementById("animatedChart");

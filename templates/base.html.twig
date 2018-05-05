@@ -24,20 +24,22 @@
 {% block menu %}
     <header>
         <nav id="topNavBar" class="navbar navbar-expand-md navbar-dark fixed-top
-                    {% if board is defined %}{{ board.background }}{% else %}my-primary-dark{% endif %}">
+            {% if board is defined %}{% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}
+            {%  else  %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.05</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.06</a>
                 <div class="btn-group">
                     {% if board is defined %}
                         <a href="../../{{ board.url }}">
-                            <button class="btn menubtn text-light pointer {{ board.background }}"
+                            <button class="btn menubtn text-light pointer
+                                {% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}"
                                     id="navbarProjectNameBtn">
                                 {{ board.name }}
                             </button>
                         </a>
                         <button type="button" id="navbarProjectBtn" data-toggle="dropdown"
                                 class="d-none d-md-flex btn menubtn dropdown-toggle dropdown-toggle-split pointer
-                                text-light {{ board.background }}"
+                                text-light {% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}"
                                 aria-haspopup="true" aria-expanded="false">
                             <span class="sr-only"> Others</span>
                         </button>

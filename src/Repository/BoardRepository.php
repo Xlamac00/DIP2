@@ -37,7 +37,7 @@ class BoardRepository extends AbstractSharableEntityRepository {
   public function getBoard($boardId, $user = null, $forceLoad = false) {
     if(!isset($this->board) || $forceLoad === true) {
       if($forceLoad === true) $this->manager->clear();
-      $this->board = $this->find($boardId);
+      $this->board = $this->findOneBy(array('id' => $boardId));
       if($user !== null) //
         $this->loadBoard($user);
     }

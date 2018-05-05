@@ -22,21 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AjaxBoardController extends Controller {
 
-//  /**
-//   * @Route("/testb", name="testb")
-//   */
-//  public function testb(Request $request) {
-//      $name = 'Strašně dlouhý název pochybného projektu #2';
-//      $color = 'ad1457';
-//
-//      /** @var BoardRepository $boardRepository */
-//      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-//      $link = $boardRepository->createNewBoard($name, $color, $this->getUser());
-//
-//      $arrData = ['name' => $name, 'color' => $color, 'link' => $link];
-//      return new JsonResponse($arrData);
-//  }
-
   /**
    * @Route("/ajax/boardNew", name="boardNew")
    */
@@ -130,12 +115,10 @@ class AjaxBoardController extends Controller {
           $notification->setText($this->getUser()->getUsername().' archived <br>project <b>'.$board->getName().'</b>');
           $entityManager->persist($notification);
         }
-
-//        $role->setRole(Board::ROLE_READ);
-//        $entityManager->persist($role);
       }
 
       $board->archive();
+//      $board->setColor('#868e96');
       $entityManager->persist($board);
       $entityManager->flush();
 
@@ -160,40 +143,6 @@ class AjaxBoardController extends Controller {
       $arrData = ['render' => $render];
       return new JsonResponse($arrData);
     }
-  }
-
-  /**
-   * @Route("/teaa", name="teaa")
-   */
-  public function teaa() {
-      $boardId = 'c43caf39';
-
-      /** @var BoardRepository $boardRepository */
-      $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $board = $boardRepository->getBoardByLink($boardId, $this->getUser());
-
-      /** @var BoardRoleRepository $boardRoleRepository */
-      $boardRoleRepository = $this->getDoctrine()->getRepository(BoardRole::class);
-      $role = $boardRoleRepository->getUserRights($this->getUser(), $board);
-      if($role->isFavorite()) { // make not favorite
-        $role->makeFavorite(false);
-        $render = '';
-      }
-      else { // make it favorite
-        $role->makeFavorite(true);
-        /** @var BoardRepository $boardRepository */
-        $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-        $active = $boardRepository->getAllActiveUsers($board, 4);
-        $role->getBoard()->setActiveUsers($active);
-        $render = $this->renderView('dashboard/card-board.html.twig', ["role" => $role, 'section' => 'fav']);
-      }
-
-      $entityManager = $this->getDoctrine()->getManager();
-      $entityManager->persist($role);
-      $entityManager->flush();
-
-      $arrData = ['board' => $boardId, 'isFavorite' => $role->isFavorite(), 'render' => $render];
-      return new JsonResponse($arrData);
   }
 
   /**
@@ -246,7 +195,7 @@ class AjaxBoardController extends Controller {
       $entityManager = $this->getDoctrine()->getManager();
       /** @var BoardRepository $boardRepository */
       $boardRepository = $this->getDoctrine()->getRepository(Board::class);
-      $board = $boardRepository->getBoard($boardId, $this->getUser());
+      $board = $boardRepository->getBoard($boardId);
 
       // create new board
       $copy = new Board();
@@ -265,9 +214,10 @@ class AjaxBoardController extends Controller {
         if($right->isShareEnabled() && $right->isActive() && !$right->isDeleted()) {
           $newRight = new BoardRole();
           $newRight->setBoard($copy);
-          $newRight->setRole($right->getRights());
+          $dbRight = $boardRoleRepository->getUserRights($right->getUser(), $board);
+          $newRight->setRole($dbRight->getRights());
           $newRight->setUser($right->getUser());
-          $newRight->setBoardHistory($right->getBoardHistory());
+          $newRight->setBoardHistory(null);
           $entityManager->persist($newRight);
 
           $notification = new Notification();

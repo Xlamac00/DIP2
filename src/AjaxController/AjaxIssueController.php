@@ -233,6 +233,13 @@ class AjaxIssueController extends Controller {
       $issue = $issueRepository->getIssue($issueId, $this->getUser());
       $gaugeCount = $issueRepository->getNumberOfGauges();
 
+      if($issue->getThisUserRights()->getRights() == Issue::ROLE_GAUGE) {
+        /** @var GaugeRepository $gaugeRepository */
+        $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
+        $gaugeEdit = $gaugeRepository->getBoundGauges($issue, $this->getUser());
+      }
+      else $gaugeEdit = array_fill(0, $gaugeCount, 1);
+
       /** @var DeadlineRepository $deadlineRepository */
       $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
       $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
@@ -251,6 +258,7 @@ class AjaxIssueController extends Controller {
          'deadlines' => $list,
          'names' => $names,
          'select' => $select,
+         'gaugeRights' => $gaugeEdit,
          'gaugeCount' => $gaugeCount];
       return new JsonResponse($arrData);
     } else return null;
@@ -312,6 +320,7 @@ class AjaxIssueController extends Controller {
          'deadlines' => $list,
          'names' => $names,
          'select' => $select,
+         'gaugeRights' => $gaugeEdit,
          'comments' => $comments,
          'tab' => $tab];
       return new JsonResponse($arrData);
@@ -422,6 +431,7 @@ class AjaxIssueController extends Controller {
          'deadlines' => $list,
          'names' => $names,
          'select' => $select,
+         'gaugeRights' => $gaugeEdit,
          'gaugeCount' => $gaugeCount,
          'tab' => $tab];
       return new JsonResponse($arrData);
@@ -466,6 +476,7 @@ class AjaxIssueController extends Controller {
          'colors' => $colors,
          'values' => $values,
          'names' => $names,
+         'gaugeRights' => $gaugeEdit,
          'tab' => $tab];
       return new JsonResponse($arrData);
     } else return null;
