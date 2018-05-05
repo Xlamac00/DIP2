@@ -83,6 +83,12 @@ class IssueRoleRepository extends ServiceEntityRepository {
     if($rights == null || !$rights->isShareEnabled() || !$rights->isActive() || $rights->isDeleted())
       throw new AuthenticationException('No rights found');
 
+    // if Board is archived, return only rights to see it
+    if($boardRights->getBoard()->isArchived()) {
+      $rights->setRole(Issue::ROLE_READ);
+      return $rights;
+    }
+
     // If user has only right to read, check if he can at least change one gauge
     if($rights->getRights() === Issue::ROLE_READ) {
       foreach($issue->getGauges() as $gauge) {

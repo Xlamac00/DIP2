@@ -76,7 +76,8 @@
                 <input type="hidden" id="boardId" value="{{ board.id }}">
             </h1>
             <div class="float-right row">
-                {% if board.canUserManage or (board.isShareEnabled and board.thisuserrights.boardhistory is not null) %}
+                {% if not board.isArchived
+                    and (board.canUserManage or (board.isShareEnabled and board.thisuserrights.boardhistory is not null)) %}
                     <span class="startTooltip mt-3" data-toggle="tooltip"
                           data-placement="bottom" title="Share with other users">
                         <button class="nobtn pointer" type="button" data-toggle="modal"
@@ -99,12 +100,12 @@
                                     data-toggle="modal" data-target="#modalNewBoard">Edit project</button>
                             <button class="btn-link dropdown-item pointer" data-target="#modalEntityDelete"
                                     data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="project"
-                                    data-color="{{ board.color }}" data-toggle="modal">Delete
-                                project</button>
+                                    data-color="{{ board.color }}" data-toggle="modal" data-operation="delete">
+                                Delete project</button>
                             <button class="btn-link dropdown-item pointer" data-target="#modalEntityDelete"
-                                    data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="project"
-                                    data-color="{{ board.color }}" data-toggle="modal">Archive
-                                project</button>
+                                    data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="archive"
+                                    data-color="{{ board.color }}" data-operation="archive" data-toggle="modal">
+                                Archive project</button>
                             <button class="btn-link dropdown-item pointer" data-target="#modalEntityDuplicate"
                                     data-id="{{ board.id }}" data-color="{{ board.color }}"
                                     data-toggle="modal">Duplicate project</button>
@@ -121,7 +122,7 @@
                 {% if issue.canUserRead %}
                     <div class="col-md-4 p-0 m-0 mb-4">
                         <div class="card" id="issue-{{ issue.pageId }}">
-                            {{ include('board/issue-card.html.twig', { 'issue': issue}) }}
+                            {{ include('board/issue-card.html.twig', { 'issue': issue, 'isArchived': board.isArchived}) }}
                         </div>
                     </div>
                 {% endif %}

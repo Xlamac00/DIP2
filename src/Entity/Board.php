@@ -99,6 +99,26 @@ class Board extends AbstractSharableEntity {
   }
 
   /**
+   * @ORM\Column(type="datetime", nullable=true)
+   */
+  private $archivedAt;
+
+  public function archive() {
+    $this->archivedAt = new \DateTime("now");
+  }
+
+  public function isArchived() {
+    return $this->archivedAt !== null;
+  }
+
+  public function getArchivedTime() {
+    if($this->archivedAt === null)
+      return '';
+    else
+      return $this->archivedAt->format('M Y');
+  }
+
+  /**
    * @param array $usersArray
    */
   public function setActiveUsers($usersArray) {

@@ -82,14 +82,23 @@ $(document).ready(function() {
         var id = button.data('id');
         var type = button.data('type');
         var color = button.data('color');
+        var operation = button.data('operation');
         var modal = $(this);
         var header = document.getElementById('modalEntityDeleteHeader');
         header.className = 'modal-header text-white bg-'+color.substr(1);
-        modal.find('.modal-title').text('Delete ' + name);
-        modal.find('#modalDeleteQuestion').text('Do you really want to delete ' + name + '?');
+        if(operation === 'delete') {
+            modal.find('.modal-title').text('Delete ' + name);
+            modal.find('#modalDeleteQuestion').text('Do you really want to delete ' + name + '?');
+            document.getElementById('modalEntityDeleteBtn').innerHTML = 'Delete ' + type;
+        }
+        else if(operation === 'archive') {
+            modal.find('.modal-title').text('Archive ' + name);
+            document.getElementById('modalDeleteQuestion').innerHTML = 'Do you really want to archive ' + name + '?<br>' +
+                '<p class="text-secondary">Archived project can still be seen, but cannot be edited.</p>';
+            document.getElementById('modalEntityDeleteBtn').innerHTML = 'Archive project';
+        }
         document.getElementById('modalIssueDeleteId').value = id;
         document.getElementById('modalEntityDeleteType').value = type;
-        document.getElementById('modalEntityDeleteBtn').innerHTML = 'Delete ' + type;
     });
     var deleteEntity = document.getElementById('modalEntityDeleteBtn');
     if(deleteEntity !== null) {
@@ -104,12 +113,9 @@ $(document).ready(function() {
                         url: '/ajax/boardDelete',
                         type: "POST",
                         dataType: "json",
-                        data: {
-                            "board": link
-                        },
+                        data: { "board": link },
                         async: true,
-                        success: function (data) {
-                            console.log(data);
+                        success: function () {
                             location.href = '../../dashboard';
                         }
                     });
@@ -119,15 +125,27 @@ $(document).ready(function() {
                         url: '/ajax/issueDelete',
                         type: "POST",
                         dataType: "json",
-                        data: {
-                            "value1": link
-                        },
+                        data: { "value1": link },
                         async: true,
                         success: function (data) {
                             document.getElementById('issueCard'+data.link+'NormalSection').className = 'd-none';
                             document.getElementById('issueCard'+data.link+'DeletedSection').className = 'd-block';
                             $('#modalEntityDelete').modal('hide');
                             loading.className = "d-none";
+                        }
+                    });
+                }
+                else if(type === 'archive') {
+                    console.log('archiving'+link);
+                    $.ajax({
+                        url: '/ajax/boardArchive',
+                        type: "POST",
+                        dataType: "json",
+                        data: { "board": link },
+                        async: true,
+                        success: function (data) {
+                            console.log(data);
+                            location.href = '../../dashboard';
                         }
                     });
                 }

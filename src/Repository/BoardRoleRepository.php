@@ -53,12 +53,16 @@ class BoardRoleRepository extends ServiceEntityRepository {
     foreach($roles as $role) {
       if($role->getRights() !== null && $role->getRights() !== Board::ROLE_VOID
         && $role->isActive() === true && !$role->isDeleted()) {
-        $boards[] = $role;
-        if ($role->isFavorite())
-          $favorite[] = $role;
+        if($role->getBoard()->isArchived())
+          $archived[] = $role;
+        else {
+          $boards[] = $role;
+          if ($role->isFavorite())
+            $favorite[] = $role;
+        }
       }
     }
-    return ['boards' => $boards, 'favorite' => $favorite];
+    return ['boards' => $boards, 'favorite' => $favorite, 'archived' => $archived];
   }
 
   /** Returns the rights the User have on this Board.
@@ -227,9 +231,9 @@ class BoardRoleRepository extends ServiceEntityRepository {
    * @param string|User $userId - either User entity or 20+ char unique user link
    * @param string|null $googleId - either null for anonymous user or google id
    *
-   * @return $role - one of the constants set in the Board entity
+   * @return BoardRole - one of the constants set in the Board entity
    */
-  public function checkUsersRights($boardId, $userId, $googleId = null) {
+  public function getUsersRights($boardId, $userId, $googleId = null) {
     if($userId instanceof User) {
       $user = $userId;
     }
@@ -244,7 +248,9 @@ class BoardRoleRepository extends ServiceEntityRepository {
 
     /** @var BoardRepository $boardRepository */
     $boardRepository = $this->manager->getRepository(Board::class);
-    if(strlen($boardId) == 8)
+    if($boardId instanceof Board)
+      $board = $boardId;
+    else if(strlen($boardId) == 8)
       $board = $boardRepository->getBoardByLink($boardId, $user);
     else
       $board = $boardRepository->getBoard($boardId, $user);
@@ -258,7 +264,16 @@ class BoardRoleRepository extends ServiceEntityRepository {
     if($rights->isDeleted() || !$rights->isActive())
       throw new AuthenticationException('User deleted');
 
-    return $rights->getRights();
+    // Board is archived, return only read rights
+    if($board->isArchived()) {
+      $rights->setRole(Board::ROLE_READ);
+    }
+
+    return $rights;
+  }
+
+  public function checkUsersRights($boardId, $userId, $googleId = null) {
+    return $this->getUsersRights($boardId, $userId, $googleId)->getRights();
   }
 
   /** Checks if the board has set the share link and if the link is ok.

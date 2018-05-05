@@ -25,7 +25,7 @@ class DashboardController extends Controller {
     $boardRole = $this->getDoctrine()->getRepository(BoardRole::class);
     /** @var BoardRole[][] $boards */
     $boards = $boardRole->getUserBoardsAndFavorite($this->getUser());
-    if(sizeof($boards['boards']) == 0) { // user has nothing yet
+    if(sizeof($boards['boards']) == 0 && sizeof($boards['archived']) == 0) { // user has nothing yet
       return $this->showDefaultHomepage();
     }
     elseif(sizeof($boards['boards']) == 1 or sizeof($boards['favorite']) == 1) {
@@ -56,12 +56,9 @@ class DashboardController extends Controller {
     $boardRole = $this->getDoctrine()->getRepository(BoardRole::class);
     /** @var BoardRole[][] $boards */
     $boards = $boardRole->getUserBoardsAndFavorite($this->getUser());
-    if(sizeof($boards['boards']) == 0) { // user has nothing yet
+    if(sizeof($boards['boards']) == 0 && sizeof($boards['archived']) == 0) { // user has nothing yet
       return $this->showDefaultHomepage();
     }
-//    elseif(sizeof($boards['boards']) == 1) {
-//      return $this->showSingleBoard($boards['boards'][0]);
-//    }
     else { // user has more than one board
       return $this->showMoreBoards($boards);
     }
@@ -77,7 +74,8 @@ class DashboardController extends Controller {
     $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
     $notifications = $notificationRepository->getUnreadNotifications($user);
     return $this->render('dashboard/homepage.html.twig',
-      ['boards' => '', 'favorite' => [], 'tips' => $tips, 'notifications' => $notifications]);
+      ['boards' => '', 'favorite' => [], 'tips' => $tips,
+       'notifications' => $notifications, 'archived' => []]);
   }
 
   /** @param BoardRole $board */
@@ -98,7 +96,8 @@ class DashboardController extends Controller {
     $notificationRepository = $this->getDoctrine()->getRepository(Notification::class);
     $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
     return $this->render('dashboard/homepage.html.twig',
-      ['boards' => $boards['boards'], 'favorite' => $boards['favorite'], 'notifications' => $notifications]);
+      ['boards' => $boards['boards'], 'favorite' => $boards['favorite'],
+       'notifications' => $notifications, 'archived' => $boards['archived']]);
 
   }
 }

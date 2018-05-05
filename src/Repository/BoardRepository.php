@@ -71,7 +71,7 @@ class BoardRepository extends AbstractSharableEntityRepository {
     /** @var BoardRoleRepository $boardRoleRepository */
     $boardRoleRepository = $this->manager->getRepository(BoardRole::class);
 //    $this->board->setAllUsers($boardRoleRepository->getBoardUsers($this->board->getId()));
-    $right = $boardRoleRepository->getUserRights($user, $this->board);
+    $right = $boardRoleRepository->getUsersRights($this->board, $user);
     $this->board->setThisUserRights($right);
     /** @var IssueRoleRepository $issueRoleRepository */
     $issueRoleRepository = $this->manager->getRepository(IssueRole::class);

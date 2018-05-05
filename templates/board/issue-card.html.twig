@@ -1,29 +1,30 @@
 
 <div id="issueCard{{ issue.pageId }}NormalSection" class="d-block">
-    <div class="card-header clearfix bg-white pr-1 pb-0">
+    <div class="card-header clearfix pr-1 pb-0 {% if isArchived %}bg-muted{% else %}bg-white{% endif %}">
         <h5 class="float-left text-dark mt-1"
             style="max-width: {% if issue.activeUsers|length > 1 %}60%{% else %}75%{% endif %}">
-            <a href="../../{{ issue.url }}" title="{{ issue.name }}" class="overflow-text">{{ issue.name }}</a></h5>
+            <a href="../../{{ issue.url }}" title="{{ issue.name }}"
+               class="overflow-text {% if isArchived %}text-dark{% endif %}">{{ issue.name }}</a></h5>
         <div class="dropdown float-right">
-
-            {% if issue.canUserManage
+            {% if not isArchived and
+                (issue.canUserManage
                 or (issue.canUserRead
                     and issue.isShareEnabled
                     and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
-                or ( issue.canUserWrite and issue.isShareEnabled)%}
+                or ( issue.canUserWrite and issue.isShareEnabled))%}
                 <button type="button" class="nobtn float-right text-dark mt-1 pointer"
                         id="dropdownCard{{ issue.link }}"
                         data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
                     <i class="fas fa-ellipsis-v text-dark mx-2"></i>
                 </button>
                 <div class="dropdown-menu my-dropdown dropdown-menu-right" aria-labelledby="dropdownCard{{ issue.link }}">
-                    {% if issue.isShareEnabled or issue.canUserManage %}
+                    {% if issue.canUserManage or (issue.isShareEnabled and issue.thisuserrights.issuehistory is not null)%}
                         <button class="dropdown-item pointer issueShare btn-link px-3 py-1" data-id="{{ issue.pageId }}"
                                 data-toggle="modal" data-target="#modalIssueShare">Share</button>
                     {% endif %}
                     {% if issue.canUserManage %}
                         <button class="dropdown-item pointer btn-link px-3 py-1" data-target="#modalEntityDelete"
-                                data-type="issue" data-color="#secondary"
+                                data-type="issue" data-color="#secondary" data-operation="delete"
                                 data-name="{{ issue.name }}" data-id="{{ issue.pageId }}" data-toggle="modal">
                             Delete issue</button>
                     {% endif %}
