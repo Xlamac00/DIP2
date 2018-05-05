@@ -134,13 +134,62 @@ $(document).ready(function() {
             }
         };
     }
+    // One modal window to delete any Issue - on open insert issue name and id
+    $('#modalEntityDuplicate').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        if(button !== null) {
+            var id = button.data('id');
+            var color = button.data('color').substr(1);
+            var header = document.getElementById('modalDuplicateHeader');
+            header.className = 'modal-header text-white bg-'+color;
+            document.getElementById('modalDuplicateId').value = id;
+        }
+        $('#modalDuplicateDate input').datepicker({
+            format: "dd/mm/yyyy",
+            weekStart: 1,
+            todayHighlight: true
+        });
+        document.getElementById('modalDuplicateName').focus();
+    });
+    var duplicateBoard = document.getElementById('modalDuplicateBtn');
+    if(duplicateBoard !== null) {
+        duplicateBoard.onclick = function () {
+            var boardId = document.getElementById('modalDuplicateId');
+            var name = document.getElementById('modalDuplicateName');
+            var start = document.getElementById('modalDuplicateStart');
+            var loading = document.getElementById('modalDuplicateLoading');
+            if(name.value.length <= 1) name.classList.add('is-invalid');
+            else name.classList.remove('is-invalid');
+            if(start.value.length <= 0) start.classList.add('is-invalid');
+            else start.classList.remove('is-invalid');
+            if(name.value.length > 0 && start.value.length > 0) {
+                console.log(name.value+","+boardId.value+";"+start.value);
+                loading.className = 'd-block';
+                $.ajax({
+                    url: '/ajax/boardDuplicate',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "board": boardId.value,
+                        "name": name.value,
+                        "start": start.value
+                    },
+                    async: true,
+                    success: function (data) {
+                        console.log(data);
+                        loading.className = '';
+                        location.href = '../../'+data.url;
+                    }
+                });
+            }
+        };
+    }
     var leaveBoard = document.getElementById('modalLeaveBoardBtn');
     if(leaveBoard !== null) {
         leaveBoard.onclick = function () {
             var board = document.getElementById('boardId');
             var loading = document.getElementById('modalLeaveBoardLoading');
             loading.className = 'd-block';
-            console.log('click');
             $.ajax({
                 url: '/ajax/boardRemoveCurrentUser',
                 type: "POST",

@@ -124,6 +124,11 @@ class Deadline {
     else return '';
   }
 
+  /** @return Gauge */
+  public function getGauge() {
+    return $this->gauge;
+  }
+
   public function getDaysLeft() {
     return ((new DateTime("now - 1 day"))->diff($this->end))->format('%a');
   }
@@ -133,6 +138,10 @@ class Deadline {
     $now = (new DateTime("now - 1 day"))->diff($this->end)->format('%a');
     if($total == 0) return 100;
     return 100-(($now*100)/$total);
+  }
+
+  public function getDuration() {
+    return (($this->start)->diff($this->end))->format('%a');
   }
 
   /** @return Issue */

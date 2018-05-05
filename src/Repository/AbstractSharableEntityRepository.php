@@ -7,6 +7,7 @@ use App\Entity\Board;
 use App\Entity\IssueShareHistory;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -25,6 +26,22 @@ abstract class AbstractSharableEntityRepository extends ServiceEntityRepository 
     parent::__construct($registry, $class);
     $this->registry = $registry;
     $this->manager = $registry->getManager();
+  }
+
+  /** Generates links for new Entity.
+   *
+   * @param AbstractSharableEntity $entity
+   */
+  public function generateShareLink($entity) {
+    while(1) { // try generating random strings
+      try{
+        $entity->generateLinks();
+        return;
+      }
+      catch (UniqueConstraintViolationException $e) { //random string was not unique! (probably never gonna happen)
+        continue;
+      }
+    }
   }
 
   /** Checks if $user has admin rights to edit $entity.

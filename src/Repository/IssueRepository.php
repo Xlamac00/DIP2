@@ -121,17 +121,8 @@ class IssueRepository extends AbstractSharableEntityRepository {
       $issue->setShareRights(Board::ROLE_READ);
       $issue->setShareEnabled(false);
     }
-    while(1) { // try generating random strings
-      try{
-        $issue->generateLinks();
-        $this->manager->persist($issue);
-        $this->manager->flush();
-        break;
-      }
-      catch (UniqueConstraintViolationException $e) { //random string was not unique! (probably never gonna happen)
-        continue;
-      }
-    }
+    $this->generateShareLink($issue);
+    $this->manager->persist($issue);
 
     /** @var BoardRoleRepository $boardRole */
     $boardRole = $this->registry->getRepository(BoardRole::class);
@@ -164,7 +155,6 @@ class IssueRepository extends AbstractSharableEntityRepository {
     $admin->setIssue($issue);
     $admin->setUser($currentUser);
     $this->manager->persist($admin);
-    $this->manager->flush();
 
     // create new empty reminder setting
     $reminder = new Reminder();

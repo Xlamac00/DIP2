@@ -30,7 +30,7 @@ Encore
     .addStyleEntry('bootstrap', './assets/css/bootstrap.min.css')
     .addStyleEntry('tips-style', './assets/css/tips.css')
 
-    .addEntry('favicon', './assets/img/favicon.ico')
+    .addEntry('favicon', './assets/img/graph.ico')
     .addEntry('google-login', './assets/img/signin_normal.png')
     .addEntry('arrow-left', './assets/img/arrow_left.png')
     .addEntry('arrow-right', './assets/img/arrow_right.png')

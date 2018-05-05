@@ -93,6 +93,11 @@ class IssueRoleRepository extends ServiceEntityRepository {
       }
     }
 
+    // if user(/issue) has rights to write, but user is only anonymous, give him rights to read only
+    // (should have anonwrite rights!
+    if($rights->getRights() === Issue::ROLE_WRITE && $user->isAnonymous())
+      $rights->setRole(Issue::ROLE_READ);
+
     return $rights;
   }
 

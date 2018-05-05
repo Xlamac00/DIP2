@@ -40,6 +40,17 @@ class GaugeRepository extends ServiceEntityRepository  {
     return $gauge;
   }
 
+  /** Returns all Gauges in Issue
+   * @param Issue $issue - issue
+   *
+   * @return Gauge[]
+   */
+  public function getGaugesInIssue($issue) {
+    /** @var Gauge[] $gauge */
+    $gauge = $this->findBy(['issue' => $issue->getId()]);
+    return $gauge;
+  }
+
   /** Returns if the Issue and User has set rights only for one-gauge-edit.
    * If return true, user has ISSUE_ROLE_GAUGE role, else IssueRole rights have to be checked.
    * @param Issue $issue
@@ -102,6 +113,21 @@ class GaugeRepository extends ServiceEntityRepository  {
     $this->manager->persist($change);
     $this->manager->flush();
     return $change->getId();
+  }
+
+  /** Initiates new Gauge to value 1.
+   * Used only when creating new Gauge.
+   *
+   * @param Gauge $gauge
+   * @param User $user
+   */
+  public function gaugeValueInit($gauge, $user) {
+    $change = new GaugeChanges();
+    $change->setGauge($gauge);
+    $change->setValues(1);
+    $change->setUser($user);
+    $this->manager->persist($change);
+    $this->manager->flush();
   }
 
   public function changeGaugeName($newName) {

@@ -10,6 +10,10 @@
     <script src="{{ asset('build/sharing.js') }}"></script>
     <script src="{{ asset('build/board.js') }}"></script>
     <script src="{{ asset('build/typeahead.js') }}"></script>
+    {% if board.canUserManage %}
+        <script src="{{ asset('build/datepickerjs.js') }}"></script>
+        <link rel="stylesheet" href="{{ asset('build/datepicker.css') }}" />
+    {% endif %}
     <script>
         var options = {
             scales: {
@@ -97,6 +101,13 @@
                                     data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="project"
                                     data-color="{{ board.color }}" data-toggle="modal">Delete
                                 project</button>
+                            <button class="btn-link dropdown-item pointer" data-target="#modalEntityDelete"
+                                    data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="project"
+                                    data-color="{{ board.color }}" data-toggle="modal">Archive
+                                project</button>
+                            <button class="btn-link dropdown-item pointer" data-target="#modalEntityDuplicate"
+                                    data-id="{{ board.id }}" data-color="{{ board.color }}"
+                                    data-toggle="modal">Duplicate project</button>
                         {% else %}
                             <button class="btn-link dropdown-item pointer" data-target="#modalLeaveBoard"
                                     data-toggle="modal">Leave project</button>
@@ -138,6 +149,40 @@
                                 <input type="hidden" id="modalEntityDeleteType" value="">
                                 <button type="button" class="btn btn-danger pointer"
                                         id="modalEntityDeleteBtn">Delete</button>
+                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="modalEntityDuplicate" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header" id="modalDuplicateHeader">
+                                <h5 class="modal-title">Duplicate {{ board.name }}</h5>
+                                <button type="button" class="close pointer" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Will create the same project with same issues, users and deadlines, but with all
+                                    tasks starting at 0%.</p>
+                                <label for="modalDuplicateName" class="mb-0">Select new name:</label>
+                                <input type="text" placeholder="New project name"
+                                       class="form-control mb-3" id="modalDuplicateName">
+                                <label for="modalDuplicateStart" class="mb-0">Select starting date:</label>
+                                <div id="modalDuplicateDate">
+                                    <input type="text" class="form-control w-50"
+                                           placeholder="Project starting date" id="modalDuplicateStart">
+                                    <p class="text-secondary">All deadlines will start from
+                                        this day, but will have the duration of deadlines in this project.</p>
+                                </div>
+                                <p id="modalDuplicateLoading" class="d-none">
+                                    <i class="fas fa-spinner fa-spin"></i> Sending ...</p>
+                            </div>
+                            <div class="modal-footer d-flex justify-content-start">
+                                <input type="hidden" id="modalDuplicateId" value="">
+                                <button type="button" class="btn btn-success pointer"
+                                        id="modalDuplicateBtn">Duplicate</button>
                                 <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
                             </div>
                         </div>

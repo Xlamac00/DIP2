@@ -39,7 +39,7 @@
 
     <div class="bg-white card-img-top">
         {{ include('graphs/graph.html.twig', { 'gauges': issue.gauges,
-            'gauge_name': issue.link,
+            'gauge_name': issue.id,
             'issue_id': issue.id}) }}
     </div>
 

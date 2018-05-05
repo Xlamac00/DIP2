@@ -47,7 +47,6 @@ class DeadlineRepository extends ServiceEntityRepository {
    * @return Deadline[]
    */
   public function getDeadlinesForIssue($issue) {
-//    if(!isset($this->deadline)) {
       $qb = $this->createQueryBuilder('d')
         ->where('d.issue = :issue')
         ->andWhere('d.end > :yesterday')
@@ -56,7 +55,5 @@ class DeadlineRepository extends ServiceEntityRepository {
         ->orderBy('d.end', 'ASC')
         ->getQuery();
       return $qb->execute();
-//    }
-//    return $this->deadline;
   }
 }

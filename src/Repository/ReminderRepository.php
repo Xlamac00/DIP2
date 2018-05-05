@@ -18,8 +18,8 @@ class ReminderRepository extends ServiceEntityRepository {
     $this->registry = $registry;
   }
 
-  public function getReminderByIssue($issue) {
-    if(!isset($this->reminder)) {
+  public function getReminderByIssue($issue, $forceFind = false) {
+    if(!isset($this->reminder) || $forceFind === true) {
       $this->reminder = $this->findOneBy(["issue" => $issue]);
     }
     return $this->reminder;

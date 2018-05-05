@@ -144,18 +144,9 @@ class BoardRepository extends AbstractSharableEntityRepository {
     $board->setName($name);
     $board->setColor($color);
     $board->setShareEnabled(true);
-    $board->setShareRights(Board::ROLE_ANON);
-    while(1) { // try generating random strings
-      try{
-        $board->generateLinks();
-        $this->manager->persist($board);
-        $this->manager->flush();
-        break;
-      }
-      catch (UniqueConstraintViolationException $e) { //random string was not unique! (probably never gonna happen)
-        continue;
-      }
-    }
+    $board->setShareRights(Board::ROLE_READ);
+    $this->generateShareLink($board);
+    $this->manager->persist($board);
 
     // set current user as admin - he created this issue
     $admin = new BoardRole();
