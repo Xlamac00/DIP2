@@ -57,6 +57,11 @@ class User implements UserInterface, \Serializable {
    */
   private $isActive;
 
+  /**
+   * @ORM\Column(type="string", length=2)
+   */
+  private $language;
+
   /** Variables set in the authenticator if the user is granted permission to see certain pages.  */
   private $permissionPageId;
   private $permissionRole;
@@ -115,6 +120,12 @@ class User implements UserInterface, \Serializable {
   }
   public function getAnonymousEmail() {
     return $this->anonymousEmail;
+  }
+  public function setLanguage($lang) {
+    $this->language = $lang;
+  }
+  function getLanguage() {
+    return $this->language;
   }
 
   // Username is unique 20 char string

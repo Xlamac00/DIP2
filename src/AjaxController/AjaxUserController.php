@@ -43,6 +43,22 @@ class AjaxUserController extends Controller {
   }
 
   /**
+   * @Route("/ajax/userLanguageChange", name="user_language_change")
+   */
+  public function changeLanguage(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $lang = $request->request->get('language');
+
+      /** @var UserRepository $userRepository */
+      $userRepository = $this->getDoctrine()->getRepository(User::class);
+      $userRepository->changeLanguage($this->getUser(), $lang);
+
+      $arrData = ['success' => $this->getUser()->getId().",".$lang];
+      return new JsonResponse($arrData);
+    }
+  }
+
+  /**
    * @Route("/ajax/autocompleteUsername", name="ajax_autocomplete_username")
    */
   public function autocompleteUsername(Request $request) {

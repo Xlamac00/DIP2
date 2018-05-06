@@ -90,6 +90,15 @@ class GaugeRepository extends ServiceEntityRepository  {
     return $result;
   }
 
+  /** Returns all Gauges bound to the given User
+   * @param User $user
+   * @return Gauge[]
+   */
+  public function getUserGauges($user) {
+    $gauges = $this->findBy(array('userEdit' => $user->getId()));
+    return $gauges;
+  }
+
   public function setGauge($gauge) {
     $this->gauge = $gauge;
   }

@@ -57,6 +57,7 @@ $(document).ready(function() {
                 async: true
             });
             hideAllTips(element);
+            $('.tipsHideForever').tooltip('dispose');
             container.onclick = null;
         });
     }

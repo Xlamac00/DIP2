@@ -1,1 +1,40 @@
-Home: Home
+# Titles
+my_deadlines: My deadlines
+my_projects: My projects
+fav_projects: Favorite projects
+arch_projects: Archived projects
+new_project: Create new project
+notifications: Notifications
+project_title: Manage your tasks easily!
+
+# Navigation bar
+language: Language
+login_google: Login with Google
+logout: Logout
+title_changeUser: Change user name
+show_deadlines: Show my deadlines
+no_notifications: You have no new notifications!
+others: Others
+projects: Projects
+
+# General messages
+created: Created
+displayed: Displayed
+close: Close
+or: Or
+loading: Loading data ...
+
+# User
+userlist_title: Number of changes done by this user in this
+userlist_head: Users contributing to this
+changes: Changes
+username: Username
+checklist_noMail: - no email address!
+checklist_noMailMsg: User has no email defined - will only receive in-app notification
+click_enable: click to enable/disable
+
+# Dashboard
+signin_msg: Sign in for free
+create_own_projects: To create your own projects
+get_invited1: Get invited
+get_invited2: By your friends

@@ -255,6 +255,7 @@ class IssueRepository extends AbstractSharableEntityRepository {
    * @param null $index - index with new position for the guage (starts from 0)
    */
   public function updateGaugesIndex($gauge_id = null, $index = null) {
+    if($index < 0) $index = 0;
     $i = 0;
     $manager = $this->getEntityManager();
     // gauges are ordered by position by default

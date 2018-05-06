@@ -27,7 +27,7 @@
             {% if board is defined %}{% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}
             {%  else  %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.06</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.07</a>
                 <div class="btn-group">
                     {% if board is defined %}
                         <a href="../../{{ board.url }}">
@@ -41,13 +41,13 @@
                                 class="d-none d-md-flex btn menubtn dropdown-toggle dropdown-toggle-split pointer
                                 text-light {% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}"
                                 aria-haspopup="true" aria-expanded="false">
-                            <span class="sr-only"> Others</span>
+                            <span class="sr-only"> {% trans %}others{% endtrans %}</span>
                         </button>
                     {% elseif not(is_granted('ROLE_ANONYMOUS')) or (boards is defined and boards|length > 0) %}
                         <button type="button" class="btn d-none d-md-block menubtn dropdown-toggle pointer text-light
                         my-primary-dark"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="navbarProjectBtn">
-                            Projects
+                            {% trans %}projects{% endtrans %}
                         </button>
                     {% endif %}
                     <div class="dropdown-menu" id="navbarProjectsBody"></div>

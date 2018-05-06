@@ -46,18 +46,22 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   public function getCredentials(Request $request) {
     $uri = $request->server->get('REQUEST_URI');
     preg_match('/\/[i,b,u,g]\/[0-9A-z]{8}\//', $uri, $matches); // get page id from url
+//    $prefered = $request->getPreferredLanguage();
+//    $lang = ($prefered == 'cs' || $prefered == 'cz') ? 'cz' : 'en';
     return array(
       'clientId' => $request->cookies->get('clientId'),
       'googleId' => $request->cookies->get('googleId'),
       'pageId' => sizeof($matches) > 0 ? substr($matches[0], 3, 8) : null,
       'pageType' => sizeof($matches) > 0 ? substr($matches[0], 1, 1) : null,
-      'shareLink' => key($request->query->all())
+      'shareLink' => key($request->query->all()),
+//      'language' => $lang
     );
   }
 
   public function getUser($credentials, UserProviderInterface $userProvider) {
     $userId = $credentials['clientId'];
     $googleId = $credentials['googleId'];
+//    $lang = $credentials['language'];
 
     if($userId === null) {
       $userId = uniqid('', true); // random user id
@@ -76,7 +80,7 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
         else
           return false;
       }
-      $user->setPagePermission($credentials['pageId'], $role);
+//      $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
     else if($credentials['pageType'] === 'b') { // board
@@ -90,17 +94,17 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
         else
           return false;
       }
-      $user->setPagePermission($credentials['pageId'], $role);
+//      $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
     else if($credentials['pageType'] === 'u') { // shared link for specific user
       $role = $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
-      $user->setPagePermission($credentials['pageId'], $role);
+//      $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
     else if($credentials['pageType'] === 'g') { // shared link for specific user for only one gauge
       $role = $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user,true);
-      $user->setPagePermission($credentials['pageId'], $role);
+//      $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
     else

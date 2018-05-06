@@ -282,7 +282,7 @@ class AjaxBoardController extends Controller {
           $gaugeRepository->gaugeValueInit($copyGauge, $this->getUser());
 
           // creates deadline for gauge
-          $deadline = $deadlineRepository->getDeadlineByIssue($issue->getId(), $gauge->getId());
+          $deadline = $deadlineRepository->getDeadlineByIssue($issue, $gauge);
           if($deadline !== null) {
             $newDeadline = new Deadline();
             $newDeadline->setText($deadline->getText());
@@ -297,7 +297,7 @@ class AjaxBoardController extends Controller {
         }
 
         //creates deadline for whole issue
-        $deadline = $deadlineRepository->getDeadlineByIssue($issue->getId(), null);
+        $deadline = $deadlineRepository->getDeadlineByIssue($issue, null);
         if($deadline !== null) {
           $newDeadline = new Deadline();
           $newDeadline->setText($deadline->getText());

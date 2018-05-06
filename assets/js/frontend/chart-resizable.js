@@ -241,6 +241,7 @@ $(document).ready(function() {
                 else if ($('.gaugeEditOwnerInput').is(':focus')) {// dialog to add gauge editor
                     var focused = $(':focus');
                     ajaxInviteUserToGauge(focused[0].id.substr(1), focused[0].value);
+                    focused.blur();
                 }
             }
             else if (document.getElementById('IssueDeadlinesSection').style.display === 'block') { // creating new
@@ -741,8 +742,9 @@ $(document).ready(function() {
             this.classList.remove('border-muted');
             this.parentNode.getElementsByClassName('text-success')[0].classList.add('d-inline-flex');
         });
-        $('.gaugeEditOwnerInput').focusout(function () {
-            ajaxInviteUserToGauge(this.id.substr(1), this.value);
+        $('.gaugeEditSend').click(function () {
+            var input = this.parentNode.childNodes[0];
+            ajaxInviteUserToGauge(input.id.substr(1), input.value);
         });
         $('.gaugeEditOwnerInput').typeahead({
             // data source - ajax query to user names
@@ -756,7 +758,6 @@ $(document).ready(function() {
                     },
                     async: true,
                     success: function (data) {
-                        // document.getElementById(name+"InviteBtn").style.display = 'block';
                         return process(data.result);
                     }
                 });
@@ -799,17 +800,22 @@ $(document).ready(function() {
                     replaceChart(data);
                     replaceDeadlineItems(data.list,null);
                     input.classList.remove('border-secondary');
-                    input.classList.add('border-muted');
                     input.value = data.user;
                     oldUser = data.user;
                     input.blur();
                     loading.className = 'd-none';
-                    // if(loading !== null) loading.parentNode.removeChild(loading);
+                    if(data.success === false)
+                        input.classList.add('border-danger');
+                    else {
+                        input.classList.remove('border-danger');
+                        input.classList.add('border-muted');
+                    }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown ) {
                     console.log(textStatus+","+errorThrown);
                     input.classList.remove('border-secondary');
                     input.classList.add('border-muted');
+                    input.classList.add('is-invalid');
                     input.blur();
                     loading.className = 'd-none';
                 }
@@ -818,6 +824,7 @@ $(document).ready(function() {
         else {
             input.parentNode.getElementsByClassName('text-success')[0].classList.remove('d-inline-flex');
             input.classList.remove('border-secondary');
+            input.classList.remove('border-danger');
             input.classList.add('border-muted');
         }
     }
@@ -992,20 +999,15 @@ $(document).ready(function() {
     //https://medium.com/@treetop1500/setting-up-a-sortable-drag-n-drop-interface-for-symfony-entities-7f0c84ac0c8e
     function initDraggableEntityRows() {
         var dragSrcEl = null; // the object being drug
-        var startPosition = null; // the index of the row element (0 through whatever)
-        var endPosition = null; // the index of the row element being dropped on (0 through whatever)
-        var parent; // the parent element of the dragged item
         var entityId; // the id (key) of the entity
 
         function handleDragStart(e) {
             try {
-            dragSrcEl = this;
-            entityId = $(this).attr('rel');
-            dragSrcEl.style.opacity = '0.6';
-            parent = dragSrcEl.parentNode;
-            startPosition = Array.prototype.indexOf.call(parent.children, dragSrcEl);
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML);
+                dragSrcEl = this.parentNode;
+                entityId = $(this).attr('rel');
+                dragSrcEl.style.opacity = '0.6';
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.parentNode.innerHTML);
             }
             catch(err) {
                 e.preventDefault();
@@ -1027,8 +1029,9 @@ $(document).ready(function() {
             if (e.stopPropagation) {
                 e.stopPropagation(); // stops the browser from redirecting.
             }
+            console.log(this);
             if (dragSrcEl !== this) {// Don't do anything if dropping the same column we're dragging.
-                endPosition = Array.prototype.indexOf.call(parent.children, this);
+                var endPosition = $(this).attr('data-position');
                 dragSrcEl.innerHTML = this.innerHTML;
                 hideAllSections(false);
                 $.ajax({
@@ -1052,7 +1055,7 @@ $(document).ready(function() {
         function handleDragEnd() {
             this.style.opacity = '1';  // this / e.target is the source node.
         }
-        var rows = document.querySelectorAll('div.sortable > div');
+        var rows = document.querySelectorAll('div.sortable > div div div');
         [].forEach.call(rows, function(row) {
             row.addEventListener('dragstart', handleDragStart, false);
             row.addEventListener('dragover', handleDragOver, false);

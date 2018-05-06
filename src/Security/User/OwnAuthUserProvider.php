@@ -2,8 +2,10 @@
 namespace App\Security\User;
 
 use App\Entity\BoardRole;
+use App\Entity\Gauge;
 use App\Entity\IssueRole;
 use App\Repository\BoardRoleRepository;
+use App\Repository\GaugeRepository;
 use App\Repository\IssueRoleRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -86,6 +88,21 @@ class OwnAuthUserProvider extends OAuthUserProvider {
             }
           }
         }
+      }
+
+      // Get all gauges bound to anon user and changes its owner to new google user
+      /** @var GaugeRepository $gaugeRepository */
+      $gaugeRepository = $this->manager->getRepository(Gauge::class);
+      $gauges = $gaugeRepository->getUserGauges($anonUser);
+      foreach ($gauges as $gauge) {
+        $gauge->bindUserToGauge($user);
+        $this->manager->persist($gauge);
+      }
+
+      // if anonymous user changed his language, change it too
+      if($anonUser->getLanguage() !== 'en' && $anonUser->getLanguage() !== $user->getLanguage()) {
+        $user->setLanguage($anonUser->getLanguage());
+        $this->manager->persist($user);
       }
       $this->manager->flush();
 

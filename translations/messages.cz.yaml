@@ -1,1 +1,5 @@
-Home: Domů
+# Navigation bar
+language: Jazyk
+login_google: Přihlásit s Google účtem
+logout: Odhlásit se
+my_deadlines: Moje úkoly

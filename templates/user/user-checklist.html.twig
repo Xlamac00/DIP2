@@ -9,8 +9,8 @@
 <input type="checkbox" id="userChecklist{{ role.user.id }}" value="{{ role.user.id }}" {% if check %}checked{% endif %}>
 {% if role.user.isAnonymous %}
     <label for="userChecklist{{ role.user.id }}"
-           title="{{ role.user.username }}{% if role.user.anonymousemail == '' %} - no email address!{% else %}: click
-            to enable/disable{% endif %}">
+           title="{{ role.user.username }}{% if role.user.anonymousemail == '' %}{% trans %}checklist_noMail{% endtrans
+           %}{% else %}: {% trans %}click_enable{% endtrans %}{% endif %}">
         <div class="mr-1 p-0 user-portrait float-left userChecklistAnonymous">
             <i class="fas fa-2x fa-user-circle user-image-anonymous-big position-absolute text-light"></i>
             <div class="user-image-anonymous-bg-big" style="background-color: {{ role.user.color }}"></div>
@@ -18,13 +18,13 @@
     </label>
     {% if role.user.anonymousemail == '' %}
         <div class="position-relative d-inline-block" style="left: -10px; z-index: 2;"
-             title="User has no email defined - will only receive in-app notification">
+             title="{% trans %}checklist_noMailMsg{% endtrans %}">
             <i class="fas fa-exclamation-triangle text-secondary question"></i>
         </div>
     {% endif %}
 {% else %}
     <label for="userChecklist{{ role.user.id }}" class="userChecklistLogged">
         <img src="{{ role.user.imagelink }}" class="mr-1 p-0 user-portrait user-image-google-big float-left"
-             title="{{ role.user.username }}: click to enable/disable">
+             title="{{ role.user.username }}: {% trans %}click_enable{% endtrans %}">
     </label>
 {% endif %}

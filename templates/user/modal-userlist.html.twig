@@ -2,21 +2,22 @@
 <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h4 class="modal-title" id="exampleModalLongTitle">{{ name }}</h4>
+            <h4 class="modal-title">{{ name }}</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
         <div class="modal-body">
             <div class="clearfix">
-                <h5 class="mb-3">Users contributing to this {{ type }}</h5>
+                <h5 class="mb-3">{% trans %}userlist_head{% endtrans %} {{ type }}</h5>
                 <table class="table mt-2">
                     <thead>
                         <tr>
                             <th scope="col"></th>
-                            <th scope="col">Username</th>
+                            <th scope="col">{% trans %}username{% endtrans %}</th>
                             <th scope="col" class="text-center"
-                                title="Number of changes done by this user in this {{ type }}"> Changes</th>
+                                title="{% trans %}userlist_title{% endtrans %} {{ type }}">
+                                {% trans %}changes{% endtrans %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,7 +33,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">{% trans %}close{% endtrans %}</button>
         </div>
     </div>
 </div>

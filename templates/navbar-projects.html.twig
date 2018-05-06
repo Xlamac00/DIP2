@@ -1,6 +1,6 @@
 
 {% if favorite|length > 0 and favorite|length != boards|length %}
-    <span class="text-secondary pl-2">Favorite projects</span>
+    <span class="text-secondary pl-2">{% trans %}fav_projects{% endtrans %}</span>
     {% for role in favorite %}
         <div class="m-1">
             <a class="dropdown-item {{ role.board.background }}-light rounded"
@@ -10,7 +10,7 @@
     {% endfor %}
 {% endif %}
 
-<span class="text-secondary pl-2 pt-5">My projects</span>
+<a href="{{ path('dashboard') }}" class="text-secondary pl-2 pt-5">{% trans %}my_projects{% endtrans %}</a>
 {% for role in boards %}
     <div class="m-1">
         <a class="dropdown-item {{ role.board.background }}-light rounded"
@@ -22,5 +22,5 @@
  {% if not is_granted('ROLE_ANONYMOUS') %}
     <div class="dropdown-divider"></div>
     <button class="dropdown-item pointer" type="button" data-toggle="modal" data-target="#modalNewBoard">
-        Create new project</button>
+        {% trans %}new_project{% endtrans %}</button>
 {% endif %}

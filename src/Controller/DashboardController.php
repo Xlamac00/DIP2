@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Entity\Board;
 use App\Entity\BoardRole;
 use App\Entity\Bug;
+use App\Entity\Deadline;
 use App\Entity\Notification;
 use App\Entity\Tips;
 use App\Entity\User;
 use App\Repository\BoardRepository;
 use App\Repository\BoardRoleRepository;
+use App\Repository\DeadlineRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\TipsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -86,6 +88,10 @@ class DashboardController extends Controller {
 
   /** @param BoardRole[][] $boards */
   private function  showMoreBoards($boards) {
+    /** @var DeadlineRepository $deadlineRepository */
+    $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+    $deadlines = $deadlineRepository->getDeadlinesForUser($this->getUser());
+
     /** @var BoardRepository $boardRepository */
     $boardRepository = $this->getDoctrine()->getRepository(Board::class);
     foreach($boards['boards'] as $board) { // get all users that contributed to all boards
@@ -97,7 +103,7 @@ class DashboardController extends Controller {
     $notifications = $notificationRepository->getUnreadNotifications($this->getUser());
     return $this->render('dashboard/homepage.html.twig',
       ['boards' => $boards['boards'], 'favorite' => $boards['favorite'],
-       'notifications' => $notifications, 'archived' => $boards['archived']]);
+       'notifications' => $notifications, 'archived' => $boards['archived'], 'deadlines' => $deadlines]);
 
   }
 }

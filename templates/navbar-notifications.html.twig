@@ -12,7 +12,7 @@
     </button>
     <div class="dropdown-menu my-dropdown mt-2" aria-labelledby="dropdownMenuNotifications"
           style="right: 10px; left: auto;">
-        <div class="text-secondary text-center">Notifications:</div>
+        <div class="text-secondary text-center">{% trans %}notifications{% endtrans %}:</div>
         <div class="dropdown-divider"></div>
         {% if notifications['data']|length > 0 %}
             {% for note in notifications['data']  %}
@@ -21,7 +21,7 @@
                         <div class="col-10 pr-5">
                             {% if note.link|length > 0 %}
                                 <a href="{{ note.link }}" class="{% if note.isShown %}text-secondary{% else %}text-dark{% endif %}"
-                               title="{% if note.isShown %}Displayed {{ note.shown }}{% else %}Created {{ note.date }}{% endif %}">
+                               title="{% if note.isShown %}{% trans %}displayed{% endtrans %} {{ note.shown }} {% else %}{% trans %}created{% endtrans %} {{ note.date }}{% endif %}">
                                 {{ note.text | raw }}
                                 </a>
                             {% else %}
@@ -39,7 +39,7 @@
                 <div class="dropdown-divider m-0"></div>
             {% endfor %}
         {% else %}
-            <div class="p-2 text-dark text-center">You have no new notifications!</div>
+            <div class="p-2 text-dark text-center">{% trans %}no_notifications{% endtrans %}</div>
         {% endif %}
     </div>
 </div>

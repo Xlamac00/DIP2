@@ -15,9 +15,10 @@
             {% endif %}
         {% endfor %}
         {% if show == 1 %}
-            <div class="form-control mx-1 mb-2" draggable="true" rel="{{ gauge.id }}">
+            <div class="form-control mx-1 mb-2" >
                 <div class="row h-100">
-                    <div class="col-1 move h-100  align-middle" title="Drag task to change its position" >
+                    <div class="col-1 move h-100  align-middle" title="Drag task to change its position"
+                         draggable="true" rel="{{ gauge.id }}" data-position="{{ gauge.position }}">
                         <i class="fas fa-2x fa-bars text-secondary align-middle"></i>
                     </div>
                     <div class="col-11">
@@ -104,10 +105,11 @@
                         {% if canWrite %}
                             <div class="form-group row  m-0 p-0">
                                 <label for="gaugeEditOwner{{ gauge.id }}" class="col-2 col-form-label">Owner</label>
-                                <div class="col-10">
-                                    <input type="text" id="u{{ gauge.id }}" value="{{ gauge.bindUserMail }}"
+                                <div class="col-10"><input type="text" id="u{{ gauge.id }}" value="{{ gauge.bindUserMail }}"
                                            class="border-muted border rounded p-1 w-75  mt-1 gaugeEditOwnerInput">
-                                    <i class="fas fa-2x fa-check-square text-success pt-1 pointer d-none"></i>
+                                    <div class="gaugeEditSend float-right">
+                                        <i class="fas fa-2x fa-check-square text-success pt-1 pointer d-none "></i>
+                                    </div>
                                     <div class="d-none" id="gaugeEditLoading{{ gauge.id }}">
                                         <i class="fas fa-2x fa-spinner fa-spin"></i>
                                     </div>

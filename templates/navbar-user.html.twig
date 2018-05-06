@@ -6,7 +6,7 @@
     </button>
     <div class="dropdown-menu my-dropdown mt-2" aria-labelledby="dropdownMenuUser" style="right: 10px; left: auto;"
          id="navbar-user-menu">
-        <label title="Change user name" for="navbar-username">
+        <label title="{% trans %}title_changeUser{% endtrans %}" for="navbar-username">
             <span class="input-group">
                 <div class="ml-2 mt-1">
                     {{ include('user/user-icon.html.twig', {'user': app.user, 'size': 'small'}) }}
@@ -18,11 +18,27 @@
                 <span class="text-secondary pointer mt-2 m-1" id="navbar-user-edit"><i class="fas fa-1x fa-edit"></i></span>
             </span>
         </label>
+        <button type="button" class="dropdown-item btn-link pointer" id="language">
+            {% trans %}language{% endtrans %}: {{ app.request.locale }}</button>
+
+        <div class="pl-4 d-none" id="languageChange">
+            <label>
+                <select class="custom-select pointer" id="languageSelect">
+                    <option value="en" {% if app.request.locale == 'en' %}selected{% endif %}>English</option>
+                    <option value="cz" {% if app.request.locale == 'cz' %}selected{% endif %}>Česky</option>
+                </select>
+            </label>
+        </div>
+        <div class="dropdown-divider"></div>
+            <a class="dropdown-item btn-link pointer" href="{{ path('myDeadlines') }}">
+                {% trans %}my_deadlines{% endtrans %}
+            </a>
         <div class="dropdown-divider"></div>
         {% if is_granted('ROLE_ANONYMOUS') %}
-            <a class="dropdown-item pointer" href="{{ path('hwi_oauth_service_redirect', {'service': 'google'}) }}">Login with Google</a>
+            <a class="dropdown-item pointer" href="{{ path('hwi_oauth_service_redirect', {'service': 'google'}) }}">
+                {% trans %}login_google{% endtrans %}</a>
         {% else %}
-            <a class="dropdown-item pointer" href="{{ url('logout') }}">Logout</a>
+            <a class="dropdown-item pointer" href="{{ url('logout') }}">{% trans %}logout{% endtrans %}</a>
         {% endif %}
     </div>
 </div>

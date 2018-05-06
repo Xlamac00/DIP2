@@ -12,6 +12,32 @@ $(document).ready(function() {
     }
 
     /** **************************************************************** **
+     *  *****************        LANGUAGE CHANGE        ****************
+     ** **************************************************************** **/
+    var langBtn = document.getElementById('language');
+    langBtn.onclick = function () {
+        langBtn.classList.add('d-none');
+        var langSelect = document.getElementById('languageChange');
+        langSelect.classList.remove('d-none');
+        langSelect.onchange = function () {
+            var select = document.getElementById('languageSelect');
+            var lang = select.options[select.selectedIndex].value;
+            $.ajax({
+                url:'/ajax/userLanguageChange',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "language": lang
+                },
+                async: true,
+                success: function () {
+                    location.reload();
+                }
+            });
+        }
+    };
+
+    /** **************************************************************** **
      *  ****************        NAVBAR - USERNAME        ***************
      ** **************************************************************** **/
     var navbarUsername = document.getElementById('navbar-username');

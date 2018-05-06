@@ -451,8 +451,9 @@ class AjaxIssueController extends Controller {
 
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
-      $issue = $issueRepository->getIssue($issue_id, $this->getUser());
+      $issueRepository->getIssue($issue_id, $this->getUser());
       $issueRepository->updateGaugesIndex($gauge_id, $new_position);
+      $issue = $issueRepository->getIssue($issue_id, $this->getUser(), true);
 
       if($issue->getThisUserRights()->getRights() == Issue::ROLE_GAUGE) {
         /** @var GaugeRepository $gaugeRepository */
@@ -595,7 +596,7 @@ class AjaxIssueController extends Controller {
 
       /** @var DeadlineRepository $deadlineRepository */
       $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
-      $deadline = $deadlineRepository->getDeadlineByIssue($issue->getId(), $gaugeId === 'issue' ? null : $gaugeId);
+      $deadline = $deadlineRepository->getDeadlineByIssue($issue, $gaugeId === 'issue' ? null : $gaugeId);
 
       if($deadline === null) { // create new deadline
         $deadline = new Deadline();
@@ -781,6 +782,7 @@ class AjaxIssueController extends Controller {
       $user = null;
       $email = null;
       $name = '';
+      $success = false;
       /** @var UserRepository $userRepository */
       $userRepository = $this->getDoctrine()->getRepository(User::class);
       // invite new user from my DB
@@ -794,37 +796,46 @@ class AjaxIssueController extends Controller {
         $email = $result[0];
         $user = $userRepository->findUserByEmail(trim($result[0]));
       }
-      elseif(strlen($username) <= 1 && $gauge !== null) {
+      elseif(strlen($username) <= 0 && $gauge !== null) {
         // delete users right to edit single gauge
         $gaugeRepository->bindUserWithGauge($gauge, null);
+        $success = true;
       }
       else {
         if($gauge !== null) {
           $name = $gauge->getBindUserMail();
+          if($name === $username)
+            $success = true;
         }
         else $name = '';
       }
 
       if($user instanceof User && $issue !== null && $gauge !== null) { // User is already in my DB
+        if($user->isAnonymous() && $user->getAnonymousEmail() !== null)
+          $name = explode('@', $user->getAnonymousEmail())[0]."@...";
+        else
+          $name = $user->getUsername();
         if($gauge->getBindUserName() !== $user->getUsername()) {
           $gaugeRepository->bindUserWithGauge($gauge, $user);
-          $name = $user->getUsername();
 
           /** @var IssueRoleRepository $issueRoleRepository */
           $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
           $issueRoleRepository->giveUserRightsToIssue($user, $issue, Issue::ROLE_READ, null, null);
 
-          $notification = new Notification();
-          $notification->setDate();
-          $notification->setCreator($this->getUser());
-          $notification->setUser($user);
-          $notification->setUrl($issue->getUrl());
-          $notification->setText($this->getUser()->getUsername().' assigned you <br>to task <b>'.$gauge->getName().'</b>');
-          $entityManager = $this->getDoctrine()->getManager();
-          $entityManager->persist($notification);
-          $entityManager->flush();
+          if($user !== $this->getUser()) {
+            $notification = new Notification();
+            $notification->setDate();
+            $notification->setCreator($this->getUser());
+            $notification->setUser($user);
+            $notification->setUrl($issue->getUrl());
+            $notification->setText($this->getUser()->getUsername().' assigned you <br>to task <b>'.$gauge->getName().'</b>');
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($notification);
+            $entityManager->flush();
+          }
 //          $this->inviteUserByEmail($user->getEmail(), $issue->getUrl(), $issue, $this->getUser(), $mailer);
         }
+        $success = true;
       }
       elseif(strlen($email) > 2 && $issue !== null && $gauge !== null) { // only users email was included
         $share = new UserShare();
@@ -836,9 +847,11 @@ class AjaxIssueController extends Controller {
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($share);
         $entityManager->flush();
-        $name = $email." invited";
+        $name = "user invited";
+        $gaugeRepository->bindUserWithGauge($gauge, null); // restart user
 
         $this->inviteUserByEmail($email, $share->getUrl(), $issue, $this->getUser(), $mailer);
+        $success = true;
       }
 
       /** @var DeadlineRepository $deadlineRepository */
@@ -859,6 +872,7 @@ class AjaxIssueController extends Controller {
          'names' => $names,
          'issue' => $issueId,
          'gauge' => $gaugeId,
+         'success' => $success,
          'user' => $name];
       return new JsonResponse($arrData);
     } else return null;

@@ -121,6 +121,16 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $this->manager->flush();
   }
 
+  /** Changes users language
+   * @param User $user
+   * @param string $newLanguage - 2 char string
+   */
+  public function changeLanguage($user, $newLanguage) {
+    $user->setLanguage($newLanguage);
+    $this->manager->persist($user);
+    $this->manager->flush();
+  }
+
   /** Returns all possible users that fit the substring.
    * Used for autocomplete where finding new users to share with.
    *
@@ -154,6 +164,7 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $user->setUsername('Anonymous user');
     $user->setLink($userLink);
     $user->setColor($this->getRandomColor());
+    $user->setLanguage('en');
     $this->manager->persist($user);
     $this->manager->flush();
     $this->user = $user;
@@ -210,12 +221,6 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $tipDeadlines->setName('deadlines');
     $this->manager->persist($tipDeadlines);
 
-//    $tipNewDeadline = new Tips();
-//    $tipNewDeadline->setUser($user->getAnonymousLink());
-//    $tipNewDeadline->setScreen('issue');
-//    $tipNewDeadline->setName('newDeadline');
-//    $this->manager->persist($tipNewDeadline);
-
     $tipReminders = new Tips();
     $tipReminders->setUser($user->getAnonymousLink());
     $tipReminders->setScreen('issue');
@@ -248,6 +253,7 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     $user->setColor($this->getRandomColor());
     $user->setEmail($email);
     $user->setImageLink($image);
+    $user->setLanguage('en');
     $this->manager->persist($user);
     $this->manager->flush();
     $this->user = $user;

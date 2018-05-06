@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    My deadlines
+{% endblock %}
+
+
+{% block stylesheets %}
+    {{  parent() }}
+    <script src="{{ asset('build/chart.js') }}"></script>
+{% endblock %}
+
+
+{% block body %}
+    <main role="main" class="col-xl-12">
+        <div class="clearfix">
+            <h1 class="float-left pt-3 pb-0">My deadlines</h1>
+        </div>
+
+        <div class="card-columns">
+            {% for issue in deadlines %}
+                {#<div class="col-md-4 p-0 m-0 mb-4">#}
+                    <div class="card">
+                        {{ include('deadline/issue-card.html.twig', { 'issue': issue}) }}
+                    </div>
+                {#</div>#}
+            {% endfor %}
+        </div>
+    </main>
+{% endblock %}
