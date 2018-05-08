@@ -83,7 +83,8 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="clearfix">
-                    <h2 id="issueName" class="float-left text-smallcaps" style="max-width: {% if issue.canUserManage %}60%{% else %}75%{% endif %}">
+                    <h2 id="issueName" class="float-left text-smallcaps"
+                        style="max-width: {% if issue.canUserManage %}50%{% else %}75%{% endif %}">
                         <span class="overflow-text" title="{{ issue.name }}">{{ issue.name }}</span>
                         <input type="hidden" id="issueId" value="{{ issue.pageId }}">
                     </h2>
@@ -109,8 +110,53 @@
                                     data-toggle="tooltip" data-placement="bottom" title="Manage deadlines">
                                 <i class="fas fa-2x fa-stopwatch"></i>
                             </button>
-                        {% endif %}
-                        {% if not issue.board.isArchived
+                            <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
+                                  data-placement="bottom" title="User settings">
+                                <div class="dropdown mx-2">
+                                    <button type="button" class="nobtn pointer" id="gaugeEditBtn"
+                                            data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
+                                        <i class="fas fa-2x fa-users"></i>
+                                    </button>
+                                    <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
+                                         aria-labelledby="gaugeEditBtn" >
+                                        <button class="btn-link dropdown-item pointer"
+                                           data-id="{{ issue.pageId }}"
+                                           data-toggle="modal" data-target="#modalIssueShare">
+                                            Share issue
+                                        </button>
+                                        <button class="btn-link dropdown-item pointer"
+                                                data-id="{{ issue.pageId }}"
+                                                data-toggle="modal" data-target="#modalIssueUsers">
+                                            Manage user rights
+                                        </button>
+                                    </div>
+                                </div>
+                            </span>
+                            <div class="modal fade modalIssueUsers" tabindex="-1" role="dialog" aria-hidden="true"
+                                 id="modalIssueUsers">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-dark">
+                                            <h4 class="modal-title">Manage user rights</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <i class="fas fa-spinner fa-spin float-right"
+                                               id="usersIndividualLoading" style="display: none"></i>
+                                            <span class="text-secondary">List of all users with rights to this issue.</span>
+                                            <div id="modalIssueUsersBody">
+                                                <i class="fas fa-spinner fa-spin"></i> Loading data ...
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2">
+                                                <button class="btn btn-primary float-left pointer" data-dismiss="modal" >Done</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elseif not issue.board.isArchived and
                             (issue.canUserManage
                             or (issue.canUserRead
                                 and issue.isShareEnabled
@@ -124,17 +170,17 @@
                                     <i class="fas fa-2x fa-share"></i>
                                 </button>
                             </span>
-                            <div class="modal fade modalShareIssue" tabindex="-1" role="dialog" aria-hidden="true"
-                                 id="modalIssueShare">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
-                                        </div>
+                        {% endif %}
+                        <div class="modal fade modalShareIssue" tabindex="-1" role="dialog" aria-hidden="true"
+                             id="modalIssueShare">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}
+                        </div>
                         {% if issue.canUserManage %}
                             <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
                                   data-placement="bottom" title="Settings">

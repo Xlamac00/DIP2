@@ -55,6 +55,35 @@ abstract class AbstractRoleEntity extends AbstractBasicRoleEntity {
     return $this->boardHistory;
   }
 
+  /**
+   * @ORM\ManyToOne(targetEntity="IssueShareHistory")
+   * @ORM\JoinColumn(name="id_issue_history", referencedColumnName="id", nullable=true)
+   */
+  private $issueHistory;
+
+  /**
+   * @param IssueShareHistory $history
+   */
+  public function setIssueHistory($history) {
+    $this->issueHistory = $history;
+  }
+
+  /** @return boolean */
+  public function isIssueHistory() {
+    return $this->issueHistory !== null;
+  }
+
+  /** @return IssueShareHistory */
+  public function getIssueHistory() {
+    return $this->issueHistory;
+  }
+
+  // Indicates if user gained access via board-link to ISSUE and it was later changed
+  // Useful only in Issue - everywhere else returns false
+  public function isOldBoardRole() {
+    return false;
+  }
+
   public function setActive($bool) {
     $this->isActive = $bool;
   }

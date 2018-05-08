@@ -78,7 +78,7 @@ class GaugeRepository extends ServiceEntityRepository  {
    * @return integer[]
    */
   public function getBoundGauges($issue, $user) {
-    $gauges = $this->findBy(array('issue' => $issue->getId()));
+    $gauges = $this->findBy(array('issue' => $issue->getId()), array("position" => "ASC"));
     $result = array();
     /** @var Gauge $gauge */
     foreach($gauges as $gauge) {
@@ -96,6 +96,16 @@ class GaugeRepository extends ServiceEntityRepository  {
    */
   public function getUserGauges($user) {
     $gauges = $this->findBy(array('userEdit' => $user->getId()));
+    return $gauges;
+  }
+
+  /** Returns all Gauges bound to the given User in given Issue
+   * @param Issue $issue
+   * @param User $user
+   * @return Gauge[]
+   */
+  public function getUserGaugesInIssue($issue, $user) {
+    $gauges = $this->findBy(array('userEdit' => $user->getId(), 'issue' => $issue->getId()));
     return $gauges;
   }
 

@@ -14,17 +14,19 @@
 {% block body %}
     <main role="main" class="col-xl-12">
         <div class="clearfix">
-            <h1 class="float-left pt-3 pb-0">My deadlines</h1>
+            <h1 class="float-left pt-3 pb-0">{% trans %}my_deadlines{% endtrans %}</h1>
         </div>
 
         <div class="card-columns">
             {% for issue in deadlines %}
-                {#<div class="col-md-4 p-0 m-0 mb-4">#}
-                    <div class="card">
-                        {{ include('deadline/issue-card.html.twig', { 'issue': issue}) }}
-                    </div>
-                {#</div>#}
+                <div class="card">
+                    {{ include('deadline/issue-card.html.twig', { 'issue': issue}) }}
+                </div>
             {% endfor %}
         </div>
+        {% if deadlines|length == 0 %}
+            <h5 class="text-secondary">To display your deadlines, you must assign yourself (or your manager)
+            to any task and create deadline for that task.</h5>
+        {% endif %}
     </main>
 {% endblock %}

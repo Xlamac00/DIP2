@@ -107,7 +107,9 @@ class User implements UserInterface, \Serializable {
     return null;
   }
   public function getEmail() {
-    return $this->email;
+    if($this->email !== null)
+      return $this->email;
+    else return $this->anonymousEmail;
   }
   public function getGoogleId() {
     return $this->googleId;

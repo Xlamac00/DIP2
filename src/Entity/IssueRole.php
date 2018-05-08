@@ -18,26 +18,21 @@ class IssueRole extends AbstractRoleEntity {
     $this->issue = $issue;
   }
 
-  /**
-   * @ORM\ManyToOne(targetEntity="IssueShareHistory")
-   * @ORM\JoinColumn(name="id_issue_history", referencedColumnName="id", nullable=true)
+  /** Indicates that user gained access via board-link (isBoardHistory) and it was changed - should be affected
+   * by any other changes to board-link until set to null again.
+   * @ORM\Column(type="string", length=24, nullable=true)
    */
-  private $issueHistory;
+  private $oldBoardRole;
 
-  /**
-   * @param IssueShareHistory $history
-   */
-  public function setIssueHistory($history) {
-    $this->issueHistory = $history;
+  public function setOldBoardRole($role) {
+    $this->oldBoardRole = $role;
   }
 
-  /** @return boolean */
-  public function isIssueHistory() {
-    return $this->issueHistory !== null;
+  public function getOldBoardRole() {
+    return $this->oldBoardRole;
   }
 
-  /** @return IssueShareHistory */
-  public function getIssueHistory() {
-    return $this->issueHistory;
+  public function isOldBoardRole() {
+    return $this->oldBoardRole !== null;
   }
 }

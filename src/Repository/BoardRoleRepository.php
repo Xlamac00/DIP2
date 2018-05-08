@@ -33,6 +33,36 @@ class BoardRoleRepository extends ServiceEntityRepository {
     return $this->findBy(['board' => $board, 'isDeleted' => 0]);
   }
 
+  /** Returns all Board users that were invited or gained access via link and are not anonymous
+   * @param Board $board
+   * @return BoardRole[]
+   * */
+  public function getBoardUsersWithoutAnonymousLinks($board) {
+    $role = $this->getBoardUsers($board->getId());
+    $admins = array();
+    $normal = array();
+    $link = array();
+    foreach($role as $item) {
+      if(($item->isBoardHistory() || $item->isIssueHistory()) && $item->getUser()->isAnonymous())
+        ;
+      elseif($item->getRights() === Issue::ROLE_ADMIN)
+        $admins[] = $item;
+      elseif($item->isBoardHistory() || $item->isIssueHistory())
+        $link[] = $item;
+      else
+        $normal[] = $item;
+    }
+    return array_merge($admins, $normal, $link);
+  }
+
+  /** Returns all admins to given Board
+   * @param Board $board
+   * @return BoardRole[]
+   */
+  public function getBoardAdmins($board) {
+    return $this->findBy(['board' => $board->getId(), 'isDeleted' => 0, 'role' => Board::ROLE_ADMIN]);
+  }
+
   /** Returns all boards this user has access to.
    * @param UserInterface $user - currently logged user
    * @return BoardRole[]
@@ -123,7 +153,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
     $set_share_true = false;
     $history = $boardRole->getBoardHistory();
     if($history !== null) {
-      $oldRole = $history->getOldRole();
+      $oldRole = $history->getRights();
       //normalize the roles to avoid errors with anonwrite vs write
       if ($oldRole == Board::ROLE_ANON) $oldRole = Board::ROLE_WRITE;
       $nRole = $role == Board::ROLE_ANON ? Board::ROLE_WRITE : $role;
@@ -262,7 +292,7 @@ class BoardRoleRepository extends ServiceEntityRepository {
     $rights = $this->getUserRights($user, $board);
     if($rights === null)
       throw new AuthenticationException('No rights for the user');
-    if($rights->isDeleted() || !$rights->isActive())
+    if($rights->isDeleted() || !$rights->isActive() || !$rights->isShareEnabled())
       throw new AuthenticationException('User deleted');
 
     // Board is archived, return only read rights

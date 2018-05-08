@@ -4,7 +4,7 @@
 {% endif %}
 
 {% if user['count'] is defined %} {# if its an array and not a user object - show there are some more users #}
-    <div class="fa-layers fa-fw mr-3 p-0 {% if entity is defined %}pointer{% endif %}"
+    <div class="fa-layers fa-fw mr-3 mb-1 p-0 {% if entity is defined %}pointer{% endif %}"
          title="And {{ user['count'] }} more users"
          {% if entity is defined %}
              data-target="#modalUserlist" data-toggle="modal"

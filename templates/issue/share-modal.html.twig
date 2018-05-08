@@ -14,7 +14,24 @@
                 <div id="modal{{ issue.pageId }}PrimarySection">
                     <div class="clearfix">
                         <div class="d-flex justify-content-between">
-                            <h5>Share issue via link</h5>
+                            <h5>
+                                Share issue via link
+                                <span class="startTooltip question
+                                      {% if not issue.isOldShareRights and issue.isShareEnabled %}d-none{% endif %}"
+                                      id="issueLinkClose" data-toggle="tooltip" data-placement="bottom"
+                                      title="Issue share-link is not linked to project share-link: it won't be
+                                      affected by changes to project share-link until this is restored to it's
+                                      original value">
+                                    <i class="fas fa-unlink" style="color: {{ issue.board.color }}"></i>
+                                </span>
+                                <span class="startTooltip question
+                                        {% if issue.isOldShareRights or not issue.isShareEnabled %}d-none{% endif %}"
+                                      id="issueLinkOpen" data-toggle="tooltip" data-placement="bottom"
+                                      title="Issue share-link is linked with project share-link: any change will affect
+                                      this issue as well.">
+                                    <i class="fas fa-link" style="color: {{ issue.board.color }}"></i>
+                                </span>
+                            </h5>
                             {% if issue.canUserManage %}
                                 <div class="dropdown">
                                     <button type="button" class="nobtn float-right text-dark mt-1 pointer"
@@ -31,7 +48,9 @@
                                 <i class="fas fa-spinner fa-spin" id="modal{{ issue.pageId }}Options" style="display: none"></i>
                             {% endif %}
                         </div>
-                        <p class="text-secondary">Share this issue with everyone with this link.</p>
+                        <p class="text-secondary">
+                            Share this issue with everyone with this link.
+                        </p>
                         <div id="modal{{ issue.pageId }}EnabledSection"
                              style="display: {% if issue.isShareEnabled %} block {% else %} none {% endif %}">
                             <div class="form-group">
@@ -42,22 +61,21 @@
                                            value="{{ app.request.httphost }}/{{ issue.url }}?{{ issue.shareLink }}">
                                 </label>
                                 <div class="input-group">
-                                    {#{{ constant('ROLE_READ', board) }}#}
                                     {% if issue.canUserManage %}
                                         <select  class="form-control" id="modal{{ issue.pageId }}Select"
                                                  title="Choose the rights for users with this link">
                                             <option value="{{ constant('ROLE_WRITE', issue) }}"
                                                 {% if (issue.shareRights == constant('ROLE_WRITE', issue) or
                                                 issue.shareRights == constant('ROLE_ANON', issue)) %}selected{% endif %}>
-                                                Anyone with this link can EDIT issue</option>
+                                                EDIT: Anyone with link can edit issue</option>
                                             <option value="{{ constant('ROLE_READ', issue) }}"
                                                 {% if issue.shareRights == constant('ROLE_READ', issue) %}selected{% endif %}>
-                                                Anyone with this link can VIEW issue</option>
+                                                VIEW: Anyone with link can view issue</option>
                                         </select>
                                     {% else %}
                                         <input type="text" class="form-control bg-white" disabled
                                                value="{% if issue.shareRights is constant('ROLE_READ', issue)
-                                               %}Anyone with this link can view{% else %}Anyone with this link can edit{% endif %}">
+                                               %}VIEW: Anyone with link can view{% else %}EDIT: Anyone with link can edit{% endif %}">
                                     {% endif %}
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary"
@@ -82,7 +100,8 @@
                         </div>
                         <div id="modal{{ issue.pageId }}DisabledSection" style="display: {% if not issue.isShareEnabled %} block {% else %} none {% endif %}">
                             <div class="d-flex justify-content-center">
-                                <button class="btn btn-success" id="modal{{ issue.pageId }}Enable">Enabled link sharing</button>
+                                <button class="btn btn-success pointer" id="modal{{ issue.pageId }}Enable">
+                                    Enabled link sharing</button>
                             </div>
                         </div>
                     </div>
@@ -108,26 +127,26 @@
                         </div>
                     {% endif %}
                 </div>
-                {% if issue.canUserManage %}
-                    <div id="modal{{ issue.pageId }}IndividualSection" style="display: none">
-                        <div class="d-flex justify-content-between">
-                            <h5>Who has access</h5>
-                            <i class="fas fa-spinner fa-spin" id="modal{{ issue.pageId }}IndividualLoading"
-                               style="display: none"></i>
-                        </div>
-                        <span class="text-secondary">List of all users with rights to this issue.</span>
-                        <table class="table mt-2">
-                            <tbody id="modal{{ issue.pageId }}Userlist">
-                            </tbody>
-                        </table>
-                    </div>
-                {% endif %}
-                <div class="d-flex justify-content-between mt-5">
+                {#{% if issue.canUserManage %}#}
+                    {#<div id="modal{{ issue.pageId }}IndividualSection" style="display: none">#}
+                        {#<div class="d-flex justify-content-between">#}
+                            {#<h5>Who has access</h5>#}
+                            {#<i class="fas fa-spinner fa-spin" id="modal{{ issue.pageId }}IndividualLoading"#}
+                               {#style="display: none"></i>#}
+                        {#</div>#}
+                        {#<span class="text-secondary">List of all users with rights to this issue.</span>#}
+                        {#<table class="table mt-2">#}
+                            {#<tbody id="modal{{ issue.pageId }}Userlist">#}
+                            {#</tbody>#}
+                        {#</table>#}
+                    {#</div>#}
+                {#{% endif %}#}
+                <div class="d-flex justify-content-between mt-3">
                     <button class="btn btn-primary float-left pointer" data-dismiss="modal" >Done</button>
-                    {% if issue.canUserManage %}
-                        <button class="nobtn float-right text-secondary pointer"
-                                id="modal{{ issue.pageId }}Individual">Manage individual users</button>
-                    {% endif %}
+                    {#{% if issue.canUserManage %}#}
+                        {#<button class="nobtn float-right text-secondary pointer"#}
+                                {#id="modal{{ issue.pageId }}Individual">Manage individual users</button>#}
+                    {#{% endif %}#}
                 </div>
             </div>
         </div>

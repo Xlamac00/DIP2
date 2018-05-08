@@ -27,7 +27,7 @@
             {% if board is defined %}{% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}
             {%  else  %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.07</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">&beta; 1.08</a>
                 <div class="btn-group">
                     {% if board is defined %}
                         <a href="../../{{ board.url }}">

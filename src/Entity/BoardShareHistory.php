@@ -18,4 +18,8 @@ class BoardShareHistory extends AbstractHistoryRoleEntity {
   public function setBoard($board) {
     $this->entity = $board;
   }
+
+  public function getBoard() {
+    return $this->entity;
+  }
 }

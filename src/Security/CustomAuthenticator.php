@@ -72,39 +72,35 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   public function checkCredentials($credentials, UserInterface $user) {
     if($credentials['pageType'] === 'i') { // issue
       try { // check database if the user has rights to view this issue
-        $role = $this->issueRepository->checkUsersRights($credentials['pageId'], $credentials['clientId'], $credentials['googleId']);
+        $this->issueRepository->checkUsersRights($credentials['pageId'], $credentials['clientId'], $credentials['googleId']);
       }
       catch (AuthenticationException $e) { // user has no rights for the issue - check is there is share link
         if(strlen($credentials['shareLink']) == 32) // there is share link set
-          $role = $this->issueRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
+          $this->issueRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
         else
           return false;
       }
-//      $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
     else if($credentials['pageType'] === 'b') { // board
       try { // check database if the user has rights to view this board
-        $role = $this->boardRepository->checkUsersRights($credentials['pageId'], $credentials['clientId'], $credentials['googleId']);
+        $this->boardRepository->checkUsersRights($credentials['pageId'], $credentials['clientId'], $credentials['googleId']);
       }
       catch (AuthenticationException $e) { // user has no rights for the board - check is there is share link
         if(strlen($credentials['shareLink']) == 32) {// there is share link set
-          $role = $this->boardRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
+          $this->boardRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
         }
         else
           return false;
       }
-//      $user->setPagePermission($credentials['pageId'], $role);
       return true;
     }
     else if($credentials['pageType'] === 'u') { // shared link for specific user
-      $role = $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
-//      $user->setPagePermission($credentials['pageId'], $role);
+      $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user);
       return true;
     }
     else if($credentials['pageType'] === 'g') { // shared link for specific user for only one gauge
-      $role = $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user,true);
-//      $user->setPagePermission($credentials['pageId'], $role);
+      $this->userRepository->checkShareLinkRights($credentials['shareLink'], $credentials['pageId'], $user,true);
       return true;
     }
     else
@@ -130,7 +126,7 @@ class CustomAuthenticator extends AbstractGuardAuthenticator {
   }
 
   public function onAuthenticationFailure(Request $request, AuthenticationException $exception) {
-//    die('chyba'.$request->headers->get('referer'));
+//    die('chyba a'.$exception->getMessage());
     new RedirectResponse('/error/404');
   }
 

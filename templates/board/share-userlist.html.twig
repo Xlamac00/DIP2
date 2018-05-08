@@ -1,12 +1,45 @@
 
+{% if entity is defined and entity.isShareEnabled %}
+    <tr>
+        <td><i class="fas fa-2x fa-share-square text-secondary"></i></td>
+        <td colspan="3"><span class="text-secondary">Anyone who has the link can</span>
+            {% if entity.shareRights is constant('App\\Entity\\Board::ROLE_READ') %}
+                read
+            {% else %}
+                edit
+            {% endif %}
+        </td>
+    </tr>
+{% endif %}
 {% for role in users %}
     <tr>
-        <td>{{ include('user/user-icon.html.twig', {'user': role.user, 'size': 'small'}) }}</td>
-        <td><span class="userName {% if role.isActive != 1 %}text-secondary{% endif %}"
-                  id="modalShareUser{{ role.user.uniquelink }}">{{ role.user.username }}</span></td>
-        <td>
+        <td class="pb-0">{{ include('user/user-icon.html.twig', {'user': role.user, 'size': 'small'}) }}</td>
+        <td class="pb-0"><span class="userName {% if role.isActive != 1 or not role.isShareEnabled %}text-secondary{% endif %}"
+                  id="modalShareUser{{ role.user.uniquelink }}">{{ role.user.username }}</span>
+        </td>
+        <td class="pb-0">
             {% if role.rights is constant('App\\Entity\\Board::ROLE_ADMIN') %}
                 <span class="text-secondary">Is owner</span>
+            {% elseif role.isBoardHistory or (role.issueHistory is defined and role.isIssueHistory) %}
+                <span class="startTooltip question" data-toggle="tooltip" data-placement="top"
+                    title="User gained access via {% if role.isBoardHistory %}PROJECT{% else %}ISSUE{% endif %}
+                    share-link and is affected by share-link settings">
+                    <i class="fas fa-link
+                    {% if role.isBoardHistory %}" style="color: {{ role.boardHistory.board.color }}"{% else
+            %}text-secondary"{% endif %}
+                    ></i>
+                </span>
+                {% if (role.rights is constant('App\\Entity\\Board::ROLE_ANON') or
+                        (role.rights is constant('App\\Entity\\Board::ROLE_WRITE') and role.user.isAnonymous != 1))
+                        and (role.isShareEnabled == 1) %}
+                    <span class="text-secondary">Can edit</span>
+                {% elseif (role.rights is constant('App\\Entity\\Board::ROLE_READ') or
+                        (role.rights is constant('App\\Entity\\Board::ROLE_WRITE') and role.user.isAnonymous == 1))
+                        and (role.isShareEnabled == 1) %}
+                    <span class="text-secondary">Can view</span>
+                {% else %}
+                    <span class="text-secondary">Cannot view</span>
+                {% endif %}
             {% else %}
                 <select class="custom-select userChange" name="{{ role.user.uniquelink }}">
                     <option value="{{ constant('App\\Entity\\Board::ROLE_WRITE') }}"
@@ -32,7 +65,7 @@
                 </select>
             {% endif %}
         </td>
-        <td>
+        <td class="pb-0">
             {% if role.rights is not constant('App\\Entity\\Board::ROLE_ADMIN') %}
                 <button class="nobtn pointer userRemove"  data-toggle="tooltip"
                         data-placement="top" title="Remove {{ role.user.username }}"
@@ -41,4 +74,39 @@
             {% endif %}
         </td>
     </tr>
+    {% if gauges is defined %}
+        <tr class="{% if role.isActive != 1 or role.isShareEnabled != 1%}d-none{% endif %}"
+            id="modalUserAssign{{ role.user.uniquelink }}">
+            <td class="border-top-0 py-1"></td>
+            <td class="text-secondary border-top-0 py-1"></td>
+            <td class="border-top-0 py-1">
+                {% set userArray = [] %}
+                {% for gauge in gauges %}
+                    {% if gauge.bindUserId != role.user.id %}
+                        {% set userArray = userArray|merge([gauge.name~','~gauge.id]) %}
+                    {% endif %}
+                {% endfor %}
+                {% if userArray|length > 0 %}
+                    <select class="custom-select userAssign" name="{{ role.user.uniquelink }}">
+                        <option>Assign to task</option>
+                        {% for item in userArray %}
+                            <option value="{{ item|split(',')[1] }}">{{ item|split(',')[0] }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+                {% for gauge in gauges %}
+                    {% if gauge.bindUserId == role.user.id %}
+                        <div class="hover d-flex justify-content-between">
+                            <button class="nobtn btn-link pointer userUnbind" style="color: {{ gauge.color }}" rel="{{ gauge.id }}">
+                                {{ gauge.name }}</button>
+                            <span class="hover-hidden pointer userUnbind" title="Unbind user from this task" rel="{{ gauge.id }}">
+                                <i class="fas fa-trash text-secondary"  rel="{{ gauge.id }}"></i>
+                            </span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td class="border-top-0 py-1"></td>
+        </tr>
+    {% endif %}
 {% endfor %}

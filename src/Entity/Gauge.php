@@ -53,6 +53,7 @@ class Gauge {
     return $this->userEdit !== null;
   }
 
+  /** @return User $user */
   public function getBindUser() {
     return $this->userEdit;
   }
@@ -60,6 +61,12 @@ class Gauge {
   public function getBindUserName() {
     if($this->userEdit instanceof  User)
       return $this->userEdit->getUsername();
+    else return '';
+  }
+
+  public function getBindUserId() {
+    if($this->userEdit instanceof  User)
+      return $this->userEdit->getId();
     else return '';
   }
 

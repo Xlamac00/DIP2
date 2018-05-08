@@ -277,29 +277,30 @@ class IssueRepository extends AbstractSharableEntityRepository {
   }
 
   /**
+   * @param Issue $issue
    * @param User $user - currently logged user
    * @param $newRight - constant from Board entity with new rights for this Issue
    *
    * @return string|boolean $newRight - currently set rights for the Issue, or false if user has no rights
    */
-  public function changeIssueShareRights($user, $newRight) {
-    if($this->checkAdminRights($user, IssueRole::class, $this->issue) !== true) return false; // rights to manage
+  public function changeIssueShareRights($issue, $user, $newRight) {
+    if($this->checkAdminRights($user, IssueRole::class, $issue) !== true) return false; // rights to manage
 
     // If Issue old_share_rights == newRight, set oldRight to null (was reset to default)
-    if($this->issue->getOldShareRights() == $newRight)
-      $this->issue->setOldShareRights(null);
-    elseif($this->issue->getOldShareRights() == null) // oldRights was not set, change it
-      $this->issue->setOldShareRights($this->issue->getShareRights());
+    if($issue->getOldShareRights() == $newRight)
+      $issue->setOldShareRights(null);
+    elseif($issue->getOldShareRights() == null) // oldRights was not set, change it
+      $issue->setOldShareRights($issue->getShareRights());
 
     // Update Issue: share_rights = newRight
-    $this->issue->setShareRights($newRight);
-    $this->manager->persist($this->issue);
+    $issue->setShareRights($newRight);
+    $this->manager->persist($issue);
     $this->manager->flush();
 
     // Update IssueRole: only if the access was gained via share link and it was not overwritten by individual rights
     /** @var IssueRoleRepository $issueRoleRepository */
     $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
-    $rights = $issueRoleRepository->getIssueUsers($this->issue->getId());
+    $rights = $issueRoleRepository->getIssueUsers($issue->getId());
     /** @var IssueRole $right */
     foreach($rights as $right) {
       if($right->getRights() !== Board::ROLE_ADMIN) {
@@ -342,12 +343,13 @@ class IssueRepository extends AbstractSharableEntityRepository {
     foreach($rights as $right) {
       if($right->getRights() !== Board::ROLE_ADMIN) {
         // Access was gained via Board share link and it has old history null (was not changed individually)
-        if($right->isBoardHistory() && $right->getBoardHistory()->getOldRole() == null) {
-          $right->setShareEnabled($isAllowed);
-          $this->manager->persist($right);
-        }
+//        if($right->isBoardHistory() && $right->getBoardHistory()->getOldRole() == null) {
+//          $right->setShareEnabled($isAllowed);
+//          $this->manager->persist($right);
+//        }
         // Access was gained via Issue share link
-        else if($right->isIssueHistory() && $right->getIssueHistory()->getOldRole() == null) {
+//        else if($right->isIssueHistory() && $right->getIssueHistory()->getOldRole() == null) {
+        if($right->isIssueHistory()) {
           $right->setShareEnabled($isAllowed);
           $this->manager->persist($right);
         }

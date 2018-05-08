@@ -10,7 +10,8 @@
         <div class="mb-1 mb-lg-3">
             <div class="d-flex justify-content-between p-0">
                 <div class="d-none d-lg-block p-0 pl-1 m-0">{{ deadline.start }}</div>
-                <h5 style="color: {{ deadline.color }}">{{ deadline.name }}</h5>
+                {#<h5 style="color: {{ deadline.color }}">{{ deadline.name }}</h5>#}
+                <h5>{{ deadline.name }}</h5>
                 <div class="d-none d-lg-block p-0 pr-1 m-0">{{ deadline.end }}</div>
             </div>
             {% if deadline.text|length > 0 %}
@@ -23,7 +24,7 @@
                              style="width: {{ deadline.percentage }}%; background-color: {{ deadline.color }}">
                             <span class="d-none d-lg-block">
                                 {% if  deadline.percentage == 100 %} Time's up!
-                                {% elseif deadline.percentage > 20 %}
+                                {% elseif deadline.percentage > 25 %}
                                     {{ deadline.daysLeft }} day{% if deadline.daysLeft > 1 %}s{% endif %} left
                                 {% endif %}
                             </span>

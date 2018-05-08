@@ -35,6 +35,28 @@ class IssueRoleRepository extends ServiceEntityRepository {
     return $this->findBy(['issue' => $issue, 'isDeleted' => 0]);
   }
 
+  /** Returns all Issue users that were invited or gained access via link and are not anonymous
+   * @param Issue $issue
+   * @return IssueRole[]
+   * */
+  public function getIssueUsersWithoutAnonymousLinks($issue) {
+    $role = $this->getIssueUsers($issue->getId());
+    $admins = array();
+    $normal = array();
+    $link = array();
+    foreach($role as $item) {
+      if(($item->isBoardHistory() || $item->isIssueHistory()) && $item->getUser()->isAnonymous())
+        ;
+      elseif($item->getRights() === Issue::ROLE_ADMIN)
+        $admins[] = $item;
+      elseif($item->isBoardHistory() || $item->isIssueHistory())
+        $link[] = $item;
+      else
+        $normal[] = $item;
+    }
+    return array_merge($admins, $normal, $link);
+  }
+
   /** Returns the rights the User have on the Issue.
    * @param User $user -
    * @param Issue $issue
@@ -153,11 +175,11 @@ class IssueRoleRepository extends ServiceEntityRepository {
 
     $issueRole = $this->getUserRights($user, $issue);
     $history = $issueRole->getIssueHistory();
+    $nRole = $role == Board::ROLE_ANON ? Board::ROLE_WRITE : $role;
     if($history !== null) {
-      $oldRole = $history->getOldRole();
+      $oldRole = $history->getRights();
       //normalize the roles to avoid errors with anonwrite vs write
       if ($oldRole == Board::ROLE_ANON) $oldRole = Board::ROLE_WRITE;
-      $nRole = $role == Board::ROLE_ANON ? Board::ROLE_WRITE : $role;
       if ($oldRole == $newRights) {
         $history->setOldRole(NULL);
       } else {
@@ -165,6 +187,16 @@ class IssueRoleRepository extends ServiceEntityRepository {
       }
       $issueRole->setShareEnabled($nRole !== Board::ROLE_VOID);
       $this->manager->persist($history);
+    }
+
+    $bHistory = $issueRole->getBoardHistory();
+    if($bHistory !== null) {
+      $oldRole = $bHistory->getRights();
+      if ($oldRole == $newRights) {
+        $issueRole->setOldBoardRole(NULL);
+      } else {
+        $issueRole->setOldBoardRole($role);
+      }
     }
 
     // Update IssueRight: role = newRole
@@ -223,10 +255,14 @@ class IssueRoleRepository extends ServiceEntityRepository {
   public function checkShareLinkRights($shareLink, $pageId, $user) {
     /** @var IssueRepository $issueRepository */
     $issueRepository = $this->manager->getRepository(Issue::class);
-    $issue = $issueRepository->getIssueByLink($pageId, $user);
+    $issue = $issueRepository->getIssueByLink($pageId, $user, false);
     if($issue == null) throw new AuthenticationException('Issue not found');
     if($issue->getShareLink() == $shareLink && $issue->isShareEnabled()) {
       $rights = $issue->getShareRights();
+
+      // If share rights are for anonymous only and user is anonymous, make it read only
+      if($user instanceof User && $user->isAnonymous() && $rights === Issue::ROLE_WRITE)
+        $rights = Issue::ROLE_READ;
 
       // save record about the link use
       $history = new IssueShareHistory();
@@ -273,6 +309,7 @@ class IssueRoleRepository extends ServiceEntityRepository {
       $role->setRole(Issue::ROLE_READ);
       $role->setUser($user);
       $role->setBoardHistory($boardHistory);
+      $role->setIssueHistory($issueHistory);
       $this->manager->persist($role);
     }
 

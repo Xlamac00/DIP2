@@ -35,12 +35,12 @@ class BoardRepository extends AbstractSharableEntityRepository {
    * @return Board|null
    */
   public function getBoard($boardId, $user = null, $forceLoad = false) {
-    if(!isset($this->board) || $forceLoad === true) {
+//    if(!isset($this->board) || $forceLoad === true) {
       if($forceLoad === true) $this->manager->clear();
       $this->board = $this->findOneBy(array('id' => $boardId));
       if($user !== null) //
         $this->loadBoard($user);
-    }
+//    }
     return $this->board;
   }
 
@@ -159,24 +159,26 @@ class BoardRepository extends AbstractSharableEntityRepository {
   }
 
   /**
+   * @param Board $board
    * @param User $user - currently logged user
    * @param $newRight - constant from Board entity with new rights for all issue in this Board
    *
    * @return string|boolean $newRight - currently set rights for the Board, or false if user has no rights
    */
-  public function changeBoardShareRights($user, $newRight) {
-    if($this->checkAdminRights($user, BoardRole::class, $this->board) !== true) return false; // rights to manage
+  public function changeBoardShareRights($board, $user, $newRight) {
+    if($this->checkAdminRights($user, BoardRole::class, $board) !== true) return false; // rights to manage
 
     // Update Board: share_rights = newRight
     $this->board->setShareRights($newRight);
-    $this->manager->persist($this->board);
+    $this->manager->persist($board);
     $this->manager->flush();
 
+// Commented because changing link rights should affect history    /
     // get all users that gained rights via this link and give them new rights for $entity
     // Get all users with rights to this Board
     /** @var BoardRoleRepository $boardRoleRepository */
     $boardRoleRepository = $this->manager->getRepository(BoardRole::class);
-    $rights = $boardRoleRepository->getBoardUsers($this->board->getId());
+    $rights = $boardRoleRepository->getBoardUsers($board->getId());
     /** @var BoardRole $right */
     foreach($rights as $right) {
       if($right->getRights() !== Board::ROLE_ADMIN) {
@@ -189,7 +191,7 @@ class BoardRepository extends AbstractSharableEntityRepository {
     }
 
     // Foreach Issue in this Board
-    foreach($this->board->getIssues() as $issue) {
+    foreach($board->getIssues() as $issue) {
       // If the Issue has old_share_rights set to null => its own share rights were not changed and
       // it can be overwritten by this parent Board. Otherwise its ignored.
       if($issue->getOldShareRights() == null) {
@@ -205,8 +207,10 @@ class BoardRepository extends AbstractSharableEntityRepository {
           if($right->getRights() !== Board::ROLE_ADMIN) {
             // Access was gained via Board share link and it has old history null (was not changed individually)
             if($right->isBoardHistory() && $right->getBoardHistory()->getOldRole() == null) {
-              $right->setRole($newRight);
-              $this->manager->persist($right);
+              if($right->isOldBoardRole() === false) { // user rights were not changed individually in the issue
+                $right->setRole($newRight);
+                $this->manager->persist($right);
+              }
             }
             // Access was gained via Issue share link
             else if($right->isIssueHistory() && $right->getIssueHistory()->getOldRole() == null) {
@@ -217,28 +221,6 @@ class BoardRepository extends AbstractSharableEntityRepository {
         }
       }
     }
-    $this->manager->flush();
-
-//    $qb = $this->createQueryBuilder('b')
-//      ->select('h.id')
-//      ->join('App\Entity\BoardShareHistory', 'h')
-//      ->andWhere('h.entity = b.id')
-//      ->andWhere('h.oldRole IS NULL')
-//      ->andWhere('b.id = :id')
-//      ->setParameter('id', $this->board->getId())
-//      ->getQuery();
-//    $history = $qb->execute();
-//    $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
-//    foreach($history as $item) {
-//      $roles = $issueRoleRepository->findBy(["boardHistory" => $item['id']]);
-//      /** @var IssueRole $role */
-//      foreach($roles as $role) {
-//        if($role->getRights() !== Board::ROLE_ADMIN) {
-//          $role->setRole($newRight);
-//          $this->manager->persist($role);
-//        }
-//      }
-//    }
     $this->manager->flush();
     return $newRight;
   }
@@ -305,29 +287,6 @@ class BoardRepository extends AbstractSharableEntityRepository {
       }
     }
     $this->manager->flush();
-
-//    $allowed = parent::changeShareEnabled($user, $isAllowed, BoardRole::class, BoardShareHistory::class,
-//      $this->board);
-//    if($allowed === $isAllowed) { // change was successful, change all issue in board as well
-//       $qb = $this->createQueryBuilder('b')
-//        ->select('h.id')
-//        ->join('App\Entity\BoardShareHistory', 'h')
-//        ->andWhere('h.entity = b.id')
-//        ->andWhere('h.oldRole IS NULL')
-//        ->andWhere('b.id = :id')
-//        ->setParameter('id', $this->board->getId())
-//        ->getQuery();
-//      $history = $qb->execute();
-//      $issueRoleRepository = $this->manager->getRepository(IssueRole::class);
-//      foreach($history as $item) {
-//        $roles = $issueRoleRepository->findBy(["boardHistory" => $item['id']]);
-//        foreach($roles as $role) {
-//          $role->setShareEnabled($isAllowed);
-//          $this->manager->persist($role);
-//        }
-//      }
-//      $this->manager->flush();
-//    }
     return $isAllowed;
   }
 }

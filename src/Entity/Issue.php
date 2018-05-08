@@ -77,6 +77,10 @@ class Issue extends AbstractSharableEntity {
     $this->oldShareRights = $newRight;
   }
 
+  public function isOldShareRights() {
+    return $this->oldShareRights !== null;
+  }
+
   /**
    * @return Collection|Gauge[]
    */

@@ -27,6 +27,10 @@ abstract class AbstractHistoryRoleEntity extends  AbstractBasicRoleEntity {
     return $this->oldRole;
   }
 
+  public function isOldRole() {
+    return $this->oldRole !== null;
+  }
+
   /**
    * @ORM\Column(type="datetime")
    */

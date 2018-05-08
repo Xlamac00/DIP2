@@ -670,85 +670,83 @@ class AjaxIssueController extends Controller {
     } else return null;
   }
 
-  /** Gives rights to edit your one gauge (and view issue, board and all its issue) to one user.
-   * @Route("/tesi", name="tesi")
-   * @param \Swift_Mailer $mailer
+  /** Gives rights to edit one Gauge, but requires only users with Issue rights already.
+   * @Route("/ajax/issueAssignGauge", name="issue_ajax_assignGauge")
    * @return null|JsonResponse
-   */
-  public function tesi(\Swift_Mailer $mailer) {
-      $issueId = '52b54aab';
-      $gaugeId = '31';
-      $username = 'xlamac00@stud.fit.vutbr.cz';
+   * */
+  public function issueAssignGauge(Request $request) {
+    if ($request->isXmlHttpRequest()) {
+      $issueId = $request->request->get('issue');
+      $gaugeId = $request->request->get('gauge');
+      $userId = $request->request->get('user');
+      $success = false;
 
-      $gauge = null;
       /** @var IssueRepository $issueRepository */
       $issueRepository = $this->getDoctrine()->getRepository(Issue::class);
       $issue = $issueRepository->getIssueByLink($issueId, $this->getUser());
-      if($issue !== null) {
-        $rights = $issue->getThisUserRights();
-        if($rights === null || $rights->getRights() === Issue::ROLE_VOID) $issue = null;
-      }
 
       /** @var GaugeRepository $gaugeRepository */
       $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
-      if($issue !== null) {
-        $gauge = $gaugeRepository->getGaugeInIssue($gaugeId, $issue);
-      }
+      $gauge = $gaugeRepository->getGaugeInIssue($gaugeId, $issue);
 
-      $result = array();
-      $user = null;
-      $email = null;
-      $name = '';
-      /** @var UserRepository $userRepository */
-      $userRepository = $this->getDoctrine()->getRepository(User::class);
-      // invite new user from my DB
-      if(preg_match('/^.+\(.{2,}@ \.\.\. \)$/i', $username, $result) === 1) {
-        $name = explode('(', $result[0]);
-        $mail = explode('@', $name[1]);
-        $user = $userRepository->findUserByNameAndEmail(trim($name[0]), trim($mail[0]));
-      }
-      // send email to new user
-      elseif(preg_match('/^.{2,}@[a-z0-9\.\-]{2,}\.[a-z0-9]+$/i', $username, $result) === 1) {
-        $email = $result[0];
-        $user = $userRepository->findUserByEmail(trim($result[0]));
-      }
-      elseif(strlen($username) <= 1 && $gauge !== null) {
-        // delete users right to edit single gauge
+      if($gauge !== null && $userId === 'void') { // remove user from gauge
         $gaugeRepository->bindUserWithGauge($gauge, null);
+        $success = true;
+        $user = null;
       }
       else {
-        if($gauge !== null) {
-          $name = $gauge->getBindUserName();
-        }
-        else $name = '';
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $user = $userRepository->loadUser($userId);
       }
 
-      if($user instanceof User && $issue !== null && $gauge !== null) { // User is already in my DB
+      if($gauge !== null && $user !== null) {
         $gaugeRepository->bindUserWithGauge($gauge, $user);
-        $name = $user->getUsername();
+        $success = true;
 
-        /** @var IssueRoleRepository $issueRoleRepository */
-        $issueRoleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
-        $issueRoleRepository->giveUserRightsToIssue($user, $issue, Issue::ROLE_READ, null, null);
-
-        $this->inviteUserByEmail($user->getEmail(), $issue->getUrl(), $issue, $this->getUser(), $mailer);
-      }
-      elseif(strlen($email) > 2 && $issue !== null && $gauge !== null) { // only users email was included
-        $share = new UserShare();
-        $share->setUser($this->getUser());
-        $share->setRole(Issue::ROLE_READ);
-        $share->setEmail($email);
-        $share->setEntity($issue);
-        $share->setGauge($gauge);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($share);
-        $entityManager->flush();
-
-        $this->inviteUserByEmail($email, $share->getUrl(), $issue, $this->getUser(), $mailer);
+        if($user !== $this->getUser()) {
+          $notification = new Notification();
+          $notification->setDate();
+          $notification->setCreator($this->getUser());
+          $notification->setUser($user);
+          $notification->setUrl($issue->getUrl());
+          $notification->setText($this->getUser()->getUsername().' assigned you <br>to task <b>'.$gauge->getName().'</b>');
+          $entityManager = $this->getDoctrine()->getManager();
+          $entityManager->persist($notification);
+          $entityManager->flush();
+        }
       }
 
-      $arrData = ['issue' => $issueId, 'gauge' => $gaugeId, 'user' => $name];
+      /** @var DeadlineRepository $deadlineRepository */
+      $deadlineRepository = $this->getDoctrine()->getRepository(Deadline::class);
+      $deadlines = $deadlineRepository->getDeadlinesForIssue($issue);
+
+      /** @var IssueRoleRepository $roleRepository */
+      $roleRepository = $this->getDoctrine()->getRepository(IssueRole::class);
+      $users = $roleRepository->getIssueUsersWithoutAnonymousLinks($issue);
+      $gauges = $gaugeRepository->getGaugesInIssue($issue);
+
+      $render = $this->renderView('board/share-userlist.html.twig',
+        ["users" => $users, 'gauges' => $gauges, 'entity' => $issue]);
+      $list = $this->renderView('issue/deadlineList.html.twig',['deadlines' => $deadlines,'issue' => $issue]);
+      $labels = $this->renderView('graphs/graph-labels.html.twig',['gauges' => $issue->getGauges()]);
+      $colors = $this->renderView('graphs/graph-colors.html.twig',['gauges' => $issue->getGauges()]);
+      $values = $this->renderView('graphs/graph-values.html.twig',['gauges' => $issue->getGauges()]);
+      $names = $this->renderView('graphs/graph-names.html.twig',['gauges' => $issue->getGauges()]);
+
+      $arrData =
+        ['labels' => $labels,
+         'colors' => $colors,
+         'values' => $values,
+         'list' => $list,
+         'names' => $names,
+         'issue' => $issueId,
+         'gauge' => $gaugeId,
+         'result' => $render,
+         'success' => $success,
+         'user' => $userId];
       return new JsonResponse($arrData);
+    }
   }
 
   /** Gives rights to edit your one gauge (and view issue, board and all its issue) to one user.

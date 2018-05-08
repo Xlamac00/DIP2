@@ -22,18 +22,49 @@ $(document).ready(function() {
             }
         });
     });
+    $('#modalIssueUsers').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var id = button.data('id');
+        $.ajax({
+            url: '/ajax/entityGetUserlist',
+            type: "POST",
+            dataType: "json",
+            data: { "entity": id },
+            async: true,
+            success: function (data) {
+                var modal = document.getElementById('modalIssueUsersBody');
+                modal.innerHTML = "<table class=\"table mt-2\"><tbody>"+data.result+"</tbody></table>";
+                initView('users', id);
+            }
+        });
+    });
     /** ********************************************************************************* **
      ** **************************** ENTITY SHARING **************************** **
      ** ********************************************************************************* **/
 
-    function initEntitySharing(name, entityId) {
+    function initView(name, entityId) {
+        var removeBtn = $('.userRemove');
+        removeBtn.click(function (e) {
+            ajaxBoardRemoveUser(name, entityId, e.target)
+        });
+        removeBtn.tooltip('enable');
+        $('.userChange').change(function (e) {
+            ajaxBoardChangeUser(name, entityId, e.target);
+        });
+        $('.userAssign').change(function (e) {
+            ajaxIssueAssignUser(name, entityId, e.target);
+        });
+        $('.userUnbind').click(function (e) {
+            var target = e.target;
+            target.name = 'void';
+            ajaxIssueAssignUser(name, entityId, target);
+        });
+        $('.startTooltip').tooltip('enable');
+    }
 
-        function initView() {
-            var removeBtn = $('.userRemove');
-            removeBtn.click(ajaxBoardRemoveUser); // bind action to open gauge edit dialog
-            removeBtn.tooltip('enable');
-            $('.userChange').change(ajaxBoardChangeUser);
-        }
+    function initEntitySharing(name, entityId) {
+        $('.startTooltip').tooltip('enable');
+
 
         // Functionality of the 'copy to clipboard' button
         var copyBtn = document.getElementById(name+'CopyBtn');
@@ -84,6 +115,18 @@ $(document).ready(function() {
                             anonymous.disabled = false;
                             text.className = 'text-black';
                         }
+                        var open = document.getElementById('issueLinkOpen');
+                        var close = document.getElementById('issueLinkClose');
+                        if(data.oldIssue !== null && open !== null && close !== null) {
+                            if(data.oldIssue === true) {
+                                open.classList.add('d-none');
+                                close.classList.remove('d-none');
+                            }
+                            else {
+                                open.classList.remove('d-none');
+                                close.classList.add('d-none');
+                            }
+                        }
                         anonymous.checked = (data.option === 'ROLE_ISSUE_ANONWRITE');
                     }
                     loading.innerHTML = loadingOld;
@@ -120,87 +163,52 @@ $(document).ready(function() {
                         dSection.style.display = 'block';
                         document.getElementById(name+"Options").style.display = 'none';
                     }
-                }
-            });
-        }
-        // toggle view in modal window - change between link sharing and individual user management
-        var individualBtn = document.getElementById(name+'Individual');
-        if(individualBtn !== null) {
-            individualBtn.onclick = function () {
-                if (document.getElementById(name+"IndividualSection").style.display === 'none') {
-                    $.ajax({
-                        url: '/ajax/entityGetUserlist',
-                        type: "POST",
-                        dataType: "json",
-                        data: {
-                            "entity": entityId
-                        },
-                        async: true,
-                        success: function (data) {
-                            document.getElementById(name+'Userlist').innerHTML = data.result;
-                            initView();
-                            document.getElementById(name+"PrimarySection").style.display = 'none';
-                            document.getElementById(name+"IndividualSection").style.display = 'block';
-                            individualBtn.innerHTML = 'Return';
+                    var open = document.getElementById('issueLinkOpen');
+                    var close = document.getElementById('issueLinkClose');
+                    if(data.oldIssue !== null && open !== null && close !== null) {
+                        console.log("Show unlink:"+data.oldIssue);
+                        if(data.oldIssue === true) {
+                            open.classList.add('d-none');
+                            close.classList.remove('d-none');
                         }
-                    });
-                }
-                else {
-                    document.getElementById(name+"PrimarySection").style.display = 'block';
-                    document.getElementById(name+"IndividualSection").style.display = 'none';
-                    individualBtn.innerHTML = 'Manage individual users';
-                }
-            };
-        }
-
-        function ajaxBoardChangeUser() {
-            var loading = document.getElementById(name+'IndividualLoading');
-            loading.style.display = 'block'; // show loading button
-            var option = this.options[this.selectedIndex].value;
-            var user = this.name;
-            $.ajax({
-                url: '/ajax/entityChangeUser',
-                type: "POST",
-                dataType: "json",
-                data: {
-                    "user": user,
-                    "role": option,
-                    "entity": entityId
-                },
-                async: true,
-                success: function (data) {
-                    loading.style.display = 'none'; // hide loading
-                    var username = document.getElementById('modalShareUser'+user);
-                    if(data.enabled === true)
-                        username.className = 'userName';
-                    else
-                        username.className = 'userName text-secondary';
-                }
-            });
-        }
-        function ajaxBoardRemoveUser() {
-            var loading = document.getElementById(name+'IndividualLoading');
-            loading.style.display = 'block'; // show loading button
-            var element = this;
-            $('.userRemove').tooltip('dispose');
-            $.ajax({
-                url: '/ajax/entityRemoveUser',
-                type: "POST",
-                dataType: "json",
-                data: {
-                    "user": element.name,
-                    "entity": entityId
-                },
-                async: true,
-                success: function (data) {
-                    loading.style.display = 'none'; // hide loading
-                    if(data.success === true) {
-                        document.getElementById(name+'Userlist').innerHTML = data.result;
-                        initView();
+                        else {
+                            open.classList.remove('d-none');
+                            close.classList.add('d-none');
+                        }
                     }
                 }
             });
         }
+        // toggle view in modal window - change between link sharing and individual user management
+        // var individualBtn = document.getElementById(name+'Individual');
+        // if(individualBtn !== null) {
+        //     individualBtn.onclick = function () {
+        //         if (document.getElementById(name+"IndividualSection").style.display === 'none') {
+        //             $.ajax({
+        //                 url: '/ajax/entityGetUserlist',
+        //                 type: "POST",
+        //                 dataType: "json",
+        //                 data: {
+        //                     "entity": entityId
+        //                 },
+        //                 async: true,
+        //                 success: function (data) {
+        //                     document.getElementById(name+'Userlist').innerHTML = data.result;
+        //                     initView(name, entityId);
+        //                     document.getElementById(name+"PrimarySection").style.display = 'none';
+        //                     document.getElementById(name+"IndividualSection").style.display = 'block';
+        //                     individualBtn.innerHTML = 'Return';
+        //                 }
+        //             });
+        //         }
+        //         else {
+        //             document.getElementById(name+"PrimarySection").style.display = 'block';
+        //             document.getElementById(name+"IndividualSection").style.display = 'none';
+        //             individualBtn.innerHTML = 'Manage individual users';
+        //         }
+        //     };
+        // }
+
         // Add username to share - autocomplete
         // uses bootstrap jquery library
         // https://www.jqueryscript.net/form/jQuery-Bootstrap-4-Typeahead-Plugin.html
@@ -290,6 +298,87 @@ $(document).ready(function() {
                 username.className = 'form-control is-invalid';
             }
         }
+    }
+
+    function ajaxBoardChangeUser(name, entityId, target) {
+        var loading = document.getElementById(name+'IndividualLoading');
+        loading.style.display = 'block'; // show loading button
+        var option = target.options[target.selectedIndex].value;
+        var user = target.name;
+        $.ajax({
+            url: '/ajax/entityChangeUser',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "user": user,
+                "role": option,
+                "entity": entityId
+            },
+            async: true,
+            success: function (data) {
+                loading.style.display = 'none'; // hide loading
+                if(data.success === true) {
+                    document.getElementById('modalIssueUsersBody').innerHTML = "<table class=\"table mt-2\"><tbody>"+data.result+"</tbody></table>";
+                    initView(name, entityId);
+                }
+            }
+        });
+    }
+    function ajaxBoardRemoveUser(name, entityId, target) {
+        var loading = document.getElementById(name+'IndividualLoading');
+        loading.style.display = 'block'; // show loading button
+        $('.userRemove').tooltip('dispose');
+        $.ajax({
+            url: '/ajax/entityRemoveUser',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "user": target.name,
+                "entity": entityId
+            },
+            async: true,
+            success: function (data) {
+                loading.style.display = 'none'; // hide loading
+                console.log(data);
+                if(data.success === true) {
+                    document.getElementById('modalIssueUsersBody').innerHTML = "<table class=\"table mt-2\"><tbody>"+data.result+"</tbody></table>";
+                    initView(name, entityId);
+                }
+            }
+        });
+    }
+    function ajaxIssueAssignUser(name, entityId, target) {
+        var loading = document.getElementById(name+'IndividualLoading');
+        var option, user;
+        if(target.name === 'void') {
+            if(typeof  target.attributes.rel === 'undefined')
+                option = target.parentNode.attributes.rel.value;
+            else
+                option = target.attributes.rel.value;
+        }
+        else
+            option = target.options[target.selectedIndex].value;
+        user = target.name;
+        loading.style.display = 'block'; // show loading button
+        console.log('sending'+name+','+target.name+','+entityId+','+option);
+        $.ajax({
+            url: '/ajax/issueAssignGauge',
+            type: "POST",
+            dataType: "json",
+            data: {
+                "user": user,
+                "issue": entityId,
+                "gauge": option
+            },
+            async: true,
+            success: function (data) {
+                loading.style.display = 'none'; // hide loading
+                if(data.success === true) {
+                    document.getElementById('modalIssueUsersBody').innerHTML = "<table class=\"table mt-2\"><tbody>"+data.result+"</tbody></table>";
+                    initView(name, entityId);
+                }
+            }
+        });
     }
     var boardId = document.getElementById('boardId');
     if(boardId !== null) { // its loaded on Board overview, initiate Board sharing

@@ -12,8 +12,8 @@
 
 {% block body %}
     <main role="main" class="col-xl-12">
-        <h1 class="text-center d-none d-sm-block mt-3">{% trans %}project_title{% endtrans %}</h1>
         {% if is_granted('ROLE_ANONYMOUS') and boards|length == 0 %}
+            <h1 class="text-center d-none d-sm-block mt-3">{% trans %}project_title{% endtrans %}</h1>
             <div id="carouselExampleIndicators" data-ride="carousel"
                  class="carousel slide border border-secondary rounded bg-white mt-5 d-none d-lg-block">
                 <ol class="carousel-indicators">
