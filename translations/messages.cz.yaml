@@ -1,5 +1,95 @@
+# Titles
+my_deadlines: Moje úkoly
+my_projects: Moje projekty
+fav_projects: Oblíbené projekty
+arch_projects: Archivované projekty
+new_project: Vytvořit nový projekt
+notifications: Upozornění
+project_title: Manage your tasks easily!
+board: projekt
+issue: issue
+gauge: úkol
+gauges: úkoly
+
 # Navigation bar
 language: Jazyk
 login_google: Přihlásit s Google účtem
 logout: Odhlásit se
-my_deadlines: Moje úkoly
+title_changeUser: Změnit jméno
+show_deadlines: Zobrazit úkoly
+no_notifications: Žádné nové upozornění
+others: Další
+projects: Projekty
+
+# General messages
+created: Vytvořeno
+displayed: Zobrazeno
+close: Zavřít
+or: Nebo
+loading: Načítám ...
+
+# User
+userlist_title: Počet změn provedených daným uživatelem
+userlist_head: Zapojení uživatelé
+changes: Změny
+username: Uživatel
+checklist_noMail: - nezadaný email!
+checklist_noMailMsg: Uživatel nemá zadaný email - obdrží pouze upozornění v aplikaci
+click_enable: klikni pro povolení/zakázání
+
+# Dashboard
+signin_msg: Přihlašte se zdarma
+create_own_projects: A vytvářejte vlastní projekty
+get_invited1: Nechte se pozvat
+get_invited2: Kamarádem či vedoucím
+signin_msg_long: Přihlašte se zdarma a začněte plánovat!
+
+# Buttons
+btn_share: Sdílet
+btn_duplicate: Kopírovat
+btn_archive: Archivovat
+btn_leave: Opustit
+btn_delete: Smazat
+btn_create: Vytvořit
+btn_done: Hotovo
+btn_save: Uložit změny
+btn_edit: Upravit
+btn_close: Zavřít
+btn_restore: Obnovit
+btn_settings: Nastavení
+btn_reminders: Připomínky
+btn_reminders_long: Týdenní připomínky
+btn_manage_users: Správa uživatelů
+btn_manage_users_short: Správa uživatelů
+tooltip_users: Nastavení uživatelů
+tooltip_share: Sdílet s ostatními
+tooltip_newTask: Přidat nový úkol
+tooltip_login: Pro editaci se přihlaš!
+tooltip_deadlines: Správa úkolů
+
+# Modal
+modal_permanent: Tuto změnu nelze vrátit!
+
+# Tips
+hide_title: Nezobrazovat žádnou nápovědu
+hide_text: Vypnout nápovědu
+tip_ok_1: Ok, díky!
+tip_ok_2: Chápu!
+tip_ok_3: Jasně, dík!
+tip_ok_4: Perfektní!
+tip_issue_task_1: Jméno, barvu a pořadí úkolu lze kdykoliv změnit v nastavení.
+tip_issue_task_2: Každé zadání může mít až 4 úkoly.
+tip_issue_edit: Potáhni graf nahoru a zaznamenej tím svoje změny.
+tip_issue_comment_1: Popiš co jsi udělal nového!
+tip_issue_comment_2: Graf nepůjde editovat dokud novou změnu buď nepotvrdíš nebo nesmažeš.
+tip_issue_deadline_1: Vytvářej úkoly pro celý issue nebo pro každý úkol zvlášť.
+tip_issue_deadline_2: Uživatel bude upozorněn když mu bude zbývat 50 % a 25 % celkového času.
+tip_issue_reminder: Posílej pravidelné upozornění všem (nebo jen některým) uživatelům, aby nezapomněli zaznamenat své
+ změny.
+tip_board_issue_1: Rozděl projekt do __ a strukturuj tak svou práci.
+tip_board_issue_2: Můžeš spravovat uživatelská práva ke každému __ zvlášť, nebo pozvat všechny uživatele dohromady.
+tip_board_share_1: Sdílej projekt s ostatními pomocí odkazu, emailu, nebo jejich jména v této aplikaci.
+tip_board_share_2: Sdílej projekt pomocí odkazu, emailu, nebo jména v aplikaci.
+tip_board_share_3: Můžeš zde také spravovat uživatelská práva.
+tip_board_share_4: TIP - uživatelská práva lze spravovat i pro každý issue zvlášť.
+tip_dashboard: Začni vytvořením nového projektu.

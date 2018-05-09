@@ -6,6 +6,10 @@ arch_projects: Archived projects
 new_project: Create new project
 notifications: Notifications
 project_title: Manage your tasks easily!
+board: project
+issue: issue
+gauge: task
+gauges: tasks
 
 # Navigation bar
 language: Language
@@ -38,3 +42,53 @@ signin_msg: Sign in for free
 create_own_projects: To create your own projects
 get_invited1: Get invited
 get_invited2: By your friends
+signin_msg_long: Sign in to create new projects!
+
+# Buttons
+btn_share: Share
+btn_duplicate: Duplicate
+btn_archive: Archive
+btn_leave: Leave
+btn_delete: Delete
+btn_create: Create
+btn_done: Done
+btn_save: Save changes
+btn_edit: Edit
+btn_close: Close
+btn_restore: Restore
+btn_settings: Settings
+btn_reminders: Reminders
+btn_reminders_long: Weekly progress
+btn_manage_users: Manage user rights
+btn_manage_users_short: Manage users
+tooltip_users: User settings
+tooltip_share: Share with other users
+tooltip_newTask: Add a new task
+tooltip_login: Must login to edit
+tooltip_deadlines: Manage deadlines
+
+# Modal
+modal_permanent: This change will be permanent!
+
+# Tips
+hide_title: Don't show any future tips
+hide_text: Turn hints off
+tip_ok_1: Ok, thanks!
+tip_ok_2: Got it!
+tip_ok_3: Sure!
+tip_ok_4: Perfect!
+tip_issue_task_1: You can always change task name, color or order later in settings.
+tip_issue_task_2: You can create up to 4 tasks per each issue.
+tip_issue_edit: Pull up the graph to mark your progress.
+tip_issue_comment_1: Describe your progress!
+tip_issue_comment_2: You will not be able to change any values in the graph until you confirm or discard your update.
+tip_issue_deadline_1: Create the deadline for whole issue or for each task separately.
+tip_issue_deadline_2: You will receive notification when you have 50 % and 25 % of time left.
+tip_issue_reminder: Send regular notifications to all (or some of) the collaborators to update their progress.
+tip_board_issue_1: Divide your project into issues to structure your work.
+tip_board_issue_2: You can manage users in each issue individually or invite them all together.
+tip_board_share_1: Share whole project easily with anyone by link, e-mail or their in-app name.
+tip_board_share_2: Share project by link, e-mail or in-app name.
+tip_board_share_3: Manage everyone's access rights individually.
+tip_board_share_4: TIP - You can also share each issue separately in issue settings.
+tip_dashboard: Start by creating new project

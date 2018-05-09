@@ -1,6 +1,6 @@
 
 <div class="d-flex justify-content-between">
-    <h3 class="text-smallcaps">Weekly progress:</h3>
+    <h3 class="text-smallcaps">{% trans %}btn_reminders_long{% endtrans %}:</h3>
     <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
@@ -52,8 +52,10 @@
         </label>
         <textarea class="form-control d-none" id="reminderTextarea" rows="2">{{ data.text }}</textarea>
     </div>
-    <button class="btn btn-primary pointer mt-3" type="button" id="reminderSaveBtn">Save changes</button>
-    <span class="ml-2 d-none" id="reminderLoading"><i class="fas fa-spinner fa-spin"></i> Saving ...</span>
+    <button class="btn btn-primary pointer mt-3" type="button" id="reminderSaveBtn">
+        {% trans %}btn_save{% endtrans %}</button>
+    <span class="ml-2 d-none" id="reminderLoading">
+        <i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %} </span>
 </form>
 
 <div class="m-0 p-0 d-md-block d-lg-none">&nbsp;</div>

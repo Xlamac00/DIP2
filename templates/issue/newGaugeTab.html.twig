@@ -1,6 +1,6 @@
 
 <div class="d-flex justify-content-between">
-    <h3 class="text-smallcaps">{{ title|default('Add a new task:') }}</h3>
+    <h3 class="text-smallcaps">{% trans %}tooltip_newTask{% endtrans %}:</h3>
     <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close" title="Close">
         <span aria-hidden="true">&times;</span>
     </button>
@@ -67,5 +67,5 @@
 
 <br>
 <button class="btn btn-success mx-auto pointer" style="display: block; width: 130px;"
-        id="gaugeAddNewSaveBtn">Save task</button>
+        id="gaugeAddNewSaveBtn">{% trans %}btn_save{% endtrans %}</button>
 <div class="m-0 p-0 d-md-block d-lg-none">&nbsp;</div>

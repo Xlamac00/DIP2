@@ -1,6 +1,6 @@
 
 <div class="d-flex justify-content-between">
-    <h3 class="text-smallcaps">Edit issue:</h3>
+    <h3 class="text-smallcaps">{% trans %}btn_edit{% endtrans %} {% trans %}issue{% endtrans %}:</h3>
     <button type="button" class="close float-right gaugeCloseBtn" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
@@ -10,7 +10,7 @@
 <input type="hidden" id="issueEditId" value="{{ issue.id }}">
 <br>
 <button class="btn btn-success mx-auto pointer" style="display: block; width: 130px;"
-        id="issueEditSaveBtn">Save change</button>
+        id="issueEditSaveBtn">{% trans %}btn_save{% endtrans %}</button>
 
 {% if issue.canUserManage %}
     <div class="mt-5">
@@ -21,12 +21,13 @@
                         <i class="fas fa-2x fa-exclamation-triangle text-warning mt-2"></i>
                     </div>
                     <div class="col-10">
-                        <b class="float-left">Delete issue</b><br>
+                        <b class="float-left">{% trans %}btn_delete{% endtrans %} {% trans %}issue{% endtrans %}</b><br>
                         Permanently deletes this one issue.
                     </div>
                 </div>
             </div>
-            <button class="btn btn-outline-danger pointer float-right" id="issueEditDelete">Delete issue</button>
+            <button class="btn btn-outline-danger pointer float-right" id="issueEditDelete">
+                {% trans %}btn_delete{% endtrans %} {% trans %}issue{% endtrans %}</button>
         </div>
         <input type="hidden" id="issueDeleteId" value="{{ issue.pageId }}">
     </div>

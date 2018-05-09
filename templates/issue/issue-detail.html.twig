@@ -92,13 +92,13 @@
                         {% if issue.canUserWrite %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="gaugeAddNewBtn"
                                     value="{{ gaugeCount }}"
-                                    data-toggle="tooltip" data-placement="top" title="Add a new task">
+                                    data-toggle="tooltip" data-placement="top" title="{% trans %}tooltip_newTask{% endtrans %}">
                                 <i class="fas fa-2x fa-plus"></i>
                             </button>
                         {% elseif issue.thisuserrights.rights is constant('App\\Entity\\Issue::ROLE_WRITE')
                              and issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
                             <span class="startTooltip" data-toggle="tooltip"
-                                  data-placement="top" title="Must login to edit">
+                                  data-placement="top" title="{% trans %}tooltip_login{% endtrans %}">
                                 <button type="button" class="nobtn mx-2" disabled>
                                     <i class="fas fa-2x fa-plus"></i>
                                 </button>
@@ -107,27 +107,27 @@
                         {% if issue.canUserManage %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownDeadlineNew"
                                     value="{{ gaugeCount }}"
-                                    data-toggle="tooltip" data-placement="top" title="Manage deadlines">
+                                    data-toggle="tooltip" data-placement="top" title="{% trans %}tooltip_deadlines{% endtrans %}">
                                 <i class="fas fa-2x fa-stopwatch"></i>
                             </button>
                             <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
-                                  data-placement="top" title="User settings">
+                                  data-placement="top" title="{% trans %}tooltip_users{% endtrans %}">
                                 <div class="dropdown mx-2">
                                     <button type="button" class="nobtn pointer" id="gaugeEditBtn"
                                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
                                         <i class="fas fa-2x fa-users"></i>
                                     </button>
                                     <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
-                                         aria-labelledby="gaugeEditBtn" >
+                                         aria-labelledby="gaugeEditBtn">
                                         <button class="btn-link dropdown-item pointer"
                                            data-id="{{ issue.pageId }}"  data-color="secondary"
                                            data-toggle="modal" data-target="#modalIssueShare">
-                                            Share issue
+                                            {% trans %}btn_share{% endtrans %} {% trans %}issue{% endtrans %}
                                         </button>
                                         <button class="btn-link dropdown-item pointer"
                                                 data-id="{{ issue.pageId }}" data-color="#secondary"
                                                 data-toggle="modal" data-target="#modalIssueUsers">
-                                            Manage user rights
+                                           {% trans %}btn_manage_users{% endtrans %}
                                         </button>
                                     </div>
                                 </div>
@@ -137,7 +137,7 @@
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header text-light" id="modalEntityUsersHeader">
-                                            <h4 class="modal-title">Manage user rights</h4>
+                                            <h4 class="modal-title">{% trans %}btn_manage_users{% endtrans %}</h4>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -147,10 +147,11 @@
                                                id="usersIndividualLoading" style="display: none"></i>
                                             <span class="text-secondary">List of all users with rights to this issue.</span>
                                             <div id="modalIssueUsersBody">
-                                                <i class="fas fa-spinner fa-spin"></i> Loading data ...
+                                                <i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}
                                             </div>
                                             <div class="d-flex justify-content-between mt-2">
-                                                <button class="btn btn-primary float-left pointer" data-dismiss="modal" >Done</button>
+                                                <button class="btn btn-primary float-left pointer" data-dismiss="modal">
+                                                    {% trans %}btn_done{% endtrans %}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -163,7 +164,7 @@
                                  and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
                             or ( issue.canUserWrite and issue.isShareEnabled)) %}
                             <span class="startTooltip" data-toggle="tooltip"
-                                    data-placement="top" title="Share with other users">
+                                    data-placement="top" title="{% trans %}tooltip_share{% endtrans %}">
                                 <button type="button" class="nobtn mx-2 pointer"
                                         data-id="{{ issue.pageId }}" data-color="secondary"
                                         data-toggle="modal" data-target="#modalIssueShare">
@@ -176,14 +177,14 @@
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-body">
-                                        <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
+                                        <p><i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         {% if issue.canUserManage %}
                             <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
-                                  data-placement="top" title="Settings">
+                                  data-placement="top" title="{% trans %}btn_settings{% endtrans %}">
                                 <div class="dropdown mx-2">
                                     <button type="button" class="nobtn pointer" id="gaugeEditBtn"
                                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
@@ -191,15 +192,19 @@
                                     </button>
                                     <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
                                          aria-labelledby="gaugeEditBtn" >
-                                        <a class="dropdown-item pointer" id="dropdownGaugeBtn">Edit tasks</a>
-                                        <a class="dropdown-item pointer" id="dropdownIssueBtn">Edit issue</a>
-                                        <a class="dropdown-item pointer" id="dropdownRemindersBtn">Reminders</a>
+                                        <a class="dropdown-item pointer" id="dropdownGaugeBtn">
+                                            {% trans %}btn_edit{% endtrans %} {% trans %}gauges{% endtrans %}</a>
+                                        <a class="dropdown-item pointer" id="dropdownIssueBtn">
+                                            {% trans %}btn_edit{% endtrans %} {% trans %}issue{% endtrans %}</a>
+                                        <a class="dropdown-item pointer" id="dropdownRemindersBtn">
+                                            {% trans %}btn_reminders{% endtrans %}</a>
                                     </div>
                                 </div>
                             </span>
                         {% elseif issue.canUserEditGauge %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownGaugeBtn"
-                                    data-toggle="tooltip" data-placement="top" title="Edit tasks">
+                                    data-toggle="tooltip" data-placement="top"
+                                    title="{% trans %}btn_edit{% endtrans %} {% trans %}gauges{% endtrans %}">
                                 <i class="fas fa-2x fa-edit"></i>
                             </button>
                         {% endif %}

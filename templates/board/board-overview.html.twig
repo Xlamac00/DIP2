@@ -76,7 +76,7 @@
             <div class="float-right row">
                 {% if board.canUserManage %}
                     <span class="startTooltip mt-3" data-toggle="tooltip" id="settingsTooltip"
-                          data-placement="top" title="User settings">
+                          data-placement="top" title="{% trans %}tooltip_users{% endtrans %}">
                         <div class="dropdown mx-2">
                             <button type="button" class="nobtn pointer" id="gaugeEditBtn"
                                     data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
@@ -87,12 +87,12 @@
                                 <button class="btn-link dropdown-item pointer"
                                         data-id="{{ board.id }}" data-color="{{ board.color }}"
                                         data-toggle="modal" data-target="#modalShareBoard">
-                                    Share project
+                                    {% trans %}btn_share{% endtrans %} {% trans %}board{% endtrans %}
                                 </button>
                                 <button class="btn-link dropdown-item pointer"
                                         data-id="{{ board.id }}" data-color="{{ board.color }}"
                                         data-toggle="modal" data-target="#modalIssueUsers">
-                                    Manage user rights
+                                    {% trans %}btn_manage_users{% endtrans %}
                                 </button>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header" id="modalEntityUsersHeader">
-                                    <h4 class="modal-title">Manage user rights</h4>
+                                    <h4 class="modal-title">{% trans %}btn_manage_users{% endtrans %}</h4>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -113,10 +113,11 @@
                                        id="usersIndividualLoading" style="display: none"></i>
                                     <span class="text-secondary">Manage each user's rights to this project and all its issues.</span>
                                     <div id="modalIssueUsersBody">
-                                        <i class="fas fa-spinner fa-spin"></i> Loading data ...
+                                        <i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}
                                     </div>
                                     <div class="d-flex justify-content-between mt-2">
-                                        <button class="btn btn-primary float-left pointer" data-dismiss="modal" >Done</button>
+                                        <button class="btn btn-primary float-left pointer" data-dismiss="modal" >
+                                            {% trans %}btn_done{% endtrans %}</button>
                                     </div>
                                 </div>
                             </div>
@@ -125,7 +126,7 @@
                 {% elseif not board.isArchived
                     and board.isShareEnabled and board.thisuserrights.boardhistory is not null %}
                     <span class="startTooltip mt-3" data-toggle="tooltip"
-                          data-placement="bottom" title="Share with other users">
+                          data-placement="bottom" title="{% trans %}tooltip_share{% endtrans %}">
                         <button class="nobtn pointer" type="button" data-toggle="modal"
                                 data-target="#modalShareBoard">
                             <i class="fas fa-2x fa-share"></i>
@@ -136,32 +137,36 @@
                 <div class="dropdown mx-2 mt-3">
                     <button type="button" class="nobtn dropdown-toggle pointer"
                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
-                        <i class="fas fa-2x fa-cog "></i>
+                        <i class="fas fa-2x fa-cog"></i>
                     </button>
                     <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
                          aria-labelledby="dropdownMenuButton" >
                         {% if board.canUserManage %}
                             <button class="btn-link dropdown-item pointer" id="boardEditNameBtn"
                                     data-color="{{ board.color }}" data-name="{{ board.name }}" data-id="{{ board.pageId }}"
-                                    data-toggle="modal" data-target="#modalNewBoard">Edit project</button>
+                                    data-toggle="modal" data-target="#modalNewBoard">
+                                {% trans %}btn_edit{% endtrans %} {% trans %}board{% endtrans %}</button>
                             <button class="btn-link dropdown-item pointer" data-target="#modalEntityDelete"
                                     data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="project"
                                     data-color="{{ board.color }}" data-toggle="modal" data-operation="delete">
-                                Delete project</button>
+                                {% trans %}btn_delete{% endtrans %} {% trans %}board{% endtrans %}</button>
                             <button class="btn-link dropdown-item pointer" data-target="#modalEntityDelete"
                                     data-name="{{ board.name }}" data-id="{{ board.id }}" data-type="archive"
                                     data-color="{{ board.color }}" data-operation="archive" data-toggle="modal">
-                                Archive project</button>
+                                {% trans %}btn_archive{% endtrans %} {% trans %}board{% endtrans %}</button>
                             <button class="btn-link dropdown-item pointer" data-target="#modalEntityDuplicate"
                                     data-id="{{ board.id }}" data-color="{{ board.color }}"
-                                    data-toggle="modal">Duplicate project</button>
+                                    data-toggle="modal">
+                                {% trans %}btn_duplicate{% endtrans %} {% trans %}board{% endtrans %}</button>
                         {% else %}
                             <button class="btn-link dropdown-item pointer" data-target="#modalLeaveBoard"
-                                    data-toggle="modal">Leave project</button>
+                                    data-toggle="modal">
+                                {% trans %}btn_leave{% endtrans %} {% trans %}board{% endtrans %}</button>
                             {% if not(is_granted('ROLE_ANONYMOUS')) %}
                                 <button class="btn-link dropdown-item pointer" data-target="#modalEntityDuplicate"
                                         data-id="{{ board.id }}" data-color="{{ board.color }}"
-                                        data-toggle="modal">Duplicate project</button>
+                                        data-toggle="modal">
+                                    {% trans %}btn_duplicate{% endtrans %} {% trans %}board{% endtrans %}</button>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -192,16 +197,17 @@
                             <div class="modal-body">
                                 <p id="modalDeleteQuestion"></p>
                                 <span class="text-warning"><i class="fas fa-exclamation-triangle"></i>
-                            This change will be permanent!</span>
+                                    {% trans %}modal_permanent{% endtrans %}</span>
                                 <p id="modalIssueDeleteLoading" class="d-none">
-                                    <i class="fas fa-spinner fa-spin"></i> Sending ...</p>
+                                    <i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}</p>
                             </div>
                             <div class="modal-footer d-flex justify-content-start">
                                 <input type="hidden" id="modalIssueDeleteId" value="">
                                 <input type="hidden" id="modalEntityDeleteType" value="">
                                 <button type="button" class="btn btn-danger pointer"
-                                        id="modalEntityDeleteBtn">Delete</button>
-                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
+                                        id="modalEntityDeleteBtn">{% trans %}btn_delete{% endtrans %}</button>
+                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">
+                                    {% trans %}btn_close{% endtrans %}</button>
                             </div>
                         </div>
                     </div>
@@ -211,7 +217,9 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header {{ board.background }}">
-                                <h5 class="modal-title text-light">Leave {{ board.name }}</h5>
+                                <h5 class="modal-title text-light">
+                                    {% trans %}btn_leave{% endtrans %} {{ board.name }}
+                                </h5>
                                 <button type="button" class="close pointer" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -221,12 +229,13 @@
                                 <p class="text-secondary">You will loose the right to see/edit this project and all its
                                     issues .</p>
                                 <p id="modalLeaveBoardLoading" class="d-none">
-                                    <i class="fas fa-spinner fa-spin"></i> Sending ...</p>
+                                    <i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}</p>
                             </div>
                             <div class="modal-footer d-flex justify-content-start">
                                 <button type="button" class="btn btn-warning pointer text-light"
-                                        id="modalLeaveBoardBtn">Leave</button>
-                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
+                                        id="modalLeaveBoardBtn">{% trans %}btn_leave{% endtrans %}</button>
+                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">
+                                    {% trans %}btn_close{% endtrans %}</button>
                             </div>
                         </div>
                     </div>
@@ -237,7 +246,9 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header" id="modalDuplicateHeader">
-                                <h5 class="modal-title">Duplicate {{ board.name }}</h5>
+                                <h5 class="modal-title">
+                                    {% trans %}btn_duplicate{% endtrans %} {{ board.name }}
+                                </h5>
                                 <button type="button" class="close pointer" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -256,13 +267,14 @@
                                         this day, but will have the duration of deadlines in this project.</p>
                                 </div>
                                 <p id="modalDuplicateLoading" class="d-none">
-                                    <i class="fas fa-spinner fa-spin"></i> Sending ...</p>
+                                    <i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}</p>
                             </div>
                             <div class="modal-footer d-flex justify-content-start">
                                 <input type="hidden" id="modalDuplicateId" value="">
                                 <button type="button" class="btn btn-success pointer"
-                                        id="modalDuplicateBtn">Duplicate</button>
-                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">Close</button>
+                                        id="modalDuplicateBtn">{% trans %}btn_duplicate{% endtrans %}</button>
+                                <button type="button" class="btn btn-secondary pointer" data-dismiss="modal">
+                                    {% trans %}close{% endtrans %}</button>
                             </div>
                         </div>
                     </div>
@@ -272,7 +284,7 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
+                            <p><i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}</p>
                         </div>
                     </div>
                 </div>
@@ -281,7 +293,7 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <p><i class="fas fa-spinner fa-spin"></i> Loading data ...</p>
+                            <p><i class="fas fa-spinner fa-spin"></i> {% trans %}loading{% endtrans %}</p>
                         </div>
                     </div>
                 </div>
@@ -293,7 +305,8 @@
                             <input type="text" placeholder="New issue name" class="pointer borderless w-100 form-control"
                                    id="dashboardIssueName">
                             <div class="mt-3" id="dashboardIssueButtons" style="display: none">
-                                <button class="btn btn-success" id="dashboardIssueCreateBtn">Create</button>
+                                <button class="btn btn-success" id="dashboardIssueCreateBtn">
+                                    {% trans %}btn_create{%  endtrans %}</button>
                                 <button type="button" class="close float-right gaugeCloseBtn mt-1" aria-label="Close"
                                         id="dashboardIssueNameClose">
                                     <span aria-hidden="true">&times;</span>
@@ -316,29 +329,29 @@
                     <input type="hidden" id="startTips" value="createNewIssue">
                     <div class="tips-text-60 d-none mt-5" style="left: 30%" id="createNewIssueTipBig">
                         <div class="d-flex justify-content-between">
-                            <span> Perfect! </span>
+                            <span> {% trans %}tip_ok_4{% endtrans %} </span>
                             <button type="button" class="nobtn mx-2 startTooltip tipsHideForever"
-                                    data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
-                                Turn hints off
+                                    data-toggle="tooltip" data-placement="bottom" title="{% trans %}hide_title{% endtrans %}">
+                                {% trans %}hide_text{% endtrans %}
                             </button>
                         </div>
-                        <p class="pl-2">Divide your project into issues to structure your work.</p>
-                        <p class="pl-2">You can manage users in each issue individually or invite them all together.</p>
+                        <p class="pl-2">{% trans %}tip_board_issue_1{% endtrans %}</p>
+                        <p class="pl-2">{% trans %}tip_board_issue_2{% endtrans %}</p>
                         <img src="{{ asset('build/images/arrow_left.b4009a0c.png') }}" width="150px" class="mt-3">
                         <span class="float-right mr-2 mt-5 pointer tips-check">
-                            <i class="fas fa-check"></i> Ok, thanks!
+                            <i class="fas fa-check"></i> {% trans %}tip_ok_1{% endtrans %}
                         </span>
                     </div>
                     <div class="tips-text-small d-none" style="top: 80px" id="createNewIssueTipSmall">
                         <div class="d-flex justify-content-between">
                             <img src="{{ asset('build/images/arrow_top.fc5ac9dd.png') }}" width="150px" class="ml-5">
                             <button type="button" class="nobtn startTooltip tipsHideForever">
-                                Turn hints off
+                                {% trans %}hide_text{% endtrans %}
                             </button>
                         </div>
-                        <p class="pl-2">Divide your project into issues to structure your work.</p>
+                        <p class="pl-2">{% trans %}tip_board_issue_1{% endtrans %}</p>
                         <span class="float-right mr-2 mt-2 pointer text-light tips-check">
-                            <i class="fas fa-check"></i> Ok, thanks!
+                            <i class="fas fa-check"></i> {% trans %}tip_ok_1{% endtrans %}
                         </span>
                     </div>
                 {% elseif showShareTip == true and
@@ -347,27 +360,26 @@
                     <div class="tips-text-top-50 d-none mt-5 pl-5 pt-3"  id="sharingTipBig">
                         <div class="d-flex justify-content-between">
                             <button type="button" class="nobtn mx-2 startTooltip pointer tipsHideForever text-light"
-                                    data-toggle="tooltip" data-placement="bottom" title="Don't show any future tips">
-                               Turn hints off
+                                    data-toggle="tooltip" data-placement="bottom" title="{% trans %}hide_title{% endtrans %}">
+                                {% trans %}hide_text{% endtrans %}
                             </button>
                             <img src="{{ asset('build/images/arrow_top_right.c2debfbb.png') }}"
                                  width="150px" class="mr-5 pr-3">
                         </div>
-                        <p class="pl-2">Share whole project easily with anyone by link, e-mail or
-                            their in-app name.</p>
-                        <p class="pl-2">Manage everyone's access rights individually.</p>
-                        <p class="pl-2 text-secondary">TIP: You can also share each issue separately in issue settings.</p>
+                        <p class="pl-2">{% trans %}tip_board_share_1{% endtrans %}</p>
+                        <p class="pl-2">{% trans %}tip_board_share_3{% endtrans %}</p>
+                        <p class="pl-2 text-secondary">{% trans %}tip_board_share_4{% endtrans %}</p>
                         <span class="float-right mr-2 pointer text-light tips-check">
-                            <i class="fas fa-check"></i> Perfect!
+                            <i class="fas fa-check"></i> {% trans %}tip_ok_4{% endtrans %}
                         </span>
                     </div>
                     <div class="tips-text-top-small d-none mt-3" id="sharingTipSmall">
                         <img src="{{ asset('build/images/arrow_top_right.c2debfbb.png') }}"
                              width="150px" class="mr-5 float-right">
-                        <p class="pl-2">Share project by link, e-mail or in-app name.</p>
-                        <p class="pl-2">Manage everyone's access rights individually.</p>
+                        <p class="pl-2">{% trans %}tip_board_share_2{% endtrans %}</p>
+                        <p class="pl-2">{% trans %}tip_board_share_3{% endtrans %}</p>
                         <span class="float-right mr-2 mt-2 pointer text-light tips-check">
-                            <i class="fas fa-check"></i> Perfect!
+                            <i class="fas fa-check"></i> {% trans %}tip_ok_4{% endtrans %}
                         </span>
                     </div>
                 {% endif %}
