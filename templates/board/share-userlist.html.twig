@@ -13,11 +13,12 @@
 {% endif %}
 {% for role in users %}
     <tr>
-        <td class="pb-0">{{ include('user/user-icon.html.twig', {'user': role.user, 'size': 'small'}) }}</td>
-        <td class="pb-0"><span class="userName {% if role.isActive != 1 or not role.isShareEnabled %}text-secondary{% endif %}"
+        <td class="py-1">{{ include('user/user-icon.html.twig', {'user': role.user, 'size': 'small'}) }}</td>
+        <td class="py-1"><span class="userName {% if role.isActive != 1 or not role.isShareEnabled %}text-secondary{%
+            endif %}"
                   id="modalShareUser{{ role.user.uniquelink }}">{{ role.user.username }}</span>
         </td>
-        <td class="pb-0">
+        <td class="py-1">
             {% if role.rights is constant('App\\Entity\\Board::ROLE_ADMIN') %}
                 <span class="text-secondary">Is owner</span>
             {% elseif role.isBoardHistory or (role.issueHistory is defined and role.isIssueHistory) %}
@@ -65,7 +66,7 @@
                 </select>
             {% endif %}
         </td>
-        <td class="pb-0">
+        <td class="py-1">
             {% if role.rights is not constant('App\\Entity\\Board::ROLE_ADMIN') %}
                 <button class="nobtn pointer userRemove"  data-toggle="tooltip"
                         data-placement="top" title="Remove {{ role.user.username }}"
@@ -77,9 +78,9 @@
     {% if gauges is defined %}
         <tr class="{% if role.isActive != 1 or role.isShareEnabled != 1%}d-none{% endif %}"
             id="modalUserAssign{{ role.user.uniquelink }}">
-            <td class="border-top-0 py-1"></td>
-            <td class="text-secondary border-top-0 py-1"></td>
-            <td class="border-top-0 py-1">
+            <td class="border-top-0 pb-1 pt-0"></td>
+            <td class="text-secondary border-top-0 pb-1 pt-0"></td>
+            <td class="border-top-0 pb-1 pt-0">
                 {% set userArray = [] %}
                 {% for gauge in gauges %}
                     {% if gauge.bindUserId != role.user.id %}
@@ -106,7 +107,7 @@
                     {% endif %}
                 {% endfor %}
             </td>
-            <td class="border-top-0 py-1"></td>
+            <td class="border-top-0 pb-1 pt-0"></td>
         </tr>
     {% endif %}
 {% endfor %}

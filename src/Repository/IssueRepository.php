@@ -236,14 +236,15 @@ class IssueRepository extends AbstractSharableEntityRepository {
       if($key == $gaugeIndex) { // correct gauge (ordered)
         $gauge = new GaugeRepository($this->registry);
         $gauge->getGauge($data->getId());
-        $newValue = $gauge->gaugeValueChange($value);
+        $newValue = round($gauge->gaugeValueChange($value));
         $changeId = $gauge->gaugeValueLog($value, $userId);
-        $oldValue = $gauge->getPreviousValue($changeId);
+        $oldValue = round($gauge->getPreviousValue($changeId));
         return
           ['color' => $data->getColor(),
-            'name' => $data->getName(),
-           'oldValue' => round($oldValue),
-           'newValue' => round($newValue)];
+           'name' => $data->getName(),
+           'oldValue' => $oldValue,
+           'newValue' => $newValue,
+           'newValueText' => ($newValue <= 2 ? 0 : $newValue)];
       }
     }
     return ["error"];

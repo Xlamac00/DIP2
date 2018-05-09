@@ -172,6 +172,7 @@ class AjaxIssueController extends Controller {
       /** @var GaugeRepository $gaugeRepository */
       $gaugeRepository = $this->getDoctrine()->getRepository(Gauge::class);
       $result = $gaugeRepository->gaugeValueDiscard($issue);
+      if($result['newValue'] <= 2) $result['newValue'] = 2;
 
       $arrData =
         ['newValue' => $result['newValue'],
@@ -217,7 +218,7 @@ class AjaxIssueController extends Controller {
 
       $entityManager = $this->getDoctrine()->getManager();
       $gauge = new Gauge();
-      $gauge->setValue(1);
+      $gauge->setValue(0);
       $gauge->setName($name);
       $gauge->setColor($color);
       $gauge->setIssue($issue);

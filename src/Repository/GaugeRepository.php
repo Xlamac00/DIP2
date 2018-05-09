@@ -118,6 +118,8 @@ class GaugeRepository extends ServiceEntityRepository  {
     $value = round($newValue, 1);
     $this->gauge->setValue($value);
     $this->manager->flush();
+//    if($value <= 2) return 0;
+//    else return $value;
     return $value;
   }
 
@@ -143,7 +145,7 @@ class GaugeRepository extends ServiceEntityRepository  {
   public function gaugeValueInit($gauge, $user) {
     $change = new GaugeChanges();
     $change->setGauge($gauge);
-    $change->setValues(1);
+    $change->setValues(0);
     $change->setUser($user);
     $this->manager->persist($change);
     $this->manager->flush();

@@ -22,12 +22,13 @@
                         and issue.isShareEnabled
                         and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
                         or ( issue.canUserWrite and issue.isShareEnabled)%}
-                        <button class="dropdown-item pointer issueShare btn-link px-3 py-1" data-id="{{ issue.pageId }}"
+                        <button class="dropdown-item pointer issueShare btn-link px-3 py-1"
+                                data-id="{{ issue.pageId }}"  data-color="secondary"
                                 data-toggle="modal" data-target="#modalIssueShare">Share issue</button>
                     {% endif %}
                     {% if issue.canUserManage %}
                         <button class="btn-link dropdown-item pointer px-3 py-1"
-                                data-id="{{ issue.pageId }}"
+                                data-id="{{ issue.pageId }}" data-color="#secondary"
                                 data-toggle="modal" data-target="#modalIssueUsers">Manage users
                         </button>
                         <button class="dropdown-item pointer btn-link px-3 py-1" data-target="#modalEntityDelete"

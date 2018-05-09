@@ -4,7 +4,7 @@
     <input type="hidden" id="modal{{ issue.pageId }}id" value="{{ issue.id }}">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-secondary" id="modal{{ issue.pageId }}Header">
                 <h4 class="modal-title" id="exampleModalLongTitle">Share {{ issue.name }}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -14,24 +14,26 @@
                 <div id="modal{{ issue.pageId }}PrimarySection">
                     <div class="clearfix">
                         <div class="d-flex justify-content-between">
-                            <h5>
-                                Share issue via link
-                                <span class="startTooltip question
-                                      {% if not issue.isOldShareRights and issue.isShareEnabled %}d-none{% endif %}"
-                                      id="issueLinkClose" data-toggle="tooltip" data-placement="bottom"
-                                      title="Issue share-link is not linked to project share-link: it won't be
-                                      affected by changes to project share-link until this is restored to it's
-                                      original value">
-                                    <i class="fas fa-unlink" style="color: {{ issue.board.color }}"></i>
-                                </span>
-                                <span class="startTooltip question
-                                        {% if issue.isOldShareRights or not issue.isShareEnabled %}d-none{% endif %}"
-                                      id="issueLinkOpen" data-toggle="tooltip" data-placement="bottom"
-                                      title="Issue share-link is linked with project share-link: any change will affect
-                                      this issue as well.">
-                                    <i class="fas fa-link" style="color: {{ issue.board.color }}"></i>
-                                </span>
-                            </h5>
+                            <div class="row px-3">
+                                <h5>Share issue via link</h5>
+                                {% if issue.canUserManage %}
+                                    <span class="startTooltip question px-3
+                                          {% if not issue.isOldShareRights and issue.isShareEnabled %}d-none{% endif %}"
+                                          id="issueLinkClose" data-toggle="tooltip" data-placement="bottom"
+                                          title="Issue share-link is not linked to project share-link: it won't be
+                                          affected by changes to project share-link until this is restored to it's
+                                          original value">
+                                        <i class="fas fa-unlink" style="color: {{ issue.board.color }}"></i>
+                                    </span>
+                                    <span class="startTooltip question px-3
+                                            {% if issue.isOldShareRights or not issue.isShareEnabled %}d-none{% endif %}"
+                                          id="issueLinkOpen" data-toggle="tooltip" data-placement="bottom"
+                                          title="Issue share-link is linked with project share-link: any change will affect
+                                          this issue as well.">
+                                        <i class="fas fa-link" style="color: {{ issue.board.color }}"></i>
+                                    </span>
+                                {% endif %}
+                            </div>
                             {% if issue.canUserManage %}
                                 <div class="dropdown">
                                     <button type="button" class="nobtn float-right text-dark mt-1 pointer"

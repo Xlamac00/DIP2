@@ -16,7 +16,7 @@
             datasets: [{
                 data: [
                     {% for gauge in gauges %}
-                    '{{ gauge.value }}',
+                    '{{ gauge.graphValue }}',
                     {% endfor %}
                 ],
                 backgroundColor: [

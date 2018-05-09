@@ -7,6 +7,7 @@ $(document).ready(function() {
     $('#modalIssueShare').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var id = button.data('id');
+        var color = button.data('color');
         $.ajax({
             url: '/ajax/issueGetShareModal',
             type: "POST",
@@ -17,6 +18,10 @@ $(document).ready(function() {
                 var modal = document.getElementById('modalIssueShare');
                 modal.innerHTML = data.render;
                 initEntitySharing('modal'+data.link, data.link);
+                if(color !== null) {
+                    var header = document.getElementById('modal'+data.link+'Header');
+                    header.className = 'modal-header text-white bg-'+color;
+                }
                 var copyText = document.getElementById("modal"+data.link+"Link");
                 copyText.select();
             }
@@ -25,6 +30,9 @@ $(document).ready(function() {
     $('#modalIssueUsers').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var id = button.data('id');
+        var color = button.data('color').substr(1);
+        var header = document.getElementById('modalEntityUsersHeader');
+        header.className = 'modal-header text-white bg-'+color;
         $.ajax({
             url: '/ajax/entityGetUserlist',
             type: "POST",

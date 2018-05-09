@@ -142,6 +142,11 @@ class Gauge {
     return $this->value;
   }
 
+  public function getGraphValue() {
+    if($this->value <= 2) return 2;
+    else return $this->value;
+  }
+
   public function setValue($value) {
     $this->value = $value;
   }

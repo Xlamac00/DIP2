@@ -92,13 +92,13 @@
                         {% if issue.canUserWrite %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="gaugeAddNewBtn"
                                     value="{{ gaugeCount }}"
-                                    data-toggle="tooltip" data-placement="bottom" title="Add a new task">
+                                    data-toggle="tooltip" data-placement="top" title="Add a new task">
                                 <i class="fas fa-2x fa-plus"></i>
                             </button>
                         {% elseif issue.thisuserrights.rights is constant('App\\Entity\\Issue::ROLE_WRITE')
                              and issue.shareRights is constant('App\\Entity\\Issue::ROLE_ANON') %}
                             <span class="startTooltip" data-toggle="tooltip"
-                                  data-placement="bottom" title="Must login to edit">
+                                  data-placement="top" title="Must login to edit">
                                 <button type="button" class="nobtn mx-2" disabled>
                                     <i class="fas fa-2x fa-plus"></i>
                                 </button>
@@ -107,11 +107,11 @@
                         {% if issue.canUserManage %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownDeadlineNew"
                                     value="{{ gaugeCount }}"
-                                    data-toggle="tooltip" data-placement="bottom" title="Manage deadlines">
+                                    data-toggle="tooltip" data-placement="top" title="Manage deadlines">
                                 <i class="fas fa-2x fa-stopwatch"></i>
                             </button>
                             <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
-                                  data-placement="bottom" title="User settings">
+                                  data-placement="top" title="User settings">
                                 <div class="dropdown mx-2">
                                     <button type="button" class="nobtn pointer" id="gaugeEditBtn"
                                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
@@ -120,12 +120,12 @@
                                     <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
                                          aria-labelledby="gaugeEditBtn" >
                                         <button class="btn-link dropdown-item pointer"
-                                           data-id="{{ issue.pageId }}"
+                                           data-id="{{ issue.pageId }}"  data-color="secondary"
                                            data-toggle="modal" data-target="#modalIssueShare">
                                             Share issue
                                         </button>
                                         <button class="btn-link dropdown-item pointer"
-                                                data-id="{{ issue.pageId }}"
+                                                data-id="{{ issue.pageId }}" data-color="#secondary"
                                                 data-toggle="modal" data-target="#modalIssueUsers">
                                             Manage user rights
                                         </button>
@@ -136,7 +136,7 @@
                                  id="modalIssueUsers">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
-                                        <div class="modal-header text-dark">
+                                        <div class="modal-header text-light" id="modalEntityUsersHeader">
                                             <h4 class="modal-title">Manage user rights</h4>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
@@ -163,9 +163,9 @@
                                  and issue.sharerights  is  constant ('App\\Entity\\Issue::ROLE_READ'))
                             or ( issue.canUserWrite and issue.isShareEnabled)) %}
                             <span class="startTooltip" data-toggle="tooltip"
-                                    data-placement="bottom" title="Share with other users">
+                                    data-placement="top" title="Share with other users">
                                 <button type="button" class="nobtn mx-2 pointer"
-                                        data-id="{{ issue.pageId }}"
+                                        data-id="{{ issue.pageId }}" data-color="secondary"
                                         data-toggle="modal" data-target="#modalIssueShare">
                                     <i class="fas fa-2x fa-share"></i>
                                 </button>
@@ -183,7 +183,7 @@
                         </div>
                         {% if issue.canUserManage %}
                             <span class="startTooltip" data-toggle="tooltip" id="settingsTooltip"
-                                  data-placement="bottom" title="Settings">
+                                  data-placement="top" title="Settings">
                                 <div class="dropdown mx-2">
                                     <button type="button" class="nobtn pointer" id="gaugeEditBtn"
                                             data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
@@ -199,7 +199,7 @@
                             </span>
                         {% elseif issue.canUserEditGauge %}
                             <button type="button" class="nobtn mx-2 startTooltip pointer" id="dropdownGaugeBtn"
-                                    data-toggle="tooltip" data-placement="bottom" title="Edit tasks">
+                                    data-toggle="tooltip" data-placement="top" title="Edit tasks">
                                 <i class="fas fa-2x fa-edit"></i>
                             </button>
                         {% endif %}

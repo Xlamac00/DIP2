@@ -40,14 +40,23 @@ $(document).ready(function() {
         if (changeActive === true) { //the mouse was pressed over a graph bar
             var base = (getChartMetaData().data[changeBar]._model.base);
             var perc = (base - offsetY) / (base / 100);
-            if (perc <= 1 || perc > 98) { // redraw and stop
+            if (perc < 2 || perc > 98) { // redraw and stop
                 var oldPerc = (base - changeOld['y']) / (base / 100);
-                if(oldPerc < 1.5 && perc < 1.5) // old value was also low -> unintended behaviour
+                if(oldPerc <= 2.5 && perc <= 2 && perc >= 0) {// old value was also low -> unintended behaviour
+                    // updateGraphValue(false, perc);
                     return;
-                console.log("Ending active mode");
-                perc = perc <= 1 ? 1 : 100;
+                }
+                console.log("Ending active mode"+perc+","+oldPerc+','+oldValue);
+                perc = perc <= 2 ? 2 : 100;
                 changeActive = false;
-                ajaxUpdateGraph(perc);
+                if(oldValue !== null && oldValue == 2 && perc === 2)
+                    updateGraphValue(false, perc);
+                else {
+                    console.log('sending: '+perc+','+oldValue);
+                    ajaxUpdateGraph(perc);
+                }
+                // else
+                //     updateGraphValue(false, perc);
             }
             else { // redraw the graph
                 chart.data.datasets[0].data[changeBar] = perc;
@@ -85,14 +94,15 @@ $(document).ready(function() {
     // Checks if the mouse was pressed over a graph bar and if so,
     // switches the bar into active mode and saves the coordinates
     // of original bar to draw the old line
+    var oldValue = null;
     function chartMouseDownEvent(offsetX, offsetY, touchScreen) {
         var bar = wasClickedOnBar(offsetX, offsetY, touchScreen);
         // check if user has rights to edit this gauge
         if (bar !== false && commentActive === false && gaugeRights[bar] === true) {
-            console.log('mouse down');
             var coords = getChartMetaData().data[bar]._model;
             changeActive = true;
             changeBar = bar;
+            oldValue = chart.data.datasets[0].data[changeBar];
             changeOld = {
                 "x1": (coords.x - coords.width / 2),
                 "x2": (coords.x + coords.width / 2),
@@ -110,7 +120,9 @@ $(document).ready(function() {
         if (changeActive) {
             changeActive = false;
             var newValue = chart.data.datasets[0].data[changeBar];
-            ajaxUpdateGraph(newValue);
+            if(oldValue !== null && oldValue !== newValue) {
+                ajaxUpdateGraph(newValue);
+            }
         }
     }
 
@@ -657,7 +669,7 @@ $(document).ready(function() {
                 updateGraphValue(true, data.newValue); // redraw graph value and stop
                 $("#gaugeCommentHeadline").css('color', data.color);
                 document.getElementById('gaugeCommentHeadline').innerHTML =
-                    data.name + ": " + data.oldValue + " <i class=\"fas fa-angle-right\"></i> <b>" + data.newValue + "</b> %";
+                    data.name + ": " + data.oldValue + " <i class=\"fas fa-angle-right\"></i> <b>" + data.newValueText + "</b> %";
                 hideAllSections();
                 $("#gaugeCommentSection").css('display', 'block');
                 $("#gaugeChangeCommit").css('display', 'flex');

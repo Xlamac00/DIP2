@@ -76,7 +76,7 @@
             <div class="float-right row">
                 {% if board.canUserManage %}
                     <span class="startTooltip mt-3" data-toggle="tooltip" id="settingsTooltip"
-                          data-placement="bottom" title="User settings">
+                          data-placement="top" title="User settings">
                         <div class="dropdown mx-2">
                             <button type="button" class="nobtn pointer" id="gaugeEditBtn"
                                     data-toggle="dropdown" aria-haspopup="false" aria-expanded="true">
@@ -85,12 +85,12 @@
                             <div class="dropdown-menu my-dropdown dropdown-menu-right mt-2"
                                  aria-labelledby="gaugeEditBtn" >
                                 <button class="btn-link dropdown-item pointer"
-                                        data-id="{{ board.id }}"
+                                        data-id="{{ board.id }}" data-color="{{ board.color }}"
                                         data-toggle="modal" data-target="#modalShareBoard">
                                     Share project
                                 </button>
                                 <button class="btn-link dropdown-item pointer"
-                                        data-id="{{ board.id }}"
+                                        data-id="{{ board.id }}" data-color="{{ board.color }}"
                                         data-toggle="modal" data-target="#modalIssueUsers">
                                     Manage user rights
                                 </button>
@@ -102,7 +102,7 @@
                          id="modalIssueUsers">
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
-                                <div class="modal-header text-dark">
+                                <div class="modal-header" id="modalEntityUsersHeader">
                                     <h4 class="modal-title">Manage user rights</h4>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>

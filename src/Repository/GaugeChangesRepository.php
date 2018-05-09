@@ -59,8 +59,10 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
       ->getQuery();
     $result = $qb->execute();
     if(!isset($result[1]))
-      return round($result[0]['newValue']);
-    else return round($result[1]['newValue']);
+      $value = round($result[0]['newValue']);
+    else $value = round($result[1]['newValue']);
+    if($value <= 2) return 0;
+    else return $value;
   }
 
   public function getNewestChange($issue_id) {
@@ -114,8 +116,8 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
     /** @var GaugeChanges $item */
     foreach($result as $key => $item) {
       $old = $this->getOldValue($item->getGauge()->getId(), $item->getId());
-      if($old == 1 && $item->getValue() == 1) unset($result[$key]);
-      else  $item->setOldValue($old);
+      $item->setOldValue($old);
+      if($item->getOldValue() == 0 && $item->getValue() == 0) unset($result[$key]);
     }
     return $result;
   }
@@ -140,14 +142,15 @@ class GaugeChangesRepository  extends ServiceEntityRepository  {
    */
   public function gaugeCommentSave($issue_id, $text) {
     $gauge_id = $this->getNewestGauge($issue_id);
-    $this->getGaugeChange($gauge_id['change']);
+    $change = $this->getGaugeChange($gauge_id['change']);
     $this->gaugeChange->setText($text);
     $this->manager->flush();
+    $change->setOldValue($this->getOldValue($gauge_id['gauge'], $this->gaugeChange->getId()));
     return
       ['time' => $this->gaugeChange->getTime(),
         'timeText' => $this->gaugeChange->getTimeText(),
        'value' => $this->gaugeChange->getValue(),
-       'oldValue' => $this->getOldValue($gauge_id['gauge'], $this->gaugeChange->getId()),
+       'oldValue' => $change->getOldValue(),
        'text' => $this->gaugeChange->getText(),
         'user' => $this->gaugeChange->getUser(),
        'gauge' =>

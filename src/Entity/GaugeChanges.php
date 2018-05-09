@@ -58,6 +58,8 @@ class GaugeChanges {
   }
 
   public function getOldValue() {
+    if($this->oldValue <= 2) return 0;
+    else return $this->oldValue;
     return $this->oldValue;
   }
 
@@ -66,7 +68,10 @@ class GaugeChanges {
   }
 
   public function getValue() {
-    return round($this->newValue);
+    $v = round($this->newValue);
+    if($v <= 2) return 0;
+    else return $v;
+    return $v;
   }
 
   public function getGauge(): Gauge {
