@@ -42,6 +42,7 @@ Encore
     .addEntry('slide2a', './assets/img/slide_2a.jpeg')
     .addEntry('slide2b', './assets/img/slide_2b.gif')
     .addEntry('slide3', './assets/img/slide_3.jpeg')
+    .addEntry('logo', './assets/img/logo.png')
 
     .createSharedEntry('vendor', [
         './assets/js/bootstrap.bundle.min.js',

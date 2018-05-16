@@ -27,7 +27,9 @@
             {% if board is defined %}{% if board.isArchived %}bg-secondary{% else %}{{ board.background }}{% endif %}
             {%  else  %}my-primary-dark{% endif %}">
             <div class="container">
-                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5">Myte</a>
+                <a href="{{ url('dashboard') }}" class="navbar-brand mr-5 m-0 p-0">
+                    <img src="{{ asset('build/images/logo.15ff2d0a.png') }}" height="38px" class="m-0 p-0">
+                </a>
                 <div class="btn-group">
                     {% if board is defined %}
                         <a href="../../{{ board.url }}">
